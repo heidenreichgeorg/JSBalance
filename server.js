@@ -338,7 +338,7 @@ app.get('/SAVE/', (req, res) => {
 
 
 // show convenience link to create and load a new browser window
-app.listen(PORT, () => { console.log(`Login     http://localhost:${PORT}/WELCOME.HTML`); })
+app.listen(PORT, () => { console.log(`Login     http://localhost:${PORT}/WELCOMEDROP.HTML`); })
 
 
 function phaseOne(addrT, logT, aoaCells) {
