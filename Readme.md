@@ -49,3 +49,10 @@
 # from TABLE columns 'G' on, in the TABLES's transaction rows all values are numeric with a , letter for the cents fraction and . letter for powers of thousands 
 
 
+# Assumptions Server
+# fiscal year runs from 01/01 to 12/31
+# all amounts are in Euros, and in mainland encoding
+# from TABLE columns 'G' on, in the TABLES's transaction rows all values are numeric with a , letter for the cents fraction and . letter for powers of thousands 
+
+
+
