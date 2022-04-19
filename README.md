@@ -19,7 +19,7 @@
 # The limiting columns is then called ASSETS
 # Subsequent columns shall be for Gain/Loss accounts i.e. revenues and cost
 # The limiting columns is then called EQLIAB
-# Subsequent columns shall be for Equity/Liabilty accounts, 
+# Subsequent columns shall be for Equity/Liability accounts, 
 # preferably starting with long-term liabilities, short-term liabilities, then short-term-equity and then fixed equity
 
 # Assumptions Excel Rows
