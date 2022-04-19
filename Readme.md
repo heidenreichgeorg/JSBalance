@@ -45,5 +45,7 @@
 
 # Assumptions Server
 # fiscal year runs from 01/01 to 12/31
-# all amounts are in Euros, column for the cents fraction and . for powers of thousands 
+# all amounts are in Euros, 
+# from TABLE columns 'G' on, in the TABLES's transaction rows all values are numeric with a , letter for the cents fraction and . letter for powers of thousands 
+
 
