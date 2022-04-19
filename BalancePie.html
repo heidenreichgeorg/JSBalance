@@ -1,0 +1,257 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
+        <!--SCRIPT type="text/javascript" src="/money.js"></NOSCRIPT -->
+
+<SCRIPT  type="text/javascript">
+    const debug=null;
+/*
+    var strServerDNS = 'http://'+self.location.hostname+':81/';
+
+    const D_Balance= "Bilanz";
+    const D_History = "Historie";
+    const D_Schema = "Schema";
+*/
+
+    // Chart.js data
+    const arrNumbers = [0,1,2,3,4,5,6,7,8,9];
+    const arrBorderColor=[
+        // from Charts.js sample
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102,255, 1)',
+        'rgba(255, 159, 64, 1)',
+
+        // earthtone
+        'rgba(219, 204,204, 1)',
+        'rgba(143, 170,179, 1)',
+        'rgba(196, 189,139, 1)',
+        'rgba(129, 177, 79, 1)',
+        'rgba( 69,  27,  4, 1)',
+
+        // camouflage
+        'rgba( 96,  68, 57, 1)',
+        'rgba(158, 154,117, 1)',
+        'rgba( 31,  37, 49, 1)',
+        'rgba( 65,  83, 59, 1)',
+        'rgba( 85,  72, 64, 1)',
+
+        // hatsune miku
+        'rgba( 55,  59, 62, 1)',
+        'rgba(190, 200,209, 1)',
+        'rgba(134, 206,203, 1)',
+        'rgba( 19, 122,127, 1)',
+        'rgba(225,  40,133, 1)'
+ 
+
+                            ];
+
+    const  arrBackgroundColor = [
+        'rgba(255, 99, 132, 0.5)',
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 206, 86, 0.5)',
+        'rgba( 75, 192,192, 0.5)',
+        'rgba(153, 102,255, 0.5)',
+        'rgba(255, 159, 64, 0.5)',
+
+        'rgba(219, 204,204, 0.5)',
+        'rgba(143, 170,179, 0.5)',
+        'rgba(196, 189,139, 0.5)',
+        'rgba(129, 177, 79, 0.5)',
+        'rgba( 69,  27,  4, 0.5)',
+
+        'rgba( 96,  68, 57, 0.5)',
+        'rgba(158, 154,117, 0.5)',
+        'rgba( 31,  37, 49, 0.5)',
+        'rgba( 65,  83, 59, 0.5)',
+        'rgba( 85,  72, 64, 0.5)',
+
+        'rgba( 55,  59, 62, 0.5)',
+        'rgba(190, 200,209, 0.5)',
+        'rgba(134, 206,203, 0.5)',
+        'rgba( 19, 122,127, 0.5)',
+        'rgba(225,  40,133, 0.5)'
+ 
+                            ];
+
+</SCRIPT>
+
+
+<!DOCTYPE html>    
+
+<HTML>
+    <HEAD>
+        <meta charset="ISO-8859-1">
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />        
+        <TITLE>Mobile Balance</TITLE>        
+    </HEAD>        
+    <BODY>
+    
+        <DIV class="witBorder">
+			<DIV class="mTable">
+        
+        <!-- button to start reading the file , added DIV C100-->
+        <DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
+        
+<!-- balance string contents will be placed here 
+        <pre id="strTarget"></pre>
+        <pre id="strText"></pre>
+        <pre id="strBalance"></pre>
+-->
+        <DIV class="attrLine" id="welcome"></DIV>
+
+
+        <!--canvas id="barChart" width="1200" height="500"></canvas -->
+        <div class="chart-container" style="position: relative; height:40vh; width:40vw">
+            <canvas id="assetsPieChart"></canvas>
+        </div>
+        <div class="chart-container" style="position: relative; height:40vh; width:40vw">
+            <canvas id="eqliabPieChart"></canvas>
+        </div>
+        <SCRIPT type="text/javascript">
+
+            
+                        
+            function putResponse(strTarget,strText) {       
+
+                var response = JSON.parse(strText);
+                var jAccounts = response[D_Balance];
+                var jHistory  = response[D_History];
+                var gSchema = response[D_Schema];
+                if(gSchema) {
+                    var author=gSchema.author;
+                    var residence=gSchema.residence;
+                    var iban=gSchema.iban;
+                    var register=gSchema.register;
+                    var taxnumber=gSchema.taxnumber;
+                    var reportYear=gSchema.reportYear;
+                    var client=gSchema.client;
+
+                    var welcome = document.getElementById("welcome");
+                    welcome.innerHTML = "<DIV class='L220'>&nbsp;"
+                        +"</DIV><DIV class='L220'>"+client
+                    +"</DIV><DIV class='L220'>"+register+"&nbsp;"+taxnumber
+                    +"</DIV><DIV class='L220'>&nbsp;"
+                        +"</DIV><DIV class='L220'>"+iban+"&nbsp;"+reportYear
+                    +"</DIV><DIV class='L220'>"+author+"&nbsp;"+residence
+                    +"</DIV>";
+                }
+
+                var result = [];
+                var asData = [];
+                var asLabels = [];
+                var elData = [];
+                var elLabels = [];
+
+                for (let name in jAccounts)   {
+                    var account=jAccounts[name];
+                    var gross = account.gross;
+                    var iName = account.name;
+                    var xbrl = account.xbrl;
+                    result.push("<DIV>"+name+":"+iName+"="+gross+"  /"+xbrl+"/</DIV>");
+
+                    // collect bar data
+                    // do not include the computed xbrl-named sums
+                    if(name.slice(0,10)==='de-gaap-ci') {
+
+                    } else {
+                        if(xbrl && xbrl.startsWith("de-gaap-ci_bs.ass")) {
+                            asData.push(gross);
+                            asLabels.push(name);
+                        }
+                        if(xbrl && xbrl.startsWith("de-gaap-ci_bs.eqLiab")) {
+                            elData.push(gross);
+                            elLabels.push(name);
+                        }
+                    }
+
+
+
+                };
+
+
+                for (let hash in jHistory)  {
+                    console.log(jHistory[hash]);
+                }
+
+
+                var eText = document.getElementById('strText');
+                if(eText) eText.innerHTML = barLabels.join(" ");
+
+                var eTarget = document.getElementById('strTarget');
+                if(eTarget) eTarget.innerHTML = barData.join(" ");
+
+                var eBalance = document.getElementById('strBalance');
+                if(eBalance) eBalance.innerHTML = result.join("");
+
+              //  drawBars(barLabels, arrNumeric(barData));
+
+
+                var asctx = document.getElementById('assetsPieChart').getContext('2d');
+                drawPie(asLabels, arrNumeric(asData),asctx);
+
+                var elctx = document.getElementById('eqliabPieChart').getContext('2d');
+                drawPie(elLabels, arrNumeric(elData),elctx);
+            }  
+
+            function drawBars(arrLabels,arrData) {
+               // npm i chart.js
+               if(!arrLabels) arrLabels = arrNumbers;
+               if(arrLabels.length<arrData.length) arrLabels = arrLabels.concat(arrNumbers);
+
+               var barBackground=arrBackgroundColor;
+               while(barBackground.length<arrData.length) barBackground=barBackground.concat(arrBackgroundColor);
+
+               var barBorder=arrBorderColor;
+               while(barBorder.length<arrData.length) barBorder=barBorder.concat(arrBorderColor);
+
+               var ctx = document.getElementById('barChart').getContext('2d');
+               var myChart = new Chart(ctx, {
+                   type: 'bar',
+                   data: {
+                       labels: arrLabels,
+                       datasets: [{
+                           label: 'Euro',
+                           data: arrData,
+                           backgroundColor: arrBackgroundColor,
+                           borderColor: arrBorderColor,
+                           borderWidth: 1
+                       }]
+                   },
+                   options: {
+                       scales: {y: {beginAtZero: true} }
+                   }
+               });
+           }
+           
+           function drawPie(arrLabels,arrData,context) {
+               // npm i chart.js
+               if(!arrLabels) arrLabels = arrNumbers;
+               if(arrLabels.length<arrData.length) arrLabels = arrLabels.concat(arrNumbers);
+
+               var pieBackground=arrBackgroundColor;
+               if(pieBackground.length<arrData.length) pieBackground=pieBackground.concat(arrBackgroundColor);
+
+               myChart = new Chart(context, {
+                    type: 'pie',
+                    data: {
+                        labels: arrLabels,
+                        datasets: [{  label: "Euro", data: arrData,backgroundColor: pieBackground,}]
+                    },
+                    options: {
+                        scales: {y: {beginAtZero: true} },
+                        title: { display: true, text: 'Balance' },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: { display: true, position: 'right' },
+                    }
+                });
+           }        
+       </script>
+       </DIV></DIV>
+   </BODY> 
+</HTML>

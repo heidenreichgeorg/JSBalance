@@ -1,0 +1,203 @@
+<!DOCTYPE html>    
+<HTML content-type='utf-8' lang="de-DE"  id='PageContent'>    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400&display=swap" />
+    <link rel="stylesheet" href="./FBA/mobile_green.css"/>
+    <HEAD>
+        <meta charset="ISO-8859-1">
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />        
+        <TITLE>Mobile Balance - Transfer</TITLE>        
+    </HEAD>        
+    <BODY onload="getFromServer(putResponse)" style="background-color:#000; ">   
+        <DIV class="dosborder">
+			<DIV class="dostable" >
+				<DIV  class="attrLine"> 
+					<DIV class="L22">&nbsp;</DIV>
+					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
+				</DIV>
+     		</DIV>
+		</DIV>
+       
+        <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
+        <SCRIPT type="text/javascript" src="/money.js"></SCRIPT>
+       
+        <SCRIPT type="text/javascript">            
+
+            let iCpField = 16;
+
+            let debug=1;
+
+            // data-sharing amoing different functions
+            var gResponse;
+            var gAccounts;
+            var gHistory;
+            var gSchema;
+            var gAssets;
+            var page;
+
+            var accountPages={};
+
+            const TARGET = 'file-contents';
+
+            var cCent=0;
+
+            var creditList={}; // { "COGK":{cents:"1370,00" }}
+            var debitList={}; // { "COGK":{cents:"1370,00" }}
+
+            function listCreditAccount(i,name) {
+                if(cCent>0) {
+                    creditList[name]= {"index":i, "cents":cCent};
+                } else delete creditList[name];
+
+                updateList();
+            }
+
+            function listDebitAccount(i,name) {
+                if(cCent>0) {
+                    debitList[name]= {"index":i, "cents":cCent}
+                } else delete debitList[name];
+
+                updateList();
+            }
+
+            function toggleC2D(name) {
+                console.log("toggleC2D="+name);
+                if(name && creditList[name]) {
+                    var account=creditList[name];
+                    debitList[name]=account;
+                    delete creditList[name]; 
+                    updateList();
+                }
+            }
+
+            function toggleD2C(name) {
+                console.log("toggleD2C="+name);
+                if(name && debitList[name]) {
+                    var account=debitList[name];
+                    creditList[name]=account;
+                    delete debitList[name]; 
+                    updateList();
+                }
+            }
+
+            var creditDivs="";
+            var debitDivs="";
+
+            function clearCD() { 
+                creditList={}; 
+                debitList={}; 
+                updateList();
+            }
+
+
+            function setNull() {
+                cCent=0;
+                updateList();
+            }
+
+            function allowDrop(ev) {
+                ev.preventDefault();
+            }
+
+        // GH20211015
+        function addInfo(row,parts) {
+            var sender="",refAcct="",info4="",info5="";
+            if(parts) {                
+                    if(parts.length>2) { sender=parts[2];
+                        if(parts.length>3) { refAcct=parts[3];
+                            if(parts.length>4) { info4=parts[4];
+                                if(parts.length>5) { info5=parts[5];
+                            }
+                        }
+                    }
+                }
+            }
+            return ('<DIV id="sel'+row+'" class="L120"><button '
+                +' onclick="putInfo(\''+sender+'\',\''+refAcct+'\',\''+info4+'\',\''+info5+'\')" >'
+                +row+'</button></DIV>');
+        }
+
+                        
+            function putResponse(strTarget,strText) {       
+
+                response = JSON.parse(strText);
+
+                gHistory  = response[D_History];
+                gAccounts= response[D_Balance];
+                gSchema  = response[D_Schema];
+                gAssets = response[D_FixAss];
+                page = response[D_Page];
+
+                cCent=0;
+                creditList={}; 
+                debitList={}; 
+
+                updateList();
+            }  
+
+
+
+
+            function doCommand(cmd) {  
+                var mCredit=cents2EU(cCent);
+                console.log("CREDIT="+mCredit+" APPEND '"+cmd+"'");
+
+                if(cmd==='X') mCredit="0,00";
+                
+                else {
+                    if(cmd==='<') mCredit=mCredit.slice(0,-1);
+                    else mCredit=mCredit+cmd;
+                }
+
+                cCent = parseInt(mCredit.replace(".","").replace(",",""));
+                
+                updateList();
+            }
+            
+
+            
+
+            function show(money,strCredit) {
+                if(!money) money={'cents':0 };
+                if(!strCredit || (strCredit.length==0) || (parseInt(strCredit)==0)) return money;
+                var factor=1; 
+                if(parseInt(strCredit)<0) { 
+                    factor=-1;  //console.log(strCredit); 
+                }
+                var saldo = money.cents
+                    + parseInt( strCredit.replace('.','').replace(',',''));
+
+                return { 'cents': saldo };
+            }
+
+
+            function book() {
+                var cdate = document.getElementById('date');
+                var cSender = document.getElementById('sender');
+                var cInfo3 = document.getElementById('refAcct');
+                var cInfo4 = document.getElementById('info4');
+                var cInfo5 = document.getElementById('info5');
+
+                var date=cdate.value; // date
+                var sender=cSender.value;
+                var refAcct=cInfo3.value;
+                var info4=cInfo4.value;
+                var info5=cInfo5.value; // SVWZ2
+
+                if(!date) date=".";
+                if(!sender) sender=".";
+                if(!refAcct) refAcct=".";
+                if(!info4) info4=".";
+                if(!info5) info5=".";
+
+                // effective transaction: no flag
+                var jInfo = { /*"flag":1,*/ "date":date, "sender":sender, "refAcct":refAcct, "svwz":info4, "svwz2":info5, "credit":creditList, "debit":debitList };
+
+
+                save(jInfo);
+            }
+
+       </script>
+   </BODY> 
+</HTML>

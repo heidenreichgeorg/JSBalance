@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html  id='PageContent'>
+    <link rel="stylesheet" href="./FBA/mobile_green.css"/>
+<head>
+    <TITLE>Mobile Balance - Abschlussbuchung</TITLE>        
+
+    <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
+    <script>
+        var debug=null;
+
+        var creditList={};
+        var debitList={};
+       
+    </script>
+</head>
+
+<body>
+    <div class="witBorder">
+        <div class="mTable" >
+            <DIV class="attrLine" id="welcome"></DIV>            
+                <div class="ulliTab"  height="700px">
+                    <DIV  id='selAccount'></DIV>
+                    <DIV id='tabHistory'></DIV>
+                    <DIV  id='display'>CLOSE</DIV>
+                    <div class="attrLine">
+                    <div class="R165" id="credit" ><div>Soll: 0,00</div></div>
+                    <div class="C100"  >&nbsp;</div>
+                    <div class="R165" id="debit" ><div>Haben 0,00</div></div>
+                    <div class="L22"  >&nbsp;</div>
+                    <div class="C100" id="buttons" >
+                        <div class="L22"  >&nbsp;</div>
+                        <DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Close</button> </DIV> 
+                </div></div>
+            </div>
+        </div>
+    </div>
+  
+    <SCRIPT type="text/javascript">
+
+        var gResponse;
+        var gAccounts;
+        var gHistory;
+        var gSchema;
+        var gAssets;
+
+        
+        function putResponse(strTarget,strText) {       
+
+            gResponse = JSON.parse(strText);
+
+            let gReport  = gResponse[D_Report];
+
+            gHistory  = gResponse[D_History];
+            gAccounts= gResponse[D_Balance];
+            gSchema  = gResponse[D_Schema];
+            gAssets = gResponse[D_FixAss];
+            
+                if(gSchema) {
+                    var author=gSchema.author;
+                    var residence=gSchema.residence;
+                    var iban=gSchema.iban;
+                    var register=gSchema.register;
+                    var taxnumber=gSchema.taxnumber;
+                    var reportYear=gSchema.reportYear;
+                    var client=gSchema.client;
+
+                    var welcome = document.getElementById("welcome");
+                    welcome.innerHTML = "<DIV class='L120'>"+client
+                    +"</DIV><DIV class='L220'>"+register+"&nbsp;"+taxnumber
+                    +"</DIV><DIV class='L220'>"+iban+"&nbsp;"+reportYear
+                    +"</DIV><DIV class='L220'>"+author+"&nbsp;"+residence
+                    +"</DIV>>";
+                }
+                console.log('Schema='+JSON.stringify(gSchema));
+
+                var txnTable = [];                
+
+                // build history from given account as a prompt list
+                if(gSchema && gSchema.Names && gSchema.Names.length>0) {
+                    var parts=gSchema.Names;
+
+
+                let closing = JSON.parse(gReport.xbrlIncome.closing); //.split(CSEP);
+
+                var jInfo = closing; // { "date":closing[1], "sender":closing[2], "refAcct":closing[3], "svwz":closing[4], "svwz2":closing[5], "credit":[], "debit":[]  };
+
+                txnTable.push('<DIV class="attrLine">'
+                +'<div class="L22" >&nbsp;</div>'
+                +'<div class="C100" id="date" value="'+jInfo.date+'">'+jInfo.date+'</div>'
+                +'<DIV class="L120">'+jInfo.sender+'</DIV>'      
+                +'<DIV class="L120">'+jInfo.refAcct+'</DIV>'
+                +'<DIV class="L120">'+jInfo.svwz+'</DIV>'
+                +'<DIV class="L120">'+jInfo.svwz2+'</DIV>'
+                +'</DIV>');
+
+
+
+                var aTable = document.getElementById('selAccount');
+                if(aTable) aTable.innerHTML = txnTable.join("");
+
+
+                creditList= jInfo.credit;
+                debitList = jInfo.debit;
+
+                // override other year 
+                jInfo.flag = 1;
+
+
+                save(jInfo);
+            
+            }
+        
+            
+        }
+
+       
+        
+        function closeWindow() {
+            window.close();
+        }
+
+
+        </script>
+    </body>
+</html>
+
+

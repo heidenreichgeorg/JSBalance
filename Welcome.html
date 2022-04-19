@@ -1,0 +1,125 @@
+ <!DOCTYPE html>
+ <html>
+   <link rel="stylesheet" href="./FBA/mobile_green.css"/>
+ <head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width">
+   <title>Mobile Balance - LOGIN</title>
+
+  
+</head>
+
+<body>
+
+<SCRIPT>
+   var reader;
+   var content;
+
+   var readFile = function(event) {
+      var input = event.target;
+
+      reader = new FileReader();
+      reader.onload = function(){
+          var text = reader.result;
+          console.log("WELCOME.HTML readFile() MAINFILE "+text);  
+
+          postToServer("MAINFILE",text);
+      };
+      reader.readAsText(input.files[0]);
+    };
+</SCRIPT>
+
+
+   <div id='mainpage'>
+      <form action="LOGIN" method="post" id="login">
+         <h1>Sign Up</h1>
+         <div class="field">
+            <label for="name">Client:</label>
+            <input type="text" id="CLIENT" name="client" placeholder="Enter client name" />
+            <small></small>
+         </div>
+         <div class="field">
+            <label for="year">Year:</label>
+            <SELECT id="YEAR" name="year" placeholder="Enter report year" >
+               <OPTION value="2016">2016</OPTION>
+               <OPTION value="2017">2017</OPTION>
+               <OPTION value="2018">2018</OPTION>
+               <OPTION value="2019">2019</OPTION>
+               <OPTION value="2020">2020</OPTION>
+               <OPTION value="2021">2021</OPTION>
+               <OPTION value="2022">2022</OPTION>
+            </SELECT>
+            <small></small>
+         </div>        
+         <button type="submit">Login</button>
+      </form>
+   </div>
+   
+   <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
+
+   <SCRIPT>
+
+      function timeSymbol() {
+                var u = new Date(Date.now()); 
+                return ''+
+                  ('0' + (1+u.getUTCMonth())).slice(-2) +
+                  ('0' + u.getUTCDate()).slice(-2) + 
+                  ('0' + u.getUTCHours()).slice(-2) +
+                  ('0' + u.getUTCMinutes()).slice(-2) +
+                  ('0' + u.getUTCSeconds()).slice(-2) +
+                  (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
+            };     
+
+
+      const strServerDNS = 'http://'+self.location.hostname+':81/';
+
+      const form = document.querySelector("#login");
+
+      form.addEventListener('submit', function (event) {   
+         var elements=form.elements; 
+         event.preventDefault();
+         login(event,elements);      
+      } );
+
+      var content="";
+
+
+ 
+      function login(event,elements) {       
+
+         let check = localStorage.getItem("mysession");
+         if(check && check.length>10) {
+            const credentials = {
+            'sessionId':  localStorage.getItem("mysession"),
+            'time': timeSymbol()
+           };
+           console.log("login() WITH PREVIOUS SESSION");
+           // postAndDisplay("LOGIN",credentials,'mainpage');
+           // SERVER NOT RECOGNIZING CERT Strings
+
+         } else console.dir("login() NO PREVIOUS SESSION");
+      
+
+         for(let name in ['CLIENT', 'YEAR', 'JSON']) 
+            console.log("Form["+name+"] ="+form[name].value);
+
+         console.log("WELCOME C  "+form[0].value);
+         console.log("WELCOME Y  "+form[1].value);
+        // console.log("WELCOME J  "+form[2].value);
+
+            // post body data 
+         const credentials = {
+            'client':form[0].value,
+            'year':  form[1].value,
+            'sessionId':  localStorage.getItem("mysession"),
+            'time': timeSymbol()
+         };
+       
+
+         postAndDisplay("LOGIN",credentials,'mainpage');
+         
+      }
+     
+    </SCRIPT> 
+</body>
+</html>

@@ -1,0 +1,33 @@
+@charset "ISO-8859-1";
+.witBorder    { width:780px; padding: 4px; border-style: solid; border-radius: 10px; border-width: 3px; border-color: #201d5e;     }
+.mTable     {                              height: 18px;     background-color: #FFFFFF;                               display:table;    }
+.ulliTab    { width:735px; padding: 1px; border: none; font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight:400; } 
+
+
+.attrLine    { width:769px; padding: 1px; border: none; float: left; background-color: #FFFFFF;  height: 50px; font-family:  'Montserrat', sans-serif; font-size: 12px; font-weight:400; text-align: center; color: #201d5e;   }
+.attrLine   { width:769px; padding: 1px; border: none; float: left; background-color: #FFFFFF;                font-family:  'Montserrat', sans-serif; font-size: 12px; font-weight:400; text-align: center; color: #201d5e;   }
+  
+
+.keyPanel   { width:182px;               border: 1px solid #ccc; float: left;   display: table-column; } 
+.key        { width: 90px;  height:60px; padding: 1px; border: 1px solid #FFFFFF; float: left; background-color: #FFFFFF; font-family:  'Montserrat', sans-serif; font-size: 12px; font-weight:400; color: #201d5e; }
+
+input { color:#000088; }
+
+.L22      { text-align:  left; width: 20px; float: left; }		 
+.C100                        {  width: 90px; float: left;}
+.R110    { text-align: right;  width:100px; float: left;}
+.L120    {  text-align: left;  width:110px; float: left;}
+.C140                        { width:125px; float: left;}
+.R165    {  text-align: right; width:150px; float: left;}
+.L220    {  text-align: left;  width:200px; float: left;}
+.L280    {  text-align: left;  width:210px; float: left;}
+.C280                        { width:260px; float: left;} 
+.CFUL                        { width:733px; float: left;}
+
+a:hover     {  background-color: #FFFFFF; }
+.pagebreak  {              min-height: 1px; page-break-before: always; }		
+fieldset {   background: #FFFFFF;  padding: 10px;  width: 95%; }
+.submit    {   width:99px;  padding: 6px; border: 1px solid #102030; float: left;  height:40px;  color: #111166; }
+
+
+

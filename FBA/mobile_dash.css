@@ -1,0 +1,44 @@
+@charset "ISO-8859-1";
+.witBorder    { width:580px; padding: 4px; border-style: solid; border-radius: 10px; border-width: 3px; border-color: #222AAA;     }
+.mTable     {                              height: 18px;     background-color: #333333;                               display:table;    }
+.ulliTab    { width:535px; padding: 1px; border: none; font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight:400; } 
+.ulliRow    { width:455px; padding: 1px; border: none; float: left; font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight:400; } 
+.ulliLine   {                            border: none; color:#000000;                                                 display: table-row;  }
+.ulliCol    { width: 10px;               border: none; float: left; color:#222AAA; height: 600px;                     display: table-row; }
+
+.attrdiv    { width:575px;               border: 1px solid #ccc; float: left; background-color: #222222;  height:100%; }
+.attrLine    { width:569px; padding: 1px; border: 1px solid #ff8;   float: left; background-color: #000000;  height: 65px; font-family:  'Montserrat', sans-serif; font-size: 18px; font-weight:400; text-align: center; color: #ffff80;  
+  background: radial-gradient(ellipse at center, #BB9847 0%, #000000 100%);  
+  z-index: 1;  text-shadow: 1px 1px 0 #262626, 2px 2px 0 #262626, 3px 3px 0 #262626, 4px 4px 0 #262626, 5px 5px 0 #262626, 1px 1px 0 #262626, 6px 20px 20px rgba(0,0,0,1), -1px -1px 0 #fff; }
+.attrLine   { width:569px; padding: 1px; border: 1px solid #ff8;   float: left; background-color: #000000;  height: 27px; font-family:  'Montserrat', sans-serif; font-size: 18px; font-weight:400; text-align: center; color: #ffff80;  
+    background: radial-gradient(ellipse at center, #BB9847 0%, #000000 100%);  
+    z-index: 1;  text-shadow: 1px 1px 0 #262626, 2px 2px 0 #262626, 3px 3px 0 #262626, 4px 4px 0 #262626, 5px 5px 0 #262626, 1px 1px 0 #262626, 6px 20px 20px rgba(0,0,0,1), -1px -1px 0 #fff; }
+  
+
+.keyPanel   { width:182px;               border: 1px solid #ccc; float: left;   display: table-column; } 
+.key        { width: 90px;  height:60px; padding: 1px; border: 1px solid #ff8; float: left; background-color: #000000; font-family:  'Montserrat', sans-serif; font-size: 12px; font-weight:400; color: #ffff80; 
+  background: radial-gradient(ellipse at center, #BB9847 0%, #000000 100%);  
+  z-index: 1;  text-shadow: 1px 1px 0 #262626, 2px 2px 0 #262626, 3px 3px 0 #262626, 4px 4px 0 #262626, 5px 5px 0 #262626, 1px 1px 0 #262626, 6px 20px 20px rgba(0,0,0,1), -1px -1px 0 #fff;  }
+
+input { color:#000088; }
+
+.C140       { width:125px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; }
+.L220   { width:200px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 11px; font-weight:400; color: #ffff80; text-align: left;}
+.L120   { width:110px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: left;}
+.C100   { width: 84px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; }
+.L280  { width:210px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: left;} 
+.C280  { width:260px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; } 
+.CFUL   { width:533px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; }
+.R110  { width: 84px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: right; }
+.R165  { width:150px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: right; }
+.L22      { width: 20px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: left;  }		
+a:hover     {  background-color: #ff8; }
+.pagebreak  {              min-height: 1px; page-break-before: always; }		
+fieldset {   background: #eee;  padding: 10px;  width: 95%; }
+.submit    {   width:99px;  padding: 6px; border: 1px solid #886A01; float: left;  height:40px;  color: #ffff80; 
+  z-index: 1;  text-shadow: 1px 1px 0 #262626, 2px 2px 0 #262626, 3px 3px 0 #262626, 4px 4px 0 #262626, 5px 5px 0 #262626, 1px 1px 0 #262626, 6px 20px 20px rgba(0,0,0,1), -1px -1px 0 #fff; 
+  background: radial-gradient(ellipse at center, #BB9847 0%, #000000 100%);  
+  }
+
+
+
