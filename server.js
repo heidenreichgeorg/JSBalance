@@ -338,12 +338,17 @@ app.get('/SAVE/', (req, res) => {
 
 
 app.get('/welcomedrop', (req, res) => {
-    res.sendFile('./WelcomeDrop.html')
+    res.sendFile('./WelcomeDrop.html', { root: __dirname })
 })
 
 // show convenience link to create and load a new browser window
-app.listen(PORT, () => { console.log(`Login     http://localhost:${PORT}/WELCOMEDROP.HTML`); })
-//app.listen(PORT, () => { console.log(`Login     http://localhost:${PORT}UPLOAD.HTML`); })
+app.listen(PORT, () => { 
+    console.log(`Server    started from ${PORT} using files in `+__dirname); 
+    console.log(`Server    http://ec2-3-94-192-123.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
+    console.log(`Local     http:/localhost:${PORT}/welcomedrop`); 
+})
+//app.listen(PORT, () => { console.log(`Login     http://localhost:${PORT}/UPLOAD.HTML`); })
+
 
 function phaseOne(addrT, logT, aoaCells) {
 
