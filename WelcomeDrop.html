@@ -45,7 +45,7 @@
 
    <div id='mainpage'>
       <form action="LOGIN" method="post" id="login">
-         <h1>Sign Up</h1>
+         <h1 id="SignUp">Sign Up</h1>
          <h1 id="formClient">Client</h1>
          <h1 id="formYear">Year</h1>
          <div class="keyPanel" ondragover="dragOverHandler(event);" ondrop="dropHandler(event);">  
@@ -72,7 +72,7 @@ function dropHandler(ev) {
             // If dropped items aren't files, reject them
             if (ev.dataTransfer.items[i].kind === 'file') {
                var file = ev.dataTransfer.items[i].getAsFile();
-               console.log('ITEMS... file[' + i + '].name = ' + file.name);
+               console.log('FILES... file[' + i + '].name = ' + file.name);
 
                let fName = file.name;
                if(i==0 && fName.length>10 && fName.startsWith('BOOK_') && fName.endsWith('.xlsx')) {
@@ -80,23 +80,33 @@ function dropHandler(ev) {
 
                   formClient=prefix.substring(0,prefix.length-5);
                   let len = formClient.length;
-                  formYear=fName.substring(len+5,fName.length-5)
-
                   console.log('CLIENT = ' + formClient);
+
+
+
+                  formYear=fName.substring(len+5,fName.length-5)
+                  let cy = document.getElementById("formYear");
+                  if(cy) cy.innerHTML = formYear;
                   console.log('YEAR = ' + formYear);
 
-                  let cc = document.getElementById("formClient");
-                  let cy = document.getElementById("formYear");
 
+                  let platformPath = file.toPath();
+                  let cc = document.getElementById("formClient");
                   if(cc) cc.innerHTML = formClient;
-                  if(cy) cy.innerHTML = formYear;
+                  console.log('CLIENT = ' + formClient);
+                  
+
+
+                  let aoaCells = readXLSXFile(path,formClient+formYear);
+                  let su = document.getElementById("SignUp");
+                  if(su) su.innerHTML = aoaCells;
                }
             }
          }
       } else {
          // Use DataTransfer interface to access the file(s)
          for (var i = 0; i < ev.dataTransfer.files.length; i++) {
-            console.log('FILES ... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
+            console.log('OTHER ... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
          }
       }
    }
@@ -141,8 +151,8 @@ function dropHandler(ev) {
          } else console.dir("login() NO PREVIOUS SESSION");
       
 
-         for(let name in ['CLIENT', 'YEAR', 'JSON']) 
-            console.log("Form["+name+"] ="+form[name].value);
+         //for(let name in ['CLIENT', 'YEAR', 'JSON']) 
+         //);
 
          console.log("WELCOMEDROP CLIENT "+formClient);
          console.log("WELCOMEDROP YEAR   "+formYear);

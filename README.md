@@ -44,5 +44,6 @@
 
 
 # Assumptions Server
+#  TABLE file name syntax BOOK_<CLIENT><YEAR>.xlsx
 # fiscal year runs from 01/01 to 12/31
 # all amounts are in Euros, column for the cents fraction and . for powers of thousands 
