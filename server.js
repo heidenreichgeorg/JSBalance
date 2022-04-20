@@ -190,7 +190,9 @@ app.use(bodyParser.json());
 // serve your css and index.html as static
 app.use(express.static(__dirname));
 
-
+app.get('/', (req, res) => {
+    res.redirect('/SHOW');
+})
 
 
 app.post("/LOGIN", (req, res) => { 
@@ -335,7 +337,9 @@ app.get('/SAVE/', (req, res) => {
 */
 
 
-
+app.get('/welcomedrop', (req, res) => {
+    res.sendFile('./WelcomeDrop.html')
+})
 
 // show convenience link to create and load a new browser window
 app.listen(PORT, () => { console.log(`Login     http://localhost:${PORT}/WELCOMEDROP.HTML`); })
