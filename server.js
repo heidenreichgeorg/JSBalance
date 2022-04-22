@@ -223,6 +223,50 @@ app.post("/LOGIN", (req, res) => {
 
 
 
+app.post("/UPLOAD", (req, res) => { 
+
+    var banner = "NO VALID CLIENT FILE";
+    
+    console.log("POST UPLOAD "+JSON.stringify(req.body));
+
+    let remote = req.socket.remoteAddress;
+    console.log("REMOTE "+remote);
+
+
+    let data = req.body;
+
+    if(data && data.client && data.year) {
+        let client = data.client;
+        let year   = data.year;
+        let time   = data.time;    
+
+    /*
+
+    let client = req.body.client;
+    let year   = req.body.year;
+    let time   = req.body.time;    
+    //let sessionId = req.body.sessionId;
+    
+    let sessionId = strSymbol(time+client+year+time);
+    //            let sessionId = Sheets.symbolic(time+client+year+time);
+    console.dir("app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
+
+    // hangs up console.log(JSON.stringify(req.socket));
+
+    let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
+    
+    let banner = makeBanner(sessionId,year);
+    
+*/
+    }
+
+    // send back sessionId to client brwoser or file
+    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+    res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>"+banner+"</HTML>\n"); 
+    
+});
+
+
 
 // set Event Listener for LOAD/client/year/prefix/ext/
 // internal client page response 
@@ -341,13 +385,13 @@ app.get('/welcomedrop', (req, res) => {
     res.sendFile('./WelcomeDrop.html', { root: __dirname })
 })
 
+
 // show convenience link to create and load a new browser window
 app.listen(PORT, () => { 
     console.log(`Server    started from ${PORT} using files in `+__dirname); 
     console.log(`Server    http://ec2-3-94-192-123.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
     console.log(`Local     http:/localhost:${PORT}/welcomedrop`); 
 })
-//app.listen(PORT, () => { console.log(`Login     http://localhost:${PORT}/UPLOAD.HTML`); })
 
 
 function phaseOne(addrT, logT, aoaCells) {

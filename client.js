@@ -58,12 +58,31 @@ function getFromServer(responseHandler) {
 }	
 
 
-function postToServer(strTarget,strParams) {
+function postToServer(strTarget,strParams,callBack) {
 
     let strServerDNS = 'http://'+self.location.hostname+':81/'; 
     
     if(strTarget) {
         var request = new XMLHttpRequest();
+
+        /*
+        request.onerror = function (e) {
+            //console.error("Unknown Error Occured. Server response not received.");
+            console.error("postToServer "+strTarget+": "+request.responseText);
+            callBack( request.responseText );
+        };
+        */
+
+        request.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status>=200) {
+                console.log("postToServer "+strTarget+": "+request.responseText);
+                if(callBack) {
+                    if(this.status==200 || this.status==400) callBack( ""+this.status+" OK " );
+                    else callBack( request.responseText );
+                }
+            }
+        };
+
         request.open('POST',strServerDNS+strTarget, true);						
         request.addEventListener('error', handleEvent);
         request.setRequestHeader('Cache-control', 'no-cache, must-revalidate, post-check=0, pre-check=0');

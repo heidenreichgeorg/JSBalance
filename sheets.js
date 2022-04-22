@@ -3,7 +3,7 @@ const debugWrite=1;
 
 // ASSETS BEFORE OTHER ACCOUNTS
 // NO NEGATIVE RESULTS in distribute()
-// EXTEND sy_purge ;AXCEL if needed
+// EXTEND sy_purge ;EXCEL if needed
 // N defines number of columns, balance[D_Schema].total 
 
 /*
