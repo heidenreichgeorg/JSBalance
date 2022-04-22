@@ -227,37 +227,33 @@ app.post("/UPLOAD", (req, res) => {
 
     var banner = "NO VALID CLIENT FILE";
     
-    console.log("POST UPLOAD "+JSON.stringify(req.body));
-
     let remote = req.socket.remoteAddress;
-    console.log("REMOTE "+remote);
-
+    console.log("POST UPLOAD from "+remote);
 
     let data = req.body;
 
     if(data && data.client && data.year) {
-        let client = data.client;
-        let year   = data.year;
-        let time   = data.time;    
 
-    /*
+        let client = req.body.client;
+        let year   = req.body.year;
+        let time   = req.body.time;    
 
-    let client = req.body.client;
-    let year   = req.body.year;
-    let time   = req.body.time;    
-    //let sessionId = req.body.sessionId;
+
+        //let sessionId = req.body.sessionId;
+        let sessionId = strSymbol(time+client+year+time);
+        // let sessionId = Sheets.symbolic(time+client+year+time);
+        console.dir("app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
+        //if(sessionId===req.body.id) {
+
+            // hangs up console.log(JSON.stringify(req.socket));
+
+            let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
     
-    let sessionId = strSymbol(time+client+year+time);
-    //            let sessionId = Sheets.symbolic(time+client+year+time);
-    console.dir("app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
+            banner = makeBanner(sessionId,year);
 
-    // hangs up console.log(JSON.stringify(req.socket));
+            console.log ( "RESPOND with  " +banner);
 
-    let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
-    
-    let banner = makeBanner(sessionId,year);
-    
-*/
+        // } else console.log ( "INVALID session id " );
     }
 
     // send back sessionId to client brwoser or file

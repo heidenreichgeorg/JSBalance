@@ -18,8 +18,6 @@
 
 
    <div id='mainpage'>
-
-
       <DIV action="LOGIN" method="post" id="login">
          <h1 id="SignUp">Sign Up</h1>
          <h1 id="formClient">Client</h1>
@@ -30,7 +28,7 @@
           </div>
          
          <!--button type="submit">Login</button -->
-         </DIV>
+      </DIV>
    </div>
    
 
@@ -41,9 +39,8 @@
 
    <SCRIPT type="text/javascript" >
 
-var reader;
+   var reader;
    var content;
-
 
    var formClient="";
    var formYear="";
@@ -93,11 +90,12 @@ function dropHandler(ev) {
 
             var fr = new FileReader();
             fr.onload = function () {
+
                fileBuffer = this.result;            
-               console.log('UPLOAD '+fileBuffer);
+               
                let jData = JSON.parse(fileBuffer);
-               postToServer("UPLOAD",JSON.stringify(jData),showResponse);            
-              
+               //postToServer("UPLOAD",JSON.stringify(jData),showResponse);            
+               postAndDisplay("UPLOAD",jData,'mainpage');
             }
             fr.readAsText(item);
          }
