@@ -222,7 +222,7 @@ var creditDivs;
 var debitDivs;
 
 
-function updateList() {
+function validateCD() {
     var saldoC=0;
     var saldoD=0;
 
@@ -231,7 +231,7 @@ function updateList() {
         let value=creditList[name];
         saldoC+=value.cents;
         var display=moneyString(value);
-        creditDivs.push("<div class='L175' onclick='toggleC2D("+'"'+name+'"'+")'>"+name+DOUBLE+display+"</div>");
+        creditDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R110' onclick='toggleC2D("+'"'+name+'"'+")'>"+display+"</div>");
     }
  
 
@@ -240,13 +240,12 @@ function updateList() {
         let value=debitList[name];
         saldoD+=value.cents;
         var display=moneyString(value);
-        debitDivs.push("<div class='L175' onclick='toggleD2C("+'"'+name+'"'+")'>"+name+DOUBLE+display+"</div>");
+        debitDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R110' onclick='toggleD2C("+'"'+name+'"'+")'>"+display+"</div>");
     }
 
     var diff=0;
     if(saldoC>saldoD) diff=saldoC-saldoD;
     if(saldoC<saldoD) diff=saldoD-saldoC;
-
 
     //merge the two columns
     var cdPairs=[];
@@ -255,15 +254,15 @@ function updateList() {
 
         var lines=0;
         for(;creditDivs.length>0 || debitDivs.length>0;lines++) {
-            var left=  "<div class='L175'>&nbsp;</DIV>";
-            var right= "<div class='L175'>&nbsp;</DIV>";
+            var left=  "<div class='L66'>&nbsp;</DIV><div class='R110'>&nbsp;</DIV>";
+            var right= "<div class='L66'>&nbsp;</DIV><div class='R110'>&nbsp;</DIV>";
             if(creditDivs.length>0) { left=creditDivs.pop(); }
             if(debitDivs.length>0)  { right=debitDivs.pop(); }
-            cdPairs.push(left+right);
+            cdPairs.push(left+"<div class='L66'>&nbsp;</DIV>"+right);
         }
     }
-    updateTerminal(cdPairs);
-    return diff;
+
+    return { 'diff':diff, 'saldoC':saldoC, 'saldoD':saldoD, 'cdPairs':cdPairs };
 }
 
 var notes;
@@ -362,8 +361,12 @@ function makeAccount(index,name) {
 
 var terminal=null;
 
-// complete Transfer page
-function updateTerminal(cdPairs) {
+
+    
+// complete Close page
+function showTransfer(txnForm) {
+
+    let cdPairs = txnForm.cdPairs;
 
     let headerInfo = '<DIV class="C280">'+page["Transfer"]+'&nbsp;'+page["header"]+'</DIV>';
 
@@ -427,14 +430,36 @@ function updateTerminal(cdPairs) {
     for(var c=0;c<cdPairs.length;c++) {
         cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div><DIV class='R165' id='display'>&nbsp;</DIV>"+cdPairs[c]);
     }
-
-
-
     
 
     showTerminal(terminal,htmlPage);
 
 }
+
+
+// complete Close page
+function showClose(txnForm) {
+
+    let cdPairs = txnForm.cdPairs;
+
+    let headerInfo = '<DIV class="C280">'+page["Closing"]+'&nbsp;'+page["header"]+'</DIV>';
+
+    let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+    
+    if(!terminal) terminal = initTerminal(page,'PageContent',18);
+
+    var cursor=htmlPage;
+
+    
+    for(var c=0;c<cdPairs.length;c++) {
+        cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div>"+cdPairs[c]);
+        // <DIV class='R165' id='display'>&nbsp;</DIV>
+    }
+    
+
+    showTerminal(terminal,htmlPage);
+}
+
 
 
 function save(jInfo) {
@@ -445,7 +470,9 @@ function save(jInfo) {
 
     var target = document.getElementById("display");
     if(date.length>6) {
-        if(updateList()==0) {
+        let  txnForm = validateCD();
+        if(txnForm.diff==0) {
+            showTransfer(txnForm);
             postToServer("BOOK",sInfo);
             console.log('client.js save() postToServer'+sInfo);
             target.innerHTML = "<DIV >&nbsp;</DIV ><DIV onclick='closeWindow' >CLOSE</DIV>" ; // class='R110'

@@ -5,6 +5,8 @@
     <TITLE>Mobile Balance - Abschlussbuchung</TITLE>        
 
     <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
+    <SCRIPT type="text/javascript" src="/money.js"></SCRIPT>
+
     <script>
         var debug=null;
 
@@ -15,10 +17,10 @@
 </head>
 
 <body>
-    <div class="witBorder">
+    <div class="dosBorder">
         <div class="mTable" >
-            <DIV class="attrLine" id="welcome"></DIV>            
                 <div class="ulliTab"  height="700px">
+                    <DIV class="attrLine" id="welcome"></DIV>            
                     <DIV  id='selAccount'></DIV>
                     <DIV id='tabHistory'></DIV>
                     <DIV  id='display'>CLOSE</DIV>
@@ -37,6 +39,13 @@
   
     <SCRIPT type="text/javascript">
 
+        // 20220424
+        // character count for notmal columns
+        let iCpField = 16;
+        var page;
+        var accountPages={};
+        var cCent=0;
+
         var gResponse;
         var gAccounts;
         var gHistory;
@@ -54,6 +63,7 @@
             gAccounts= gResponse[D_Balance];
             gSchema  = gResponse[D_Schema];
             gAssets = gResponse[D_FixAss];
+            page = gResponse[D_Page];
             
                 if(gSchema) {
                     var author=gSchema.author;
@@ -63,6 +73,9 @@
                     var taxnumber=gSchema.taxnumber;
                     var reportYear=gSchema.reportYear;
                     var client=gSchema.client;
+                    
+                    var cDisplay = document.getElementById("display");
+                    cDisplay.innerHTML = page["Closing"];
 
                     var welcome = document.getElementById("welcome");
                     welcome.innerHTML = "<DIV class='L120'>"+client
@@ -100,13 +113,17 @@
 
 
                 creditList= jInfo.credit;
+                console.log("CREDIT = "+JSON.stringify(creditList));
+
                 debitList = jInfo.debit;
+                console.log("DEBIT = "+JSON.stringify(debitList));
 
                 // override other year 
                 jInfo.flag = 1;
 
 
-                save(jInfo);
+                showClose(validateCD());
+                //save(jInfo);
             
             }
         

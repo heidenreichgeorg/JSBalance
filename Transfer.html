@@ -24,6 +24,7 @@
        
         <SCRIPT type="text/javascript">            
 
+            // character count for notmal columns
             let iCpField = 16;
 
             let debug=1;
@@ -50,7 +51,7 @@
                     creditList[name]= {"index":i, "cents":cCent};
                 } else delete creditList[name];
 
-                updateList();
+                showTransfer(validateCD());
             }
 
             function listDebitAccount(i,name) {
@@ -58,7 +59,7 @@
                     debitList[name]= {"index":i, "cents":cCent}
                 } else delete debitList[name];
 
-                updateList();
+                showTransfer(validateCD());
             }
 
             function toggleC2D(name) {
@@ -67,7 +68,7 @@
                     var account=creditList[name];
                     debitList[name]=account;
                     delete creditList[name]; 
-                    updateList();
+                    showTransfer(validateCD());
                 }
             }
 
@@ -77,7 +78,7 @@
                     var account=debitList[name];
                     creditList[name]=account;
                     delete debitList[name]; 
-                    updateList();
+                    showTransfer(validateCD());
                 }
             }
 
@@ -87,13 +88,13 @@
             function clearCD() { 
                 creditList={}; 
                 debitList={}; 
-                updateList();
+                showTransfer(validateCD());
             }
 
 
             function setNull() {
                 cCent=0;
-                updateList();
+                showTransfer(validateCD());
             }
 
             function allowDrop(ev) {
@@ -133,7 +134,7 @@
                 creditList={}; 
                 debitList={}; 
 
-                updateList();
+                showTransfer(validateCD());
             }  
 
 
@@ -152,24 +153,9 @@
 
                 cCent = parseInt(mCredit.replace(".","").replace(",",""));
                 
-                updateList();
+                showTransfer(validateCD());
             }
             
-
-            
-
-            function show(money,strCredit) {
-                if(!money) money={'cents':0 };
-                if(!strCredit || (strCredit.length==0) || (parseInt(strCredit)==0)) return money;
-                var factor=1; 
-                if(parseInt(strCredit)<0) { 
-                    factor=-1;  //console.log(strCredit); 
-                }
-                var saldo = money.cents
-                    + parseInt( strCredit.replace('.','').replace(',',''));
-
-                return { 'cents': saldo };
-            }
 
 
             function book() {

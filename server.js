@@ -195,6 +195,8 @@ app.get('/', (req, res) => {
 })
 
 
+
+// LOGIN to an existing session
 app.post("/LOGIN", (req, res) => { 
     console.log("POST LOGIN "+JSON.stringify(req.body));
     let remote = req.socket.remoteAddress;
@@ -208,9 +210,7 @@ app.post("/LOGIN", (req, res) => {
 
     console.dir("app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
 
-    // hangs up console.log(JSON.stringify(req.socket));
-
-    let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
+     let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
     
     let banner = makeBanner(sessionId,year);
 
@@ -222,11 +222,11 @@ app.post("/LOGIN", (req, res) => {
 });
 
 
-
+//start session with uploading a session file for a known client
 app.post("/UPLOAD", (req, res) => { 
 
     // client sends client_year.JSON file
-    // tis json has to be stored as <SESSION>.json
+    // this json has to be stored as <SESSION>.json
 
     var banner = "NO VALID CLIENT FILE";
     
@@ -250,9 +250,9 @@ app.post("/UPLOAD", (req, res) => {
             Sheets.saveLatest(req.body,client,year);
             
 
-            //let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
-            banner="file save ok";
-            //banner = makeBanner(sessionId,year);
+            Sheets.start(sessionId,client,year,time,remote,phaseOne);
+
+            banner = makeBanner(sessionId,year);
 
             console.log ( "RESPOND with  " +banner);
 
@@ -819,7 +819,7 @@ function makeBanner(sessionId,year) {
 //                vbanner.push(buttonTab(`http://${localhost}:${PORT}/xfer?sessionId=${sessionId}`,de_DE['Transfer']));
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/pattern?sessionId=${sessionId}`,'Patterns'));      
-            vbanner.push(buttonTab(`http://${localhost}:${PORT}/closeandsave?sessionId=${sessionId}`,de_DE['Closing']));
+            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/closeandsave?sessionId=${sessionId}`,'Closing'));
 //            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/assetl?sessionId=${sessionId}`,'Assets']));
             //vbanner.push(buttonTab(`http://${localhost}:${PORT}/SAVE?sessionId=${sessionId}`,de_DE['Closing']));
             vbanner.push(buttonTab(`http://${localhost}:${PORT}/pie?sessionId=${sessionId}`,de_DE['Diagram']));      

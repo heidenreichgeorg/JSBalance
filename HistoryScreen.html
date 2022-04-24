@@ -26,6 +26,7 @@
 
             let debug=null;
 
+            // character count for notmal columns
             let iCpField = 16;
 
             function makeBookingText(csvHead,csvText,csvNote,style) {
@@ -255,7 +256,9 @@
 
                 var target = document.getElementById("display");
                 if(date.length>6) {
-                    if(updateList()==0) {
+                    let txnForm=validateCD().diff
+                    if(txnForm.diff==0) {
+                        showClose(txnForm);
                         postToServer("STORE",sInfo);
                         console.log('HistoryList.html log() postToServer STORE '+sInfo);
                         target.innerHTML = "<DIV >&nbsp;</DIV ><DIV onclick='closeWindow' >CLOSE</DIV>" ; // class='R110'

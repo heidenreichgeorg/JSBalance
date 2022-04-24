@@ -57,6 +57,20 @@
    module.exports['addEUMoney'] = addEUMoney;
 
 
+   function show(money,strCredit) {
+        if(!money) money={'cents':0 };
+        if(!strCredit || (strCredit.length==0) || (parseInt(strCredit)==0)) return money;
+        var factor=1; 
+        if(parseInt(strCredit)<0) { 
+            factor=-1;  //console.log(strCredit); 
+        }
+        var saldo = money.cents
+            + parseInt( strCredit.replace('.','').replace(',',''));
+
+        return { 'cents': saldo };
+    }
+    module.exports['show'] = show;
+
 
     function setEUMoney(strSet) {
         var euros=0;
