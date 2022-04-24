@@ -527,7 +527,7 @@ function create(client,year,time,remote,sessionId) {
 
     setFileNameS(session,client,year,'BOOK','xlsx'); // async find a XLSX file and sets session.sheetFile
     
-    var sFile=jsonMain(client,year);
+    var sFile=jsonMain(client,year,sessionId);
     try {
         console.log("Sheets.getSheet MAIN "+sFile);
         var json = JSON.parse(fs.readFileSync(sFile,{'encoding':'utf8'})); // was latin1 GH20211120
@@ -641,7 +641,9 @@ async function saveLatest(session,client,year) {
 
     const data = JSON.stringify(session);
 
-    var pSave = fs.writeFileSync(jsonMain(client,year), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
+    let sessionId=session.id;
+
+    var pSave = fs.writeFileSync(jsonMain(client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
         if (err) {
             console.log("sheets.js saveLatest: "+err);          
             throw err;
@@ -650,6 +652,7 @@ async function saveLatest(session,client,year) {
     });
     console.log("JSON main is saved.");
 }
+module.exports['saveLatest']=saveLatest;
 
 
 function saveSessionLog(sessionId,txn) {
@@ -709,8 +712,8 @@ module.exports['isSameFY']=isSameFY;
 
 
 // GH20211119
-function jsonMain(client,year) {
-    return ROOT+client+Slash+year+Slash+"main.json";
+function jsonMain(client,year,sid) {
+    return ROOT+client+Slash+year+Slash+fileFromSession(sid)+".json";
 }
 
 function jsonLogf(client) {
@@ -721,6 +724,19 @@ function jsonLogf(client) {
 function unixYear() {
     return new Date(Date.now()).getUTCFullYear();
 };
+
+
+function fileFromSession(sid) {
+    var result="main";
+    if(sid) {
+        var buffer=[ sid[0] ];
+        for(var i=1;i+4<sid.length;i+=4) buffer.push(sid[i]);
+        result=buffer.join('');
+    } 
+    return result;
+}
+
+
 
 
 function symbolic(pat) {

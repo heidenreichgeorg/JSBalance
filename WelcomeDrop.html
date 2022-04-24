@@ -5,30 +5,18 @@
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width">
    <title>Mobile Balance - LOGIN</title>
-
-  
 </head>
-
 <body>
-
-
-
-
-
-
-
    <div id='mainpage'>
-      <DIV action="LOGIN" method="post" id="login">
-         <h1 id="SignUp">Sign Up</h1>
-         <h1 id="formClient">Client</h1>
-         <h1 id="formYear">Year</h1>
+      <!--DIV action="LOGIN" method="post" id="login" -->
+      <h1 id="SignUp">Sign Up</h1>
          <div class="keyPanel" ondragover="dragOverHandler(event);" ondrop="dropHandler(event);">  
+            <label for="name">Client:</label>
+            <input type="text" id="CLIENT" name="client" placeholder="Enter client name" />
             <div  class="instRow"  >&nbsp;</div>            
             <div  class="instRow" id="fileupload">&nbsp;</div>            
-          </div>
-         
-         <!--button type="submit">Login</button -->
-      </DIV>
+             </div>
+      <!-- /DIV -->
    </div>
    
 
@@ -94,8 +82,12 @@ function dropHandler(ev) {
                fileBuffer = this.result;            
                
                let jData = JSON.parse(fileBuffer);
-               //postToServer("UPLOAD",JSON.stringify(jData),showResponse);            
-               postAndDisplay("UPLOAD",jData,'mainpage');
+
+               let cClient = document.getElementById('CLIENT')
+               if(cClient && cClient.value==jData.client) {
+                
+                  postAndDisplay("UPLOAD",jData,'mainpage');
+               }
             }
             fr.readAsText(item);
          }
@@ -108,69 +100,6 @@ function showResponse(response) {
    let display = document.getElementById('fileupload');
    if(response && display) display.innerHTML=response;
 }
-
-function dripHandler(ev) {
-      console.log('File(s) dropped');
-
-      // Prevent default behavior (Prevent file from being opened)
-      ev.preventDefault();
-
-      if (ev.dataTransfer.items) {
-      // Use DataTransferItemList interface to access the file(s)
-         for (var i = 0; i < ev.dataTransfer.files.length; i++) {
-            // If dropped items aren't files, reject them
-            if (ev.dataTransfer.items[i].kind === 'file') {
-               var item = ev.dataTransfer.files[i];
-               var file = item; // .getAsFile();
-               console.log('FILES... file[' + i + '].name = ' + file.name);
-
-               let fName = file.name;
-               if(i==0 && fName.length>10 && fName.startsWith('BOOK_') && fName.endsWith('.xlsx')) {
-                  let prefix=fName.substring(5).replace(/\d/g,'');
-
-                  formClient=prefix.substring(0,prefix.length-5);
-                  let len = formClient.length;
-                  console.log('FILE INFO = ' + JSON.stringify(file));
-                  console.log('FILE PATH = ' + file.path);
-
-
-
-                  formYear=fName.substring(len+5,fName.length-5)
-                  let cy = document.getElementById("formYear");
-                  if(cy) cy.innerHTML = formYear;
-                  console.log('CLIENT = ' + formClient);
-
-
-                  let platformPath = file.path;
-                  let cc = document.getElementById("formClient");
-                  if(cc) cc.innerHTML = formClient;
-                  console.log('YEAR = ' + formYear);
-                  
-
-                  var blob="empty URL";
-                  reader = new FileReader();
-                  reader.onload = function(){
-                     blob = reader.result;
-                     console.log("WELCOMEDROP.HTML readAsDataURL() "+blob.length);  
-                     postToServer("MAINFILE",blob);
-                  };
-                  reader.readAsArrayBuffer(file);
-
-
-
-                              let su = document.getElementById("SignUp");
-                  if(su) su.innerHTML = aoaCells;
-               }
-            }
-         }
-      } else {
-         // Use DataTransfer interface to access the file(s)
-         for (var i = 0; i < ev.dataTransfer.files.length; i++) {
-            console.log('OTHER ... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
-         }
-      }
-   }
-
 
       function timeSymbol() {
          var u = new Date(Date.now()); 
@@ -187,7 +116,7 @@ function dripHandler(ev) {
       const strServerDNS = 'http://'+self.location.hostname+':81/';
 
       const form = document.querySelector("#login");
-
+/*
       form.addEventListener('submit', function (event) {   
          var elements=form.elements; 
          event.preventDefault();
@@ -234,22 +163,7 @@ function dripHandler(ev) {
       }
      
       
-    /*
-    var fileBuffer="";
-    document.getElementById('fileupload').addEventListener('change', function () {
-        var fr = new FileReader();
-        fr.onload = function () {
-        fileBuffer = this.result;
-            
-            console.log('UPLOAD '+fileBuffer);
-
-            postToServer("UPLOAD",fileBuffer)
-            
-        };
-    fr.readAsText(this.files[0]);
-    });
-    console.log('STARTED');
-    */content
+   */content
     </SCRIPT>
 </body>
 </html>

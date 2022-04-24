@@ -225,6 +225,9 @@ app.post("/LOGIN", (req, res) => {
 
 app.post("/UPLOAD", (req, res) => { 
 
+    // client sends client_year.JSON file
+    // tis json has to be stored as <SESSION>.json
+
     var banner = "NO VALID CLIENT FILE";
     
     let remote = req.socket.remoteAddress;
@@ -237,23 +240,23 @@ app.post("/UPLOAD", (req, res) => {
         let client = req.body.client;
         let year   = req.body.year;
         let time   = req.body.time;    
+        let sessionId = req.body.id;
+        let fileId = strSymbol(time+client+year+time);
 
+        if(sessionId===fileId) {
+            
+            // save file on server, not on client
+            console.dir("app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
+            Sheets.saveLatest(req.body,client,year);
+            
 
-        //let sessionId = req.body.sessionId;
-        let sessionId = strSymbol(time+client+year+time);
-        // let sessionId = Sheets.symbolic(time+client+year+time);
-        console.dir("app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
-        //if(sessionId===req.body.id) {
-
-            // hangs up console.log(JSON.stringify(req.socket));
-
-            let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
-    
-            banner = makeBanner(sessionId,year);
+            //let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
+            banner="file save ok";
+            //banner = makeBanner(sessionId,year);
 
             console.log ( "RESPOND with  " +banner);
 
-        // } else console.log ( "INVALID session id " );
+        } else console.log ( "UPLOAD "+sessionId+" INVALID session id "+fileId);
     }
 
     // send back sessionId to client brwoser or file
@@ -927,7 +930,6 @@ function strSymbol(pat) {
     }
     return out.join('');
 }
-
 
 
 function doBook(sessionId,reqBody) {
