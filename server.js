@@ -389,7 +389,7 @@ app.get('/welcomedrop', (req, res) => {
 app.listen(PORT, () => { 
     console.log(`Server    started from ${PORT} using files in `+__dirname); 
     console.log(`Server    http://ec2-3-94-192-123.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
-    console.log(`Local     http:/localhost:${PORT}/welcomedrop`); 
+    console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
 })
 
 

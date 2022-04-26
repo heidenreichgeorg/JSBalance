@@ -256,7 +256,7 @@
 
                 var target = document.getElementById("display");
                 if(date.length>6) {
-                    let txnForm=validateCD().diff
+                    let txnForm=validateCD(creditList,debitList).diff
                     if(txnForm.diff==0) {
                         showClose(txnForm);
                         postToServer("STORE",sInfo);

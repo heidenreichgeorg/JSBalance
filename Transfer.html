@@ -51,7 +51,7 @@
                     creditList[name]= {"index":i, "cents":cCent};
                 } else delete creditList[name];
 
-                showTransfer(validateCD());
+                showTransfer(validateCD(creditList,debitList));
             }
 
             function listDebitAccount(i,name) {
@@ -59,7 +59,7 @@
                     debitList[name]= {"index":i, "cents":cCent}
                 } else delete debitList[name];
 
-                showTransfer(validateCD());
+                showTransfer(validateCD(creditList,debitList));
             }
 
             function toggleC2D(name) {
@@ -68,7 +68,7 @@
                     var account=creditList[name];
                     debitList[name]=account;
                     delete creditList[name]; 
-                    showTransfer(validateCD());
+                    showTransfer(validateCD(creditList,debitList));
                 }
             }
 
@@ -78,7 +78,7 @@
                     var account=debitList[name];
                     creditList[name]=account;
                     delete debitList[name]; 
-                    showTransfer(validateCD());
+                    showTransfer(validateCD(creditList,debitList));
                 }
             }
 
@@ -88,13 +88,13 @@
             function clearCD() { 
                 creditList={}; 
                 debitList={}; 
-                showTransfer(validateCD());
+                showTransfer(validateCD(creditList,debitList));
             }
 
 
             function setNull() {
                 cCent=0;
-                showTransfer(validateCD());
+                showTransfer(validateCD(creditList,debitList));
             }
 
             function allowDrop(ev) {
@@ -134,7 +134,7 @@
                 creditList={}; 
                 debitList={}; 
 
-                showTransfer(validateCD());
+                showTransfer(validateCD(creditList,debitList));
             }  
 
 
@@ -153,7 +153,7 @@
 
                 cCent = parseInt(mCredit.replace(".","").replace(",",""));
                 
-                showTransfer(validateCD());
+                showTransfer(validateCD(creditList,debitList));
             }
             
 
