@@ -222,7 +222,7 @@ var creditDivs;
 var debitDivs;
 
 
-function validateCD() {
+function validateCD(creditList,debitList) {
     var saldoC=0;
     var saldoD=0;
 
@@ -372,7 +372,7 @@ function showTransfer(txnForm) {
 
     let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
-    if(!terminal) terminal = initTerminal(page,'PageContent',18);
+    if(!terminal) terminal = initTerminal(page,'PageContent',18);  
 
     var cursor=htmlPage;
 
@@ -441,20 +441,24 @@ function showTransfer(txnForm) {
 function showClose(txnForm) {
 
     let cdPairs = txnForm.cdPairs;
+    var saldoC=0; saldoC=txnForm.saldoC;
+    var saldoD=0; saldoD=txnForm.saldoD;
 
     let headerInfo = '<DIV class="C280">'+page["Closing"]+'&nbsp;'+page["header"]+'</DIV>';
 
     let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
-    if(!terminal) terminal = initTerminal(page,'PageContent',18);
+    if(!terminal) terminal = initTerminal(page,'PageContent',18,  showTransfer); // GH20220426 extra fourth param for next dialog
 
     var cursor=htmlPage;
-
-    
+  
     for(var c=0;c<cdPairs.length;c++) {
         cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div>"+cdPairs[c]);
         // <DIV class='R165' id='display'>&nbsp;</DIV>
     }
+
+    cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div>"+
+    "<div class='L66'>Credit</DIV><div class='R110'>"+cents2EU(saldoC)+"</div><div class='L66'>&nbsp;</DIV><div class='L66'>Debit</DIV><div class='R110'>"+cents2EU(saldoD)+"</div>");
     
 
     showTerminal(terminal,htmlPage);
@@ -470,7 +474,7 @@ function save(jInfo) {
 
     var target = document.getElementById("display");
     if(date.length>6) {
-        let  txnForm = validateCD();
+        let  txnForm = validateCD(jInfo.credit,jInfo.debit); 
         if(txnForm.diff==0) {
             showTransfer(txnForm);
             postToServer("BOOK",sInfo);
@@ -806,11 +810,13 @@ function setScreen(targetDocument,htmlPage) {
         var  arrHTML =[  ]; 
     
 
+        var autofocus='autofocus';
         for(var num=0;htmlPage;num++) {
             var next=null;
             if(!htmlPage.succPage) { nextPage(htmlPage,strLine);  } else next = htmlPage.succPage;
             arrHTML.push('<DIV class="ulliTab" id='+htmlPage.target+num+'>'+htmlPage.arrContent.join('')+'</DIV>');
-            arrPanel.push('<div class="key" onclick="select('+strTarget+','+num+')"><label class="form-control"><input type="radio" autofocus>'+num+'</input></label></div>');
+            arrPanel.push('<div class="key" onclick="select('+strTarget+','+num+')"><label class="form-control"><input type="radio" '+autofocus+'>'+num+'</input></label></div>');
+            autofocus='';
             htmlPage=next;
         }
 
@@ -825,7 +831,10 @@ function setScreen(targetDocument,htmlPage) {
         if(eHistory) eHistory.innerHTML = '<HEAD><link rel="stylesheet" href="./FBA/mobile_green.css"/>'
             +'<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />'
             +'</HEAD><BODY  onload="getFromServer(putResponse)" '+style+' ><DIV id="windowBorder" class="dosBorder"><DIV class="mTable">'
-             + panel + arrHTML.join('') + '</DIV></DIV></BODY>';
+            
+             + panel + arrHTML.join('') 
+            
+             + '</DIV></DIV></BODY>';
         
         
         select('PageContent',0); // htmlPage.target,  -1 is the PRINT page
@@ -833,7 +842,7 @@ function setScreen(targetDocument,htmlPage) {
 }
 
 
-function initTerminal(page,target,screenLines) {   
+function initTerminal(page,target,screenLines,nextFunc) {   
      
 
     // creates the DOS-type screen
@@ -863,12 +872,11 @@ function initTerminal(page,target,screenLines) {
     l++;
 
 
-
     let boxFooter2 = "<DIV class='L120' id='box2Footer'>&nbsp;"
     +"</DIV><DIV class='L280'>"+page["reference"]
     +"</DIV><DIV class='L280'>"+page["author"]
-    +"</DIV>";
-    arrHTML.push('<DIV class="attrLine" id="'+target+'termLine'+l+'">'+boxFooter2+'</DIV>');
+    +"</DIV>" + (nextFunc==null ? "": "<BUTTON autofocus class='L40' onclick='nextFunc'> >>> </BUTTON>");
+    arrHTML.push('<DIV  class="attrLine" id="'+target+'termLine'+l+'">'+boxFooter2+'</DIV>');
     l++;
 
 
@@ -885,6 +893,10 @@ function initTerminal(page,target,screenLines) {
     return document;
 }
 
+// GH20220426
+function nextFunc(ev) {
+    postToServer("NEXT",sInfo);
+}
 
 function showTerminal(terminal,htmlPage) {   
      
@@ -900,7 +912,7 @@ function showTerminal(terminal,htmlPage) {
     for(;l<htmlPage.screenLines;l++) {
         let arrHTMLKey=strTarget+"termLine"+l;
         let docHTML=terminal.getElementById(arrHTMLKey);
-        if(docHTML) {
+        if(docHTML && htmlPage.arrContent[l]) {
             docHTML.innerHTML=htmlPage.arrContent[l];
             console.log("showTerminal sets "+arrHTMLKey);
         } else console.log("showTerminal can't find "+arrHTMLKey);

@@ -259,6 +259,9 @@
                     let txnForm=validateCD(creditList,debitList).diff
                     if(txnForm.diff==0) {
                         showClose(txnForm);
+
+
+                        // LOG button: store transaction pattern  and show it in PatternList
                         postToServer("STORE",sInfo);
                         console.log('HistoryList.html log() postToServer STORE '+sInfo);
                         target.innerHTML = "<DIV >&nbsp;</DIV ><DIV onclick='closeWindow' >CLOSE</DIV>" ; // class='R110'

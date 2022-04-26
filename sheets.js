@@ -31,7 +31,8 @@ const Money = require('./money.js');
 //const Client = require('./client.js');
 
 const D_Schema = "Schema"; // includes .Names .total
-const ROOT = 'D:\\Privat\\';
+const LOCALROOT = 'D:\\Privat\\';
+const SERVEROOT = '/opt/app/sessions/';
 const Slash = '\\';
 
 const CSEP = ';';
@@ -146,7 +147,7 @@ async function setFileNameS(session,client,base,start,ext) {
 
     // directory path
     var result=null;
-    var dir = ROOT+client+Slash+base+Slash;
+    var dir = LOCALROOT+client+Slash+base+Slash;
 
     var lStart= start.toLowerCase();
     var lExt= ext.toLowerCase();
@@ -608,7 +609,7 @@ function create(client,year,time,remote,sessionId) {
 function getFromFile(client,base,sFile,time,sName) {
 
     var sheetCells=[];
-    var dir = ROOT+client+Slash+base+Slash;
+    var dir = LOCALROOT+client+Slash+base+Slash;
 
     if(debug) console.log("getFromFile "+sFile+" in "+dir);
 
@@ -713,11 +714,11 @@ module.exports['isSameFY']=isSameFY;
 
 // GH20211119
 function jsonMain(client,year,sid) {
-    return ROOT+client+Slash+year+Slash+fileFromSession(sid)+".json";
+    return LOCALROOT+client+Slash+year+Slash+fileFromSession(sid)+".json";
 }
 
 function jsonLogf(client) {
-    return ROOT+client+Slash+"logf.json";
+    return LOCALROOT+client+Slash+"logf.json";
 }
 
 

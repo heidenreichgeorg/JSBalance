@@ -77,12 +77,15 @@
                     var cDisplay = document.getElementById("display");
                     cDisplay.innerHTML = page["Closing"];
 
+                    /*
                     var welcome = document.getElementById("welcome");
                     welcome.innerHTML = "<DIV class='L120'>"+client
                     +"</DIV><DIV class='L220'>"+register+"&nbsp;"+taxnumber
                     +"</DIV><DIV class='L220'>"+iban+"&nbsp;"+reportYear
-                    +"</DIV><DIV class='L220'>"+author+"&nbsp;"+residence
-                    +"</DIV>>";
+                    +"</DIV><DIV class='L220'>"+author+"&nbsp; "+residence
+                        +'</DIV><DIV class="C100"><button id="read-button" onclick="bookTax()" )>NEXT</button> '
+                    +"</DIV>";
+                    */
                 }
                 console.log('Schema='+JSON.stringify(gSchema));
 
@@ -122,7 +125,7 @@
                 jInfo.flag = 1;
 
 
-                showClose(validateCD());
+                showClose(validateCD(creditList,debitList));
                 //save(jInfo);
             
             }
