@@ -17,7 +17,7 @@ const DOUBLE = ':';
 const CSEP = ';';
 const COLMIN=1; // minimum length of column text
         
-const PORT = 443;
+const PORT = 81;
 
 
 function getFromServer(responseHandler) {
