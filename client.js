@@ -17,12 +17,12 @@ const DOUBLE = ':';
 const CSEP = ';';
 const COLMIN=1; // minimum length of column text
         
-
+const PORT = 443;
 
 
 function getFromServer(responseHandler) {
                 
-    let strServerDNS = 'http://'+self.location.hostname+':81/'; 
+    let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/'; 
 
     var request = new XMLHttpRequest();
     if(debug) console.log("getFromServer()  ENTER");
@@ -60,7 +60,7 @@ function getFromServer(responseHandler) {
 
 function postToServer(strTarget,strParams,callBack) {
 
-    let strServerDNS = 'http://'+self.location.hostname+':81/'; 
+    let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/'; 
     
     if(strTarget) {
         var request = new XMLHttpRequest();
@@ -98,7 +98,7 @@ function postAndDisplay(strCommand,jBody,target) {
 
 // show modal message window
 
-    let strServerDNS = 'http://'+self.location.hostname+':81/'; 
+    let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';
     const url = strServerDNS+strCommand;
 
     // request options

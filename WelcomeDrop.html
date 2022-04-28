@@ -112,8 +112,8 @@ function showResponse(response) {
          (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
       };     
 
-
-      const strServerDNS = 'http://'+self.location.hostname+':81/';
+      
+      const strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';
 
       const form = document.querySelector("#login");
 /*
