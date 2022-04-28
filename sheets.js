@@ -32,7 +32,7 @@ const Money = require('./money.js');
 
 const D_Schema = "Schema"; // includes .Names .total
 const LOCALROOT = 'D:\\Privat\\';
-const SERVEROOT = '/opt/app/sessions/';
+const SERVEROOT = '/data/sessions/';
 const Slash = '\\';
 
 const CSEP = ';';
@@ -338,6 +338,9 @@ function readNumeric(csvLines,makeMoneyFunc) {
     }
     return aoaCells;
 }
+
+
+
 function start(sessionId,client,year,time,remote,phaseOneFunction) {
     
     var balance = [];
@@ -528,7 +531,7 @@ function create(client,year,time,remote,sessionId) {
 
     setFileNameS(session,client,year,'BOOK','xlsx'); // async find a XLSX file and sets session.sheetFile
     
-    var sFile=jsonMain(client,year,sessionId);
+    var sFile=jsonMain(SERVEROOT,client,year,sessionId);
     try {
         console.log("Sheets.getSheet MAIN "+sFile);
         var json = JSON.parse(fs.readFileSync(sFile,{'encoding':'utf8'})); // was latin1 GH20211120
@@ -644,7 +647,7 @@ async function saveLatest(session,client,year) {
 
     let sessionId=session.id;
 
-    var pSave = fs.writeFileSync(jsonMain(client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
+    var pSave = fs.writeFileSync(jsonMain(LOCALROOT,client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
         if (err) {
             console.log("sheets.js saveLatest: "+err);          
             throw err;
@@ -655,6 +658,24 @@ async function saveLatest(session,client,year) {
 }
 module.exports['saveLatest']=saveLatest;
 
+
+async function save2Server(session,client,year) {
+    console.log("save2Server Saving(JSON) to "+SERVEROOT);        
+
+    const data = JSON.stringify(session);
+
+    let sessionId=session.id;
+
+    var pSave = fs.writeFileSync(jsonMain(SERVEROOT,client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
+        if (err) {
+            console.log("sheets.js saveLatest: "+err);          
+            throw err;
+        }
+        console.log("saveLatest Saving("+data+")");          
+    });
+    console.log("JSON main is saved.");
+}
+module.exports['save2Server']=save2Server;
 
 function saveSessionLog(sessionId,txn) {
 
@@ -713,8 +734,8 @@ module.exports['isSameFY']=isSameFY;
 
 
 // GH20211119
-function jsonMain(client,year,sid) {
-    return LOCALROOT+client+Slash+year+Slash+fileFromSession(sid)+".json";
+function jsonMain(root,client,year,sid) {
+    return root+client+Slash+year+Slash+fileFromSession(sid)+".json";
 }
 
 function jsonLogf(client) {
