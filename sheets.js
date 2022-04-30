@@ -33,7 +33,7 @@ const Money = require('./money.js');
 const D_Schema = "Schema"; // includes .Names .total
 const LOCALROOT = 'D:\\Privat\\';
 const SERVEROOT = '/data/sessions/';
-const Slash = '\\';
+const Slash = '/';
 
 const CSEP = ';';
 const CEND = '|';
@@ -439,7 +439,7 @@ function xlsxWrite(sessionId,tBuffer) {
                         let len=session.sheetName.length;
                         if(len>6) {
                             if(debugWrite) console.log("sheets.xlsxWrite saveLatest("+arrTransaction+") to "+client+","+year);
-                            saveLatest(session,client,year);
+                            saver2Server(session,client,year);
                             
                         } else console.dir("sheets.xlsxWrite can't write to "+session.sheetName);
 
@@ -596,7 +596,7 @@ function create(client,year,time,remote,sessionId) {
             console.dir('sheets.js getFromFile reads '+session.sheetName+" with "+session.sheetCells.length+" lines.")
 
             //console.log('sheets.js getFromFile reads '+session.sheetName); 
-            saveLatest(session,client,year);       
+            saver2Server(session,client,year);       
         }   
     }, 2000);
 
@@ -612,7 +612,7 @@ function create(client,year,time,remote,sessionId) {
 function getFromFile(client,base,sFile,time,sName) {
 
     var sheetCells=[];
-    var dir = LOCALROOT+client+Slash+base+Slash;
+    var dir = SERVEROOT+client+Slash+base+Slash;
 
     if(debug) console.log("getFromFile "+sFile+" in "+dir);
 
@@ -639,28 +639,9 @@ function getFromFile(client,base,sFile,time,sName) {
 }
 
 
-
+/*
 async function saveLatest(session,client,year) {
     console.log("saveLatest Saving(JSON)");        
-
-    const data = JSON.stringify(session);
-
-    let sessionId=session.id;
-
-    var pSave = fs.writeFileSync(jsonMain(LOCALROOT,client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
-        if (err) {
-            console.log("sheets.js saveLatest: "+err);          
-            throw err;
-        }
-        console.log("saveLatest Saving("+data+")");          
-    });
-    console.log("JSON main is saved.");
-}
-module.exports['saveLatest']=saveLatest;
-
-
-async function save2Server(session,client,year) {
-    console.log("save2Server Saving(JSON) to "+SERVEROOT);        
 
     const data = JSON.stringify(session);
 
@@ -674,6 +655,25 @@ async function save2Server(session,client,year) {
         console.log("saveLatest Saving("+data+")");          
     });
     console.log("JSON main is saved.");
+}
+module.exports['saveLatest']=saveLatest;
+*/
+
+async function save2Server(session,client,year) {
+    console.log("save2Server Saving(JSON) to "+SERVEROOT);        
+
+    const data = JSON.stringify(session);
+
+    let sessionId=session.id;
+
+    var pSave = fs.writeFileSync(jsonMain(SERVEROOT,client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
+        if (err) {
+            console.log("sheets.js saver2Server: "+err);          
+            throw err;
+        }
+        console.log("saver2Server Saving("+data+")");          
+    });
+    console.log("saver2Server: JSON main is saved.");
 }
 module.exports['save2Server']=save2Server;
 
@@ -739,7 +739,7 @@ function jsonMain(root,client,year,sid) {
 }
 
 function jsonLogf(client) {
-    return LOCALROOT+client+Slash+"logf.json";
+    return SERVEROOT+client+Slash+"logf.json";
 }
 
 

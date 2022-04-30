@@ -247,9 +247,8 @@ app.post("/UPLOAD", (req, res) => {
             
             // save file on server, not on client
             console.dir("app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
-            //Sheets.saveLatest(req.body,client,year);
+
             Sheets.save2Server(req.body,client,year);
-            
 
             Sheets.start(sessionId,client,year,time,remote,phaseOne);
 
