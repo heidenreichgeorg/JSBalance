@@ -149,10 +149,10 @@ async function setFileNameS(root,session,client,year,start,ext) {
     var result=null;
     var dir = root+client+Slash; // GH20220430
 
-    var lStart= year+start.toLowerCase();   // GH20220430
+    var lStart =year; // =start.toLowerCase();   // GH20220430
     var lExt= ext.toLowerCase();
 
-    if(debug) console.log("sheet.js getFileName in "+dir+" for "+lStart+"*"+lExt);
+    if(debug) console.log("sheet.js getFileName SEARCH in "+dir+" for "+lStart+"*"+lExt);
 
 
 
