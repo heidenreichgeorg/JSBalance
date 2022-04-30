@@ -143,13 +143,13 @@ function getLatestFile(dir,files,lStart,lExt) {
 
 
 
-async function setFileNameS(root,session,client,base,start,ext) {
+async function setFileNameS(root,session,client,year,start,ext) {
 
     // directory path
     var result=null;
-    var dir = root+client+Slash+base+Slash;
+    var dir = root+client+Slash; // GH20220430
 
-    var lStart= start.toLowerCase();
+    var lStart= year+start.toLowerCase();   // GH20220430
     var lExt= ext.toLowerCase();
 
     if(debug) console.log("sheet.js getFileName in "+dir+" for "+lStart+"*"+lExt);
@@ -609,10 +609,10 @@ function create(client,year,time,remote,sessionId) {
 
 
 
-function getFromFile(client,base,sFile,time,sName) {
+function getFromFile(client,year,sFile,time,sName) {
 
     var sheetCells=[];
-    var dir = SERVEROOT+client+Slash+base+Slash;
+    var dir = SERVEROOT+client+Slash; // GH20220430
 
     if(debug) console.log("getFromFile "+sFile+" in "+dir);
 
@@ -735,7 +735,8 @@ module.exports['isSameFY']=isSameFY;
 
 // GH20211119
 function jsonMain(root,client,year,sid) {
-    return root+client+Slash+year+Slash+fileFromSession(sid)+".json";
+    return root+client+Slash+year+fileFromSession(sid)+".json";
+    // return root+client+Slash+year+Slash+fileFromSession(sid)+".json"; GH20220430
 }
 
 function jsonLogf(client) {
