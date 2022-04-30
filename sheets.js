@@ -136,7 +136,7 @@ function getLatestFile(dir,files,lStart,lExt) {
                 
             } //else console.log("getLatestFile("+lStart+","+lExt+") skips "+file);
         });
-    } catch(err) { conso9le.dir(err); }
+    } catch(err) { console.dir("getLatestFile from dir="+dir+"  files="+files+":"+err); }
     if(debug) console.log("getLatestFile("+lStart+","+lExt+")     returns  "+found);
     return found;
 }
