@@ -143,11 +143,11 @@ function getLatestFile(dir,files,lStart,lExt) {
 
 
 
-async function setFileNameS(session,client,base,start,ext) {
+async function setFileNameS(root,session,client,base,start,ext) {
 
     // directory path
     var result=null;
-    var dir = LOCALROOT+client+Slash+base+Slash;
+    var dir = root+client+Slash+base+Slash;
 
     var lStart= start.toLowerCase();
     var lExt= ext.toLowerCase();
@@ -529,7 +529,7 @@ function create(client,year,time,remote,sessionId) {
     
     var session = { 'client':client,  'year':year,  'remote':remote,  'time':time,  'sheetCells':'', 'sheetName':client+year, 'id':sessionId, 'logT':[] };
 
-    setFileNameS(session,client,year,'BOOK','xlsx'); // async find a XLSX file and sets session.sheetFile
+    setFileNameS(SERVEROOT,session,client,year,'BOOK','xlsx'); // async find a XLSX file and sets session.sheetFile
     
     var sFile=jsonMain(SERVEROOT,client,year,sessionId);
     try {
