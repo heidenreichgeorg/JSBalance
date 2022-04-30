@@ -97,6 +97,8 @@ function load(sessionId,phaseOneFunction) {
     // INSTEAD OF SESSION BAlANCE MEMBER
     var balance = [];
 
+    let addrT= 0;
+
     var session = get(sessionId);
 
     if(session && session.time && session.time.length>4 && session.client && session.client.length>2 && session.year && session.year.length>3) {
@@ -106,7 +108,7 @@ function load(sessionId,phaseOneFunction) {
         if(session.sheetCells && session.sheetCells.length>H_LEN) {
 
             console.log("Sheets.js UPDATE with "+session.id);    
-            balance = phaseOneFunction(session.logT, session.sheetCells);
+            balance = phaseOneFunction(addrT,session.logT, session.sheetCells);
 
         } else { console.error("Sheets.js UPDATE() NO SHEET CELLS"); }
 
@@ -344,7 +346,8 @@ function readNumeric(csvLines,makeMoneyFunc) {
 function start(sessionId,client,year,time,remote,phaseOneFunction) {
     
     var balance = [];
-
+    let addrT = null;
+    
     if(time && time.length>4 && client && client.length>2 && year && year.length>3) {
         var session = create(client,year,time,remote,sessionId);
         if(session.sheetCells && session.sheetCells.length>H_LEN) {
@@ -354,8 +357,8 @@ function start(sessionId,client,year,time,remote,phaseOneFunction) {
             // GLOBAL STATE CHANGE  without balance member GH20211120
             setSession(session);
 
-            balance = phaseOneFunction(session.logT,session.sheetCells);
-            console.dir("Sheets.js START uses sessionId: "+sessionId);    
+            balance = phaseOneFunction(addrT,session.logT,session.sheetCells);
+            console.dir("Sheets.js start() uses sessionId: "+sessionId);    
 
         } else { console.log("Sheets.js start() NO SHEET CELLS"); }
     }
