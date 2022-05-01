@@ -42,6 +42,7 @@ const XLSX = require('xlsx');
 //const { pseudoRandomBytes } = require('crypto');
 
 
+
 const J_ACCT = 6;
 const H_LEN  = 7; // header length
 
@@ -383,7 +384,7 @@ function xlsxWrite(sessionId,tBuffer) {
 
             if(client && year) {
 
-                    if(debugWrite) console.log("sheets.xlsxWrite ENTER "+session.sheetName+ " for ("+client+","+year+") in file "+session.sheetFile);
+                    if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+session.sheetName+ " for ("+client+","+year+") in file "+session.sheetFile);
 
                     var excelData=[];            
                     var numLines = 0;
@@ -395,14 +396,14 @@ function xlsxWrite(sessionId,tBuffer) {
                         numLines = session.sheetCells.length;
                         schemaLen = session.sheetCells[H_LEN].length;
                         // GH20220131
-                        console.dir("sheets.xlsxWrite using schemaLen "+schemaLen+" for #"+numLines);
+                        console.dir("1410 sheets.xlsxWrite using schemaLen "+schemaLen+" for #"+numLines);
                         
                         for(;r<numLines;r++) {
                             var arrTransaction = numericSheet(session.sheetCells[r],schemaLen);
                             arrTransaction.push(CEND);
                             excelData.push(arrTransaction);
                         }
-                    } else console.error("sheets.xlsxWrite NO sheetCells");
+                    } else console.error("1415 sheets.xlsxWrite NO sheetCells");
 
 
                     var excelLogT=[];            
@@ -414,7 +415,7 @@ function xlsxWrite(sessionId,tBuffer) {
                             excelLogT.push(arrLine);
                             numLogs++;
                         }                       
-                    } else console.dir("sheets.xlsxWrite NO LOGT");
+                    } else console.dir("1425 sheets.xlsxWrite NO LOGT");
 
 
                     var excelAddrT=[];            
@@ -427,8 +428,8 @@ function xlsxWrite(sessionId,tBuffer) {
                                 excelAddrT.push(arrLine);
                                 numAddrs++;
                             }                       
-                        } else console.dir("sheets.xlsxWrite NO ADDRT");
-                    } catch(err) {console.dir("sheets.xlsxWrite ADDRT "+err);}
+                        } else console.dir("1435 sheets.xlsxWrite NO ADDRT");
+                    } catch(err) {console.dir("1445 sheets.xlsxWrite ADDRT "+err);}
 
 
                     if(tBuffer) {
@@ -443,14 +444,14 @@ function xlsxWrite(sessionId,tBuffer) {
                         // add new txn to JSON
                         let len=session.sheetName.length;
                         if(len>6) {
-                            if(debugWrite) console.log("sheets.xlsxWrite saveLatest("+arrTransaction+") to "+client+","+year);
+                            if(debugWrite) console.log("1450 sheets.xlsxWrite saveLatest("+arrTransaction+") to "+client+","+year);
                             save2Server(session,client,year);
                             
-                        } else console.dir("sheets.xlsxWrite can't write to "+session.sheetName);
+                        } else console.dir("1455 sheets.xlsxWrite can't write to "+session.sheetName);
 
-                        if(debugWrite) console.log("sheets.xlsxWrite APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
+                        if(debugWrite) console.log("1460 sheets.xlsxWrite APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
                     }
-                    else if(debugWrite) console.log("sheets.xlsxWrite SAVE("+client+","+year+") #"+numLines);
+                    else if(debugWrite) console.log("1465 sheets.xlsxWrite SAVE("+client+","+year+") #"+numLines);
 
 
 
@@ -462,11 +463,11 @@ function xlsxWrite(sessionId,tBuffer) {
                     try{  
                         workBook = XLSX.readFile(session.sheetFile);
                         // GH20220118 workBook.Sheets[session.sheetName]=xSheet;
-                    } catch(err) { console.dir("sheets.xlsxWrite FAILED to OPEN sheetFile "+session.sheetFile+" for ("+client+","+year+") #"+numLines);}
+                    } catch(err) { console.dir("1475 sheets.xlsxWrite FAILED to OPEN sheetFile "+session.sheetFile+" for ("+client+","+year+") #"+numLines);}
 
                     if(workBook==null) {
                         workBook = XLSX.utils.book_new();
-                        console.dir("sheets.xlsxWrite CREATE new workbook for ("+client+","+year+") #"+numLines);
+                        console.dir("1480 sheets.xlsxWrite CREATE new workbook for ("+client+","+year+") #"+numLines);
                     }
 
 
@@ -476,7 +477,7 @@ function xlsxWrite(sessionId,tBuffer) {
                             workBook.Sheets[session.sheetName]=xSheet;                
                         } else {
                             // did not work
-                            console.dir("sheets.xlsxWrite CREATE SHEET "+sesssion.sheetName+" for ("+client+","+year+") #"+numLines);
+                            console.dir("1485 sheets.xlsxWrite CREATE SHEET "+sesssion.sheetName+" for ("+client+","+year+") #"+numLines);
                             XLSX.utils.book_append_sheet(workBook, xSheet, session.sheetName);
                         }
                         if(debugWrite) console.log("sheets.xlsxWrite SHEET ("+client+year+")  OK ");
@@ -485,44 +486,44 @@ function xlsxWrite(sessionId,tBuffer) {
 
                     if(numLogs>0 && excelLogT && lSheet) {
                         if(workBook.Sheets && workBook.Sheets['LOGT']) {
-                            if(debugWrite) console.log("sheets.xlsxWrite UPDATE SHEET LOGT #"+numLogs);
+                            if(debugWrite) console.log("1490 sheets.xlsxWrite UPDATE SHEET LOGT #"+numLogs);
                             workBook.Sheets['LOGT']=lSheet;                
                         } else {
                             // did not work
-                            console.dir("sheets.xlsxWrite CREATE SHEET LOGT "+numLogs);
+                            console.dir("1495 sheets.xlsxWrite CREATE SHEET LOGT "+numLogs);
                             XLSX.utils.book_append_sheet(workBook, lSheet, 'LOGT');
                         }
-                        if(debugWrite) console.log("sheets.xlsxWrite SHEET LOGT OK ");
+                        if(debugWrite) console.log("1500 sheets.xlsxWrite SHEET LOGT OK ");
                     }
 
 
                     if(numAddrs>0 && excelAddrT && aSheet) {
                         if(workBook.Sheets && workBook.Sheets['ADDR']) {
-                            if(debugWrite) console.log("sheets.xlsxWrite UPDATE SHEET ADDR #"+numAddrs);
+                            if(debugWrite) console.log("1510 sheets.xlsxWrite UPDATE SHEET ADDR #"+numAddrs);
                             workBook.Sheets['ADDR']=aSheet;                
                         } else {
                             // did not work
-                            console.dir("sheets.xlsxWrite CREATE SHEET ADDR #"+numAddrs);
+                            console.dir("1515 sheets.xlsxWrite CREATE SHEET ADDR #"+numAddrs);
                             XLSX.utils.book_append_sheet(workBook, aSheet, 'ADDR');
                         }
-                        if(debugWrite) console.log("sheets.xlsxWrite SHEET ADDR OK ");
+                        if(debugWrite) console.log("1520 sheets.xlsxWrite SHEET ADDR OK ");
                     }
 
 
                     XLSX.writeFile(workBook, session.sheetFile);
-                    if(debugWrite)  console.log("sheets.xlsxWrite WRITE FILE "+session.sheetFile);
+                    if(debugWrite)  console.log("1530 sheets.xlsxWrite WRITE FILE "+session.sheetFile);
                     
                 } else {
-                    console.dir("sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
+                    console.dir("1535 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
                 }   
             } else {
-                console.dir("sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
+                console.dir("1545 sheets.xlsxWrite() NO sheetName and NOT writing "+JSON.stringify(session));
             }
         } else {
-                console.dir("sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
+                console.dir("1555 sheets.xlsxWrite NO sheetFile and NOT writing "+JSON.stringify(session));
         }
     } else {
-        console.dir("sheets.xlsxWrite NO SESSION "+sessionId);
+        console.dir("1565 sheets.xlsxWrite NO SESSION "+sessionId);
     }
 }
 module.exports['xlsxWrite']=xlsxWrite;

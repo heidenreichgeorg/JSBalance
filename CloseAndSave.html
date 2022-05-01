@@ -138,7 +138,7 @@
             let sessionId = paramString.split('=')[1];
             console.log("1110 CloseAndSave sessionId = "+sessionId);
             
-            postToServer("SAVE",  {'sessionId':sessionId }  );
+            postToServer("SAVE",  "{'sessionId':sessionId }"  );
 
             console.log("1200 CloseAndSave Download EXIT");
             // closeWindow();
