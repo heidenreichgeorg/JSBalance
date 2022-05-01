@@ -1,4 +1,4 @@
-let debugLoad=0;
+let debug=0;
 
 // Imports
 const { addEUMoney, moneyString, iScaleMoney, setEUMoney , setENMoney, setMoney, subEUMoney, lessMoney, cents2EU } = require('./money.js');
@@ -436,13 +436,13 @@ function phaseOne(addrT, logT, aoaCells) {
                         const aNames=row;
                         result[D_Schema]["Names"]=aNames;
                         result.writeTime = unixTime();
-                        if(debugLoad>1) console.log("N at "+result.writeTime);
+                        if(debug>1) console.log("N at "+result.writeTime);
                         var column;
                         for(column=0;column<aNames.length && !(aNames[column].length>0 && aNames[column].length<4 && aNames[column].includes(CEND));column++) {
                             var rawName=aNames[column];
                             if(rawName && rawName.length>=COLMIN && column>=J_ACCT) {
                                 var aName=rawName.trim();
-                                if(debugLoad>1) console.log("N "+aName);
+                                if(debug>1) console.log("N "+aName);
                                 if(aName==='ASSETS') { iAssets=column;
                                     result[D_Schema].assets=column;
                                 } else if(aName==='EQLIAB') { iEqLiab=column;
@@ -481,7 +481,7 @@ function phaseOne(addrT, logT, aoaCells) {
                         result[D_Schema].client    = row[3];
                     }
                     else if(key && key==='A') {
-                        if(debugLoad>0) console.log("Server.phaseOne ASSET  "+row);
+                        if(debug>0) console.log("Server.phaseOne ASSET  "+row);
                         const assetInfo = row;
                         if(assetInfo.length>J_ACCT) {
                             var date = assetInfo[1];
@@ -493,8 +493,8 @@ function phaseOne(addrT, logT, aoaCells) {
                                 var rest =assetValue(assetInfo,iAssets);
                                 var cost =getCost(idnt,nmbr,init);
                                 result[D_FixAss][idnt]={ "date":date, "type":type, "init":init,  "nmbr":nmbr, "idnt":idnt, "rest":rest, "cost":cost };
-                                if(debugLoad>1) console.log(" BOOK  "+idnt+" = "+result[D_FixAss][idnt].init+ "for #"+nmbr+" at "+cost);
-                                //if(debugLoad>1) console.log("Assets"+JSON.stringify( result[D_FixAss][idnt] ));
+                                if(debug>1) console.log(" BOOK  "+idnt+" = "+result[D_FixAss][idnt].init+ "for #"+nmbr+" at "+cost);
+                                //if(debug>1) console.log("Assets"+JSON.stringify( result[D_FixAss][idnt] ));
                             }
                         }
                     }
@@ -522,7 +522,7 @@ function phaseOne(addrT, logT, aoaCells) {
                     else if(key && parseInt(key)>0) {                    
                         const MINTXN=5; // elements in a TXN
                         var jHistory = result[D_History];
-                        //if(debugLoad>1) console.log("BOOK "+row.join(CSEP));
+                        //if(debug>1) console.log("BOOK "+row.join(CSEP));
                         if(row.length>MINTXN && result[D_Schema].Names){
                             var gNames = result[D_Schema].Names;
                             var gDesc  = result[D_Schema].Desc;
@@ -538,14 +538,14 @@ function phaseOne(addrT, logT, aoaCells) {
                                     if(rawName && rawName.length>1) {
                                         result[D_Balance][rawName] = Account.makeAccount(rawName,xbrl,xdesc,xColumn);
                                     }
-                                    if(debugLoad>1) console.log("make("+rawName+","+xbrl+","+xdesc+","+xColumn+")");
+                                    if(debug>1) console.log("make("+rawName+","+xbrl+","+xdesc+","+xColumn+")");
                                     
                                 };
                             }
 
                             var column=0;
                             aLine.forEach(strAmount => {
-                                if(debugLoad>1) console.log("init "+strAmount);
+                                if(debug>1) console.log("init "+strAmount);
                                 if(column>=J_ACCT && strAmount && strAmount.length>0) {
                                     var acName = gNames[column];
                                     if(acName && acName.length>1) {
@@ -559,13 +559,13 @@ function phaseOne(addrT, logT, aoaCells) {
                                             
                                             if(firstLine) {
                                                 result[D_Balance][acName] = Account.openAccount(account,strAmount);
-                                                if(debugLoad>1) console.log("open "+strAmount
+                                                if(debug>1) console.log("open "+strAmount
                                                     +" for "+gNames[column]
                                                     +"  = "+JSON.stringify(result[D_Balance][acName])
                                                 );
                                             } else { 
                                                 result[D_Balance][acName] = Account.addEUMoney(account,strAmount);
-                                                if(debugLoad>1) console.log("add  "+strAmount
+                                                if(debug>1) console.log("add  "+strAmount
                                                 +" to  "+gNames[column]
                                                 +"  = "+JSON.stringify(result[D_Balance][acName]));
                                             }
@@ -588,7 +588,7 @@ function phaseOne(addrT, logT, aoaCells) {
                                 var cost =getCost(idnt,nmbr,init);
     
                                 result[D_FixAss][idnt]={ "date":date, "type":type, "init":init,  "nmbr":nmbr, "idnt":idnt, "rest":init, "cost":cost};
-                                if(debugLoad>1) console.log("INVEST "+idnt+" = "+result[D_FixAss][idnt].rest+ "for #"+nmbr+" at "+cost);
+                                if(debug>1) console.log("INVEST "+idnt+" = "+result[D_FixAss][idnt].rest+ "for #"+nmbr+" at "+cost);
                             }
 
                             if(aLine[3] && aLine[3].trim()==='SELL') {
@@ -611,7 +611,7 @@ function phaseOne(addrT, logT, aoaCells) {
                                 // OPEN
                                 // MUST VERIFY existing identifier
                                 result[D_FixAss][idnt]={ "date":date, "type":type, "init":init,  "nmbr":nmbr, "idnt":idnt, "rest":remn, "cost":cost };
-                                if(debugLoad>1) console.log("SELL "+idnt+" = "+result[D_FixAss][idnt].rest);
+                                if(debug>1) console.log("SELL "+idnt+" = "+result[D_FixAss][idnt].rest);
                             }
 
                             if(aLine[3] && aLine[3].trim()==='YIELD') {
@@ -639,16 +639,16 @@ function phaseOne(addrT, logT, aoaCells) {
                                         // OPEN
                                         // MUST VERIFY existing identifier
                                         result[D_FixAss][idnt]={ "date":date, "type":type, "init":iVal,  "nmbr":nmbr, "idnt":idnt, "rest":rest, "cost":price  };
-                                        if(debugLoad>1) console.log("YIELD "+idnt+" = "+result[D_FixAss][idnt].rest);
+                                        if(debug>1) console.log("YIELD "+idnt+" = "+result[D_FixAss][idnt].rest);
                                         } else  console.log("YIELD UNKNOWN "+idnt+" ASSET");
                                 } else {
-                                    if(debugLoad>1) console.log("YIELD UNKNOWN "+idnt+" = "+result[D_FixAss][idnt].rest);
+                                    if(debug>1) console.log("YIELD UNKNOWN "+idnt+" = "+result[D_FixAss][idnt].rest);
                                 }
                             }
                         }
                     }
                 });
-                if(debugLoad>1) console.log("phaseOne: check partners");
+                if(debug>1) console.log("phaseOne: check partners");
 
                 // process the partners
                 var partners = {};
@@ -750,7 +750,7 @@ function phaseOne(addrT, logT, aoaCells) {
 
 
                 result[D_Partner_NET]=partners;
-                if(debugLoad>1) 
+                if(debug>1) 
                     for (let i in partners) { console.log("Server phaseOne Partner("+i+") "+JSON.stringify(partners[i])); }
 
             } catch (err) {
