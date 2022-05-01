@@ -52,6 +52,8 @@
         var gSchema;
         var gAssets;
 
+        var paramString;
+    
         
         function putResponse(strTarget,strText) {       
 
@@ -114,7 +116,6 @@
                 var aTable = document.getElementById('selAccount');
                 if(aTable) aTable.innerHTML = txnTable.join("");
 
-
                 creditList= jInfo.credit;
                 console.log("CREDIT = "+JSON.stringify(creditList));
 
@@ -126,21 +127,19 @@
 
                 showClose(validateCD(creditList,debitList),'download');
             
-            }
-        
-            
+            }               
         }
 
     
         function download(event) {
-
             console.log("1000 CloseAndSave Download ENTER");
             handleEvent(event);
-
-            Sheets.xlsxWrite(req.query.sessionId,null); 
-            
+            paramString = strTarget.split('?')[1];
+            let sessionId = paramString.split('=')[1];
+            console.log("1010 CloseAndSave params = "+paramString);
+            console.log("1020 CloseAndSave sessionId = "+sessionId);
+            Sheets.xlsxWrite(paramString.split('=')[1],null);         
             console.log("1100 CloseAndSave Download EXIT");
-
             closeWindow();
         }
     
