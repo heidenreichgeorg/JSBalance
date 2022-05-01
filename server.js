@@ -838,7 +838,7 @@ function makeBanner(sessionId,year) {
 
 function buttonTab(link,label) {
     let result =  '<DIV class="C100"><A HREF="'+link+'" target="_blank"><BUTTON class="largeKey">'+label+'</BUTTON></A></DIV>';
-    if(debugSend) console.log(result);
+    if(debug>2) console.log(result);
     return result;
 }
 
@@ -847,7 +847,7 @@ function buttonOpenTile(link,command) {
     let strLink = "'"+link+"'";
     let strCommand = "'"+command+"'";
     let result =  '<DIV class="C100"><A HREF="JavaScript:newPopup('+strLink+','+strCommand+');" ><BUTTON class="largeKey">'+label+'</BUTTON></A></DIV>';
-    if(debugSend) console.log(result);
+    if(debug>2) console.log(result);
     return result;
 }
 
@@ -857,7 +857,7 @@ function buttonOpenWide(link,command,lines) {
     let strLink = "'"+link+"'";
     let strCommand = "'"+command+"'";
     let result =  '<DIV class="C100"><A HREF="JavaScript:newPopup('+strLink+','+strCommand+',1500,'+lines+');" ><BUTTON class="largeKey">'+label+'</BUTTON></A></DIV>';
-    if(debugSend) console.log(result);
+    if(debug>2) console.log(result);
     return result;
 }
 
