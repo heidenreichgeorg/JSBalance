@@ -347,7 +347,7 @@ app.post("/STORE", (req, res) => {
     // from HistoryList.html       
     console.log("0010 app.post STORE LOG txn into log('"+JSON.stringify(req.body)+"')");
     
-    let delta = req.body.delta
+    let delta = req.body.delta;
 
     console.log("0015 app.post STORE LOG with session id=("+req.body.sessionId+")");
 
