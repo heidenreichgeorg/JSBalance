@@ -428,7 +428,7 @@ function phaseOne(addrT, logT, aoaCells) {
 
                     lineCount++;
                     
-                    console.log("\n0110 server.phaseOne "+JSON.stringify(row));
+                    if(debug>3) console.log("0110 server.phaseOne "+JSON.stringify(row));
                         
                     var column;
                     var key=row[0];
