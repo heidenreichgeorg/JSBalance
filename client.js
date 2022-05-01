@@ -167,7 +167,8 @@ function unixTime() {
 
 
 function handleEvent(event) { 
-    console.log(unixTime()+'--'+event.type+': '+event.message+' '+event.filename+'\n'); 
+    if(event) console.log(unixTime()+'--'+event.type+': '+event.message+' '+event.filename+'\n'); 
+    else console.log(unixTime()+'--EMPTY');
 }
 
 

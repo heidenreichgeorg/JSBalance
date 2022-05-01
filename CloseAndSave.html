@@ -55,6 +55,8 @@
         
         function putResponse(strTarget,strText) {       
 
+            console.log('CloseAndSave '+strTarget);
+
             gResponse = JSON.parse(strText);
 
             let gReport  = gResponse[D_Report];
@@ -131,10 +133,12 @@
 
     
         function download(event) {
+
             console.log("1000 CloseAndSave Download ENTER");
             handleEvent(event);
 
-            //save(jInfo);
+            Sheets.xlsxWrite(req.query.sessionId,null); 
+            
             console.log("1100 CloseAndSave Download EXIT");
 
             closeWindow();
