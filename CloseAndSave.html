@@ -57,7 +57,8 @@
         
         function putResponse(strTarget,strText) {       
 
-            console.log('CloseAndSave '+strTarget);
+            console.log('1000 CloseAndSave '+strTarget);
+            paramString = strTarget.split('?')[1];
 
             gResponse = JSON.parse(strText);
 
@@ -132,22 +133,20 @@
 
     
         function download(event) {
-            console.log("1000 CloseAndSave Download ENTER");
+            console.log("1100 CloseAndSave Download ENTER with paramstring="+paramString);
             handleEvent(event);
-            paramString = strTarget.split('?')[1];
             let sessionId = paramString.split('=')[1];
-            console.log("1010 CloseAndSave params = "+paramString);
-            console.log("1020 CloseAndSave sessionId = "+sessionId);
+            console.log("1110 CloseAndSave sessionId = "+sessionId);
             Sheets.xlsxWrite(paramString.split('=')[1],null);         
-            console.log("1100 CloseAndSave Download EXIT");
+            console.log("1200 CloseAndSave Download EXIT");
             closeWindow();
         }
     
         
         function closeWindow() {
-            console.log("1200 CloseAndSave Close IN");
+            console.log("1300 CloseAndSave Close IN");
             window.close();
-            console.log("1210 CloseAndSave Close OUT");
+            console.log("1310 CloseAndSave Close OUT");
         }
 
         </script>
