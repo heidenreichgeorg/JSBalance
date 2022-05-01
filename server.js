@@ -806,25 +806,27 @@ function makeBanner(sessionId,year) {
         */
             vbanner.push('<SCRIPT>localStorage.setItem("mysession",'+`"${sessionId}"`+');</SCRIPT>');
 
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/account?sessionId=${sessionId}`,'AcctHistory'));
-            vbanner.push(buttonOpenWide(`http://${localhost}:${PORT}/dashboard?sessionId=${sessionId}`,'DashBoard',3));
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/openbalance?sessionId=${sessionId}`,'AcctOpen'));
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/history?sessionId=${sessionId}`,'History'));
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/gainloss?sessionId=${sessionId}`,'GainLoss'));
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/assets?sessionId=${sessionId}`,'Assets'));
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/balance?sessionId=${sessionId}`,'AcctClose'));
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/galshgb?sessionId=${sessionId}`,'GainlossHGB'));
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/hgbbeginyear?sessionId=${sessionId}`,'BalanceOpen'));
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/hgbregular?sessionId=${sessionId}`,'BalanceClose'));
+            let target = ""; // http://${localhost}:${PORT}
+
+            vbanner.push(buttonOpenTile(target+`/account?sessionId=${sessionId}`,'AcctHistory'));
+            vbanner.push(buttonOpenWide(target+`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
+            vbanner.push(buttonOpenTile(target+`/openbalance?sessionId=${sessionId}`,'AcctOpen'));
+            vbanner.push(buttonOpenTile(target+`/history?sessionId=${sessionId}`,'History'));
+            vbanner.push(buttonOpenTile(target+`/gainloss?sessionId=${sessionId}`,'GainLoss'));
+            vbanner.push(buttonOpenTile(target+`/assets?sessionId=${sessionId}`,'Assets'));
+            vbanner.push(buttonOpenTile(target+`/balance?sessionId=${sessionId}`,'AcctClose'));
+            vbanner.push(buttonOpenTile(target+`/galshgb?sessionId=${sessionId}`,'GainlossHGB'));
+            vbanner.push(buttonOpenTile(target+`/hgbbeginyear?sessionId=${sessionId}`,'BalanceOpen'));
+            vbanner.push(buttonOpenTile(target+`/hgbregular?sessionId=${sessionId}`,'BalanceClose'));
             if(Sheets.isSameFY(year)) {
-                vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/transfer?sessionId=${sessionId}`,'Transfer'));
-//                vbanner.push(buttonTab(`http://${localhost}:${PORT}/xfer?sessionId=${sessionId}`,de_DE['Transfer']));
+                vbanner.push(buttonOpenTile(target+`/transfer?sessionId=${sessionId}`,'Transfer'));
+//                vbanner.push(buttonTab(target+`/xfer?sessionId=${sessionId}`,de_DE['Transfer']));
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/pattern?sessionId=${sessionId}`,'Patterns'));      
-            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/closeandsave?sessionId=${sessionId}`,'Closing'));
-//            vbanner.push(buttonOpenTile(`http://${localhost}:${PORT}/assetl?sessionId=${sessionId}`,'Assets']));
-            //vbanner.push(buttonTab(`http://${localhost}:${PORT}/SAVE?sessionId=${sessionId}`,de_DE['Closing']));
-            vbanner.push(buttonTab(`http://${localhost}:${PORT}/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
+            vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
+            vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
+//            vbanner.push(buttonOpenTile(target+`/assetl?sessionId=${sessionId}`,'Assets']));
+            //vbanner.push(buttonTab(target+`/SAVE?sessionId=${sessionId}`,de_DE['Closing']));
+            vbanner.push(buttonTab(target+`/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
         vbanner.push('</DIV>');
 
         console.log("0300 makeBanner OK");
