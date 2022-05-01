@@ -196,6 +196,8 @@ app.get('/', (req, res) => {
 
 // LOGIN to an existing session
 app.post("/LOGIN", (req, res) => { 
+    console.log("\n\n");
+
     console.log("0010 app.post LOGIN "+JSON.stringify(req.body));
     let remote = req.socket.remoteAddress;
     let client = req.body.client;
@@ -223,6 +225,7 @@ app.post("/LOGIN", (req, res) => {
 
 //start session with uploading a session file for a known client
 app.post("/UPLOAD", (req, res) => { 
+    console.log("\n\n");
 
     // client sends client_year.JSON file
     // this json has to be stored as <SESSION>.json
@@ -273,6 +276,7 @@ app.post("/UPLOAD", (req, res) => {
 // set Event Listener for LOAD/client/year/prefix/ext/
 // internal client page response 
 app.get('/SHOW/', (req, res)    => { 
+    console.log("\n\n");
 
     console.log("0010 app.get SHOW req.query.sessionId="+req.query.sessionId);
 
@@ -315,6 +319,7 @@ app.get("/closeandsave", (req, res) => { res.sendFile(__dirname + "/CloseAndSave
 
 
 app.post("/BOOK", (req, res) => { 
+    console.log("\n\n");
     // from TransferForm.html       
     console.log("0010 app.post BOOK doBook('"+JSON.stringify(req.body)+"')");
 
@@ -330,6 +335,7 @@ app.post("/BOOK", (req, res) => {
 
 
 app.post("/MAINFILE", (req, res) => { 
+    console.log("\n\n");
     // FUTURE
     // upload main.json and take client/year from that file
     
@@ -345,6 +351,7 @@ app.post("/MAINFILE", (req, res) => {
 app.post("/STORE", (req, res) => { 
     // STORE txn into LOG for later use
     // from HistoryList.html       
+    console.log("\n\n");
     console.log("0010 app.post STORE LOG txn into log('"+JSON.stringify(req.body)+"')");
     
     let delta = req.body.delta;
@@ -360,17 +367,17 @@ app.post("/STORE", (req, res) => {
 
 
 
-// GH20211101
 app.get('/SAVE/', (req, res) => {
     // save  sheetFile into file named by session.sheetFile / sheetName 
+    console.log("\n\n");
 
     // add closing lines to XLSX balance sheet 
     console.log("/SAVE/ req.query.sessionId="+req.query.sessionId);
+    console.log("/SAVE/ req.body.sessionId="+req.body.sessionId);
 
-    Sheets.xlsxWrite(req.query.sessionId,null); 
+    Sheets.xlsxWrite(req.body.sessionId,null); 
 
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
-    //res.write("\nSAVED\n");
     res.end("\nSAVED.\n");
 
 });
@@ -384,12 +391,14 @@ app.get('/SAVE/', (req, res) => {
 
 
 app.get('/welcomedrop', (req, res) => {
+    console.log("\n\n");
     res.sendFile('./WelcomeDrop.html', { root: __dirname })
 })
 
 
 // show convenience link to create and load a new browser window
 app.listen(PORT, () => { 
+    console.log("\n\n");
     console.log(`Server    started from ${PORT} using files in `+__dirname); 
     console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
     console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
