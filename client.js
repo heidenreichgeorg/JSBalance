@@ -875,7 +875,7 @@ function initTerminal(page,target,screenLines,nextFuncName) {
     let boxFooter2 = "<DIV class='L120' id='box2Footer'>&nbsp;"
     +"</DIV><DIV class='L280'>"+page["reference"]
     +"</DIV><DIV class='L280'>"+page["author"]
-    +"</DIV>" + (nextFuncName==null ? "": "<BUTTON autofocus class='L40' onclick='"+nextFuncName+"(e)'> >>> </BUTTON>");
+    +"</DIV>" + (nextFuncName==null ? "": "<BUTTON autofocus class='L40' onclick='"+nextFuncName+"()'> >>> </BUTTON>");
     arrHTML.push('<DIV  class="attrLine" id="'+target+'termLine'+l+'">'+boxFooter2+'</DIV>');
     l++;
 

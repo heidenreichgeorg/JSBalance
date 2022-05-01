@@ -742,7 +742,7 @@ function phaseOne(addrT, logT, aoaCells) {
                                 }
                             }
                         } else console.dir("phaseOne: NO EQUITY list for partners");
-                    } catch(e) { console.dir("phaseOne: ERR EQUITY list for partners"+e); }
+                    } catch(err) { console.dir("phaseOne: ERR EQUITY list for partners"+err); }
                     */
 
                     
