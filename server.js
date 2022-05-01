@@ -1,6 +1,4 @@
-const debugLoad=null;
-const debugBook=null;
-const debugSend=null;
+let debugLoad=0;
 
 // Imports
 const { addEUMoney, moneyString, iScaleMoney, setEUMoney , setENMoney, setMoney, subEUMoney, lessMoney, cents2EU } = require('./money.js');
@@ -198,7 +196,7 @@ app.get('/', (req, res) => {
 
 // LOGIN to an existing session
 app.post("/LOGIN", (req, res) => { 
-    console.log("POST LOGIN "+JSON.stringify(req.body));
+    console.log("0010 app.post LOGIN "+JSON.stringify(req.body));
     let remote = req.socket.remoteAddress;
     let client = req.body.client;
     let year   = req.body.year;
@@ -208,12 +206,13 @@ app.post("/LOGIN", (req, res) => {
     let sessionId = strSymbol(time+client+year+time);
     //            let sessionId = Sheets.symbolic(time+client+year+time);
 
-    console.dir("app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
+    console.dir("0020 app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
 
-     let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
+    let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
     
     let banner = makeBanner(sessionId,year);
 
+    console.dir("0030 app.post LOGIN responds with banner="+banner);
 
     // send back sessionId to client brwoser or file
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
@@ -228,10 +227,10 @@ app.post("/UPLOAD", (req, res) => {
     // client sends client_year.JSON file
     // this json has to be stored as <SESSION>.json
 
-    var banner = "NO VALID CLIENT FILE";
+    var banner = "0031 NO VALID CLIENT FILE";
     
     let remote = req.socket.remoteAddress;
-    console.log("POST UPLOAD from "+remote);
+    console.log("0010 app.post UPLOAD from "+remote);
 
     let data = req.body;
 
@@ -246,15 +245,19 @@ app.post("/UPLOAD", (req, res) => {
         if(sessionId===fileId) {
             
             // save file on server, not on client
-            console.dir("app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
+            console.dir("0015 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
 
             Sheets.save2Server(req.body,client,year);
 
+            console.dir("0020 app.post SAVED to SERVER");
+
             Sheets.start(sessionId,client,year,time,remote,phaseOne);
+
+            console.log ( "0030 app.post START  ");
 
             banner = makeBanner(sessionId,year);
 
-            console.log ( "RESPOND with  " +banner);
+            console.log ( "0040 app.post UPLOAD responds with  " +banner);
 
         } else console.log ( "UPLOAD "+sessionId+" INVALID session id "+fileId);
     }
@@ -271,7 +274,7 @@ app.post("/UPLOAD", (req, res) => {
 // internal client page response 
 app.get('/SHOW/', (req, res)    => { 
 
-    console.log("/SHOW/ req.query.sessionId="+req.query.sessionId);
+    console.log("0010 app.get SHOW req.query.sessionId="+req.query.sessionId);
 
     // load session via id
     let session = Sheets.get(req.query.sessionId);
@@ -280,7 +283,7 @@ app.get('/SHOW/', (req, res)    => {
 
     let balance = phaseOne(session.addrT,session.logT, session.sheetCells);
 
-    console.dir("/SHOW/ sends Balance ="+JSON.stringify(balance));
+    console.dir("0200 app.get SHOW sends Balance ="+JSON.stringify(balance));
 
     //var strBalance=['Balance']; for(let key in balance) strBalance.push(key); console.log("Server.js SHOW balance="+strBalance.join(','));
 
@@ -313,7 +316,7 @@ app.get("/closeandsave", (req, res) => { res.sendFile(__dirname + "/CloseAndSave
 
 app.post("/BOOK", (req, res) => { 
     // from TransferForm.html       
-    if(debugBook>0) console.log("app.post BOOK doBook('"+JSON.stringify(req.body)+"')");
+    console.log("0010 app.post BOOK doBook('"+JSON.stringify(req.body)+"')");
 
     // SECURITY SANITIZE req.body
     let tBuffer = doBook(req.query.sessionId,req.body);
@@ -342,14 +345,14 @@ app.post("/MAINFILE", (req, res) => {
 app.post("/STORE", (req, res) => { 
     // STORE txn into LOG for later use
     // from HistoryList.html       
-    if(debugBook>0) console.log("app.post STORE LOG txn into log('"+JSON.stringify(req.body)+"')");
+    console.log("0010 app.post STORE LOG txn into log('"+JSON.stringify(req.body)+"')");
     
     let delta = req.body.delta
 
-    console.log("app.post STORE LOG with session id=("+req.body.sessionId+")");
+    console.log("0015 app.post STORE LOG with session id=("+req.body.sessionId+")");
 
     if(delta) Sheets.saveSessionLog(req.body.sessionId,req.body);
-    else console.log("app.post STORE LOG Id=("+req.body.sessionId+") did not save: no transaction!");
+    else console.log("0021 app.post STORE LOG Id=("+req.body.sessionId+") did not save: no transaction!");
     
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
     res.end("\nSTORED.");
@@ -388,7 +391,7 @@ app.get('/welcomedrop', (req, res) => {
 // show convenience link to create and load a new browser window
 app.listen(PORT, () => { 
     console.log(`Server    started from ${PORT} using files in `+__dirname); 
-    console.log(`Server    http://ec2-3-94-192-123.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
+    console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
     console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
 })
 
@@ -409,7 +412,7 @@ function phaseOne(addrT, logT, aoaCells) {
 
         var numLines=aoaCells.length;
 
-        console.log("server.phaseOne() includes "+aoaCells[numLines-1].join('  '));
+        console.log("0100 server.phaseOne() includes "+aoaCells[numLines-1].join('  '));
 
         if(numLines>J_MINROW) {
 
@@ -424,9 +427,8 @@ function phaseOne(addrT, logT, aoaCells) {
                 aoaCells.forEach(row => {
 
                     lineCount++;
-
-                    if(debugLoad>0) 
-                        console.log("\nphaseOne "+JSON.stringify(row));
+                    
+                    console.log("\n0110 server.phaseOne "+JSON.stringify(row));
                         
                     var column;
                     var key=row[0];
@@ -543,7 +545,7 @@ function phaseOne(addrT, logT, aoaCells) {
 
                             var column=0;
                             aLine.forEach(strAmount => {
-                                //if(debugLoad>1) console.log("init "+strAmount);
+                                if(debugLoad>1) console.log("init "+strAmount);
                                 if(column>=J_ACCT && strAmount && strAmount.length>0) {
                                     var acName = gNames[column];
                                     if(acName && acName.length>1) {
@@ -732,7 +734,7 @@ function phaseOne(addrT, logT, aoaCells) {
 
                                     let monNYLoss = addEUMoney(vkxx.init,{'cents':p_cyLoss[pNum]});
 
-                                    if(debugBook) console.log("NEW VKxx  #"+pNum+"  "+p_cyLoss[pNum]+"+"+vkxx.init+"="+moneyString(monNYLoss));
+                                    console.log("NEW VKxx  #"+pNum+"  "+p_cyLoss[pNum]+"+"+vkxx.init+"="+moneyString(monNYLoss));
 
                                     partners[pNum].nyLoss=moneyString(monNYLoss);
 
@@ -744,7 +746,7 @@ function phaseOne(addrT, logT, aoaCells) {
                     */
 
                     
-                } else console.dir("phaseOne: NO PARTNERS");
+                } else console.dir("0120 server.phaseOne: NO PARTNERS");
 
 
                 result[D_Partner_NET]=partners;
@@ -752,20 +754,20 @@ function phaseOne(addrT, logT, aoaCells) {
                     for (let i in partners) { console.log("Server phaseOne Partner("+i+") "+JSON.stringify(partners[i])); }
 
             } catch (err) {
-                console.error('server.js phaseOne:'+err);
-                console.dir('server.js phaseOne:'+err);
+                console.error('0125 server.js phaseOne:'+err);
+                console.dir('0125 server.js phaseOne:'+err);
             }
 
-            if(debugLoad>0) console.log("phaseOne.Schema="+JSON.stringify(result[D_Schema]));
+            console.log("0191 server.phaseOne.Schema="+JSON.stringify(result[D_Schema]));
 
-        } else console.error('server.js phaseOne NO BALANCE');
+        } else console.error('0111 server.js phaseOne NO BALANCE');
 
-    } else console.error('server.js phaseOne NO aoaCells');
+    } else console.error('0101 server.js phaseOne NO aoaCells');
 
 
-    if(debugLoad>2) 
+    
         for(let key in result) {
-            console.dir('server.js phaseOne() -> balance['+key+']'); 
+            console.dir('0200 server.js phaseOne() -> balance['+key+']'); 
         }
 
     return result;
@@ -825,7 +827,7 @@ function makeBanner(sessionId,year) {
             vbanner.push(buttonTab(`http://${localhost}:${PORT}/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
         vbanner.push('</DIV>');
 
-
+        console.log("0300 makeBanner OK");
     
     } else return  '<DIV class = "mTable"><DIV class = "ulliTab"><DIV class = "attrRow">NO SESSION info</DIV></DIV></DIV>';
     return '<SCRIPT type="text/javascript" src="/client.js"></SCRIPT><DIV class="mTable"><DIV class="wideTab">'+vbanner.join('')+'</DIV></DIV>';
@@ -886,16 +888,6 @@ function getCost(idnt,nmbr,init) {
 
 }
 
-function timeSymbol() {
-    var u = new Date(Date.now()); 
-    return ''+
-      ('0' + (1+u.getUTCMonth())).slice(-2) +
-      ('0' + u.getUTCDate()).slice(-2) + 
-      ('0' + u.getUTCHours()).slice(-2) +
-      ('0' + u.getUTCMinutes()).slice(-2) +
-      ('0' + u.getUTCSeconds()).slice(-2) +
-      (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
-};
 
 function unixTime() {
     var u = new Date(Date.now()); 

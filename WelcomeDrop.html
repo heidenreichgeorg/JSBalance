@@ -25,7 +25,7 @@
 
 
 
-   <SCRIPT type="text/javascript" >
+<SCRIPT type="text/javascript" >
 
    var reader;
    var content;
@@ -96,74 +96,12 @@ function dropHandler(ev) {
    }
 }
 
-function showResponse(response) {
-   let display = document.getElementById('fileupload');
-   if(response && display) display.innerHTML=response;
-}
-
-      function timeSymbol() {
-         var u = new Date(Date.now()); 
-         return ''+
-         ('0' + (1+u.getUTCMonth())).slice(-2) +
-         ('0' + u.getUTCDate()).slice(-2) + 
-         ('0' + u.getUTCHours()).slice(-2) +
-         ('0' + u.getUTCMinutes()).slice(-2) +
-         ('0' + u.getUTCSeconds()).slice(-2) +
-         (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
-      };     
+   function showResponse(response) {
+      let display = document.getElementById('fileupload');
+      if(response && display) display.innerHTML=response;
+   }
 
       
-      const strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';
-
-      const form = document.querySelector("#login");
-/*
-      form.addEventListener('submit', function (event) {   
-         var elements=form.elements; 
-         event.preventDefault();
-         login(event,elements);      
-      } );
-
-      var content="";
-
-
- 
-      function login(event,elements) {       
-
-         let check = localStorage.getItem("mysession");
-         if(check && check.length>10) {
-            const credentials = {
-            'sessionId':  localStorage.getItem("mysession"),
-            'time': timeSymbol()
-           };
-           console.log("login() WITH PREVIOUS SESSION");
-           // postAndDisplay("LOGIN",credentials,'mainpage');
-           // SERVER NOT RECOGNIZING CERT Strings
-
-         } else console.dir("login() NO PREVIOUS SESSION");
-      
-
-         //for(let name in ['CLIENT', 'YEAR', 'JSON']) 
-         //);
-
-         console.log("WELCOMEDROP CLIENT "+formClient);
-         console.log("WELCOMEDROP YEAR   "+formYear);
-        // console.log("WELCOME J  "+form[2].value);
-
-            // post body data 
-         const credentials = {
-            'client':formClient,
-            'year':  formYear,
-            'sessionId':  localStorage.getItem("mysession"),
-            'time': timeSymbol()
-         };
-       
-
-         postAndDisplay("LOGIN",credentials,'mainpage');
-         
-      }
-     
-      
-   */content
     </SCRIPT>
 </body>
 </html>
