@@ -137,7 +137,7 @@
             handleEvent(event);
             let sessionId = paramString.split('=')[1];
             console.log("1110 CloseAndSave sessionId = "+sessionId);
-            Sheets.xlsxWrite(paramString.split('=')[1],null);         
+            Sheets.xlsxWrite(sessionId,null);         
             console.log("1200 CloseAndSave Download EXIT");
             closeWindow();
         }
