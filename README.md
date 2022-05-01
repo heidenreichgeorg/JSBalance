@@ -54,3 +54,16 @@
 #  TABLE file name syntax BOOK_<CLIENT><YEAR>.xlsx
 # fiscal year runs from 01/01 to 12/31
 # all amounts are in Euros, column for the cents fraction and . for powers of thousands 
+
+
+# Documentation of server RESPONSE object
+# [    D_Page     ]  current language strings for general terms
+# [    D_XBRL     ]  XBRLs for each account
+# [   D_Schema    ]  static schema of the booking table
+# [   D_History   ]  history of booking transactions
+# [   D_Balance   ]  balance
+# [   D_Report    ]  gain/loss summaries
+# [   D_FixAss    ]  list of fixed assets
+# [ D_Partner_NET ]  partner tax summary
+# [   D_Muster    ]  predefined templates for transactions
+# [  D_Adressen   ]  predefined partner postal addresses
