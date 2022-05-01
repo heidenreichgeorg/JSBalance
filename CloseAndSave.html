@@ -65,36 +65,35 @@
             gAssets = gResponse[D_FixAss];
             page = gResponse[D_Page];
             
-                if(gSchema) {
-                    var author=gSchema.author;
-                    var residence=gSchema.residence;
-                    var iban=gSchema.iban;
-                    var register=gSchema.register;
-                    var taxnumber=gSchema.taxnumber;
-                    var reportYear=gSchema.reportYear;
-                    var client=gSchema.client;
-                    
-                    var cDisplay = document.getElementById("display");
-                    cDisplay.innerHTML = page["Closing"];
+            if(gSchema) {
+                var author=gSchema.author;
+                var residence=gSchema.residence;
+                var iban=gSchema.iban;
+                var register=gSchema.register;
+                var taxnumber=gSchema.taxnumber;
+                var reportYear=gSchema.reportYear;
+                var client=gSchema.client;
+                
+                var cDisplay = document.getElementById("display");
+                cDisplay.innerHTML = page["Closing"];
 
-                    /*
-                    var welcome = document.getElementById("welcome");
-                    welcome.innerHTML = "<DIV class='L120'>"+client
-                    +"</DIV><DIV class='L220'>"+register+"&nbsp;"+taxnumber
-                    +"</DIV><DIV class='L220'>"+iban+"&nbsp;"+reportYear
-                    +"</DIV><DIV class='L220'>"+author+"&nbsp; "+residence
-                        +'</DIV><DIV class="C100"><button id="read-button" onclick="bookTax()" )>NEXT</button> '
-                    +"</DIV>";
-                    */
-                }
-                console.log('Schema='+JSON.stringify(gSchema));
+                /*
+                var welcome = document.getElementById("welcome");
+                welcome.innerHTML = "<DIV class='L120'>"+client
+                +"</DIV><DIV class='L220'>"+register+"&nbsp;"+taxnumber
+                +"</DIV><DIV class='L220'>"+iban+"&nbsp;"+reportYear
+                +"</DIV><DIV class='L220'>"+author+"&nbsp; "+residence
+                    +'</DIV><DIV class="C100"><button id="read-button" onclick="bookTax()" )>NEXT</button> '
+                +"</DIV>";
+                */
+            }
+            console.log('Schema='+JSON.stringify(gSchema));
 
-                var txnTable = [];                
+            var txnTable = [];                
 
-                // build history from given account as a prompt list
-                if(gSchema && gSchema.Names && gSchema.Names.length>0) {
-                    var parts=gSchema.Names;
-
+            // build history from given account as a prompt list
+            if(gSchema && gSchema.Names && gSchema.Names.length>0) {
+                var parts=gSchema.Names;
 
                 let closing = JSON.parse(gReport.xbrlIncome.closing); //.split(CSEP);
 
@@ -110,7 +109,6 @@
                 +'</DIV>');
 
 
-
                 var aTable = document.getElementById('selAccount');
                 if(aTable) aTable.innerHTML = txnTable.join("");
 
@@ -124,21 +122,30 @@
                 // override other year 
                 jInfo.flag = 1;
 
-
-                showClose(validateCD(creditList,debitList));
-                //save(jInfo);
+                showClose(validateCD(creditList,debitList,'download'));
             
             }
         
             
         }
 
-       
+    
+        function download(event) {
+            console.log("1000 CloseAndSave Download ENTER");
+            handleEvent(event);
+
+            //save(jInfo);
+            console.log("1100 CloseAndSave Download EXIT");
+            
+            closeWindow();
+        }
+    
         
         function closeWindow() {
+            console.log("1200 CloseAndSave Close IN");
             window.close();
+            console.log("1210 CloseAndSave Close OUT");
         }
-
 
         </script>
     </body>

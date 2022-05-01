@@ -594,6 +594,9 @@ function create(client,year,time,remote,sessionId) {
             session.sheetName=sName;
             console.log('sheets.create getSheet finds '+sFile);
         } else console.log('sheets.create getSheet finds NO sheetFile');
+
+
+        // CREATE JSON FROM EXCEL
         if(!session.sheetCells || session.sheetCells.length<H_LEN) {
             session.sheetCells = getFromFile(client,year,sFile,time,sName);
 

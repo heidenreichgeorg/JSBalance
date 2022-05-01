@@ -438,7 +438,7 @@ function showTransfer(txnForm) {
 
 
 // complete Close page
-function showClose(txnForm) {
+function showClose(txnForm,nextFuncName) {
 
     let cdPairs = txnForm.cdPairs;
     var saldoC=0; saldoC=txnForm.saldoC;
@@ -448,7 +448,7 @@ function showClose(txnForm) {
 
     let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
-    if(!terminal) terminal = initTerminal(page,'PageContent',18,  showTransfer); // GH20220426 extra fourth param for next dialog
+    if(!terminal) terminal = initTerminal(page,'PageContent',18,  nextFuncName); 
 
     var cursor=htmlPage;
   
@@ -842,7 +842,7 @@ function setScreen(targetDocument,htmlPage) {
 }
 
 
-function initTerminal(page,target,screenLines,nextFunc) {   
+function initTerminal(page,target,screenLines,nextFuncName) {   
      
 
     // creates the DOS-type screen
@@ -875,7 +875,7 @@ function initTerminal(page,target,screenLines,nextFunc) {
     let boxFooter2 = "<DIV class='L120' id='box2Footer'>&nbsp;"
     +"</DIV><DIV class='L280'>"+page["reference"]
     +"</DIV><DIV class='L280'>"+page["author"]
-    +"</DIV>" + (nextFunc==null ? "": "<BUTTON autofocus class='L40' onclick='nextFunc'> >>> </BUTTON>");
+    +"</DIV>" + (nextFuncName==null ? "": "<BUTTON autofocus class='L40' onclick='"+nextFuncName+"(e)'> >>> </BUTTON>");
     arrHTML.push('<DIV  class="attrLine" id="'+target+'termLine'+l+'">'+boxFooter2+'</DIV>');
     l++;
 
@@ -891,11 +891,6 @@ function initTerminal(page,target,screenLines,nextFunc) {
 
 
     return document;
-}
-
-// GH20220426
-function nextFunc(ev) {
-    postToServer("NEXT",sInfo);
 }
 
 function showTerminal(terminal,htmlPage) {   
