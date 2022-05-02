@@ -31,9 +31,6 @@ const Money = require('./money.js');
 //const Client = require('./client.js');
 
 const D_Schema = "Schema"; // includes .Names .total
-const LOCALROOT = 'D:\\Privat\\';
-const SERVEROOT = '/data/sessions/';
-const Slash = '/';
 
 const CSEP = ';';
 const CEND = '|';
@@ -47,6 +44,18 @@ const J_ACCT = 6;
 const H_LEN  = 7; // header length
 
 
+
+const LOCALROOT = 'D:\\Privat\\';
+var SERVEROOT= '/data/sessions/';
+const Slash = '/';
+function setRoot(root) {  
+    SERVEROOT=root; 
+    console.dir("Sheets.setRoot = "+SERVEROOT);
+}
+module.exports['setRoot']=setRoot;
+
+function getRoot() {  return SERVEROOT; }
+module.exports['getRoot']=getRoot;
 
 
 
@@ -166,8 +175,9 @@ async function setFileNameS(root,session,client,year,start,ext) {
 
             if (err) { console.dir(err);  }        
             // files object contains all files names
+            session.sheetFile=dir+client+Slash+year+lStart+lExt;
             let sFile=getLatestFile(dir,files,lStart,lExt);
-            session.sheetFile=sFile;
+            if(sFile.length>session.sheetFile.length) session.sheetFile=sFile;
             if(debug) console.log("fs.readDir in "+dir+" sets "+sFile);
         })
     });

@@ -25,6 +25,21 @@ const J_ACCT = 6; // first account
 const J_MINROW=7;
 
 
+//import { argv } from 'process';
+
+// print process.argv
+process.argv.forEach(function (val, index, array) {
+    if(debug>1) console.log("0002 Starting server " + index + ': ' + val);
+    let attribute=val.split('=');
+    if(index>1 && attribute && attribute.length>1) {
+        if(debug>1) console.log("0004 Attribute " + index + ': ' + val);
+        if(attribute[0].toLowerCase()==='root') {
+            Sheets.setRoot(attribute[1]);
+            console.log("0006 Starting server SET ROOT TO " + Sheets.getRoot());
+        }        
+    }
+  });
+
 // Language de_DE
 let de_DE = {
     // Bilanz nach HGB
@@ -403,6 +418,16 @@ app.listen(PORT, () => {
     console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
     console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
 })
+
+
+
+
+
+
+
+
+
+
 
 
 function phaseOne(addrT, logT, aoaCells) {
