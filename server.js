@@ -267,11 +267,11 @@ app.post("/UPLOAD", (req, res) => {
 
             Sheets.save2Server(req.body,client,year);
 
-            console.dir("0020 app.post SAVED to SERVER");
+            console.dir("0020 app.post UPLOADED to SERVER");
 
             Sheets.start(sessionId,client,year,time,remote,phaseOne);
 
-            console.log ( "0030 app.post START  ");
+            console.log ( "0030 app.post UPLOAD STARTED  ");
 
             banner = makeBanner(sessionId,year);
 
@@ -285,52 +285,6 @@ app.post("/UPLOAD", (req, res) => {
     res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>"+banner+"</HTML>\n"); 
     
 });
-
-
-
-// set Event Listener for LOAD/client/year/prefix/ext/
-// internal client page response 
-app.get('/SHOW/', (req, res)    => { 
-    console.log("\n\n");
-
-    console.log("0010 app.get SHOW req.query.sessionId="+req.query.sessionId);
-
-    // load session via id
-    let session = Sheets.get(req.query.sessionId);
-    
-    //var strSession=['Session']; for(let key in session) strSession.push(key); console.log("Server.js SHOW session="+strSession.join(','));
-
-    let balance = phaseOne(session.addrT,session.logT, session.sheetCells);
-
-    console.dir("0200 app.get SHOW sends Balance ="+JSON.stringify(balance));
-
-    //var strBalance=['Balance']; for(let key in balance) strBalance.push(key); console.log("Server.js SHOW balance="+strBalance.join(','));
-
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
-
-    Sender.send(res,balance); 
-})
-
-
-app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/FBA/50eurobill.jpg"); });
-
-app.get("/account", (req, res)  => { res.sendFile(__dirname + "/AccountHistory.html"); });
-app.get("/assetl", (req, res)   => { res.sendFile(__dirname + "/AssetList.html"); });
-app.get("/assets", (req, res)   => { res.sendFile(__dirname + "/AssetScreen.html"); });
-app.get("/balance", (req, res)  => { res.sendFile(__dirname + "/BalanceTable.html"); });
-app.get("/dashboard", (req, res)  => { res.sendFile(__dirname + "/DashBoard.html"); });
-app.get("/galshgb", (req, res) => { res.sendFile(__dirname + "/HGB275S2OTC.html"); });
-app.get("/gainloss", (req, res) => { res.sendFile(__dirname + "/GainLoss.html"); });
-app.get("/history", (req, res)  => { res.sendFile(__dirname + "/HistoryScreen.html"); });
-app.get("/hgbbeginyear", (req, res) => { res.sendFile(__dirname + "/HGBBeginYear.html"); });
-app.get("/openbalance", (req, res) => {res.sendFile(__dirname + "/OpenBalance.html"); });
-app.get("/hgbregular", (req, res) => { res.sendFile(__dirname + "/HGBRegular.html"); });
-app.get("/pie", (req, res)     => { res.sendFile(__dirname + "/BalancePie.html"); });
-app.get("/pattern", (req, res)  => {res.sendFile(__dirname + "/PatternList.html"); });
-app.get("/transfer", (req, res)    => { res.sendFile(__dirname + "/Transfer.html"); });
-app.get("/closeandsave", (req, res) => { res.sendFile(__dirname + "/CloseAndSave.html"); });
-
-
 
 
 app.post("/BOOK", (req, res) => { 
@@ -382,7 +336,7 @@ app.post("/STORE", (req, res) => {
 
 
 
-app.get('/SAVE/', (req, res) => {
+app.post('/SAVE', (req, res) => {
     // save  sheetFile into file named by session.sheetFile / sheetName 
     console.log("\n\n");
 
@@ -397,6 +351,54 @@ app.get('/SAVE/', (req, res) => {
 
 });
 // save to Excel
+
+
+
+
+
+app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/FBA/50eurobill.jpg"); });
+
+app.get("/account", (req, res)  => { res.sendFile(__dirname + "/AccountHistory.html"); });
+app.get("/assetl", (req, res)   => { res.sendFile(__dirname + "/AssetList.html"); });
+app.get("/assets", (req, res)   => { res.sendFile(__dirname + "/AssetScreen.html"); });
+app.get("/balance", (req, res)  => { res.sendFile(__dirname + "/BalanceTable.html"); });
+app.get("/dashboard", (req, res)  => { res.sendFile(__dirname + "/DashBoard.html"); });
+app.get("/galshgb", (req, res) => { res.sendFile(__dirname + "/HGB275S2OTC.html"); });
+app.get("/gainloss", (req, res) => { res.sendFile(__dirname + "/GainLoss.html"); });
+app.get("/history", (req, res)  => { res.sendFile(__dirname + "/HistoryScreen.html"); });
+app.get("/hgbbeginyear", (req, res) => { res.sendFile(__dirname + "/HGBBeginYear.html"); });
+app.get("/openbalance", (req, res) => {res.sendFile(__dirname + "/OpenBalance.html"); });
+app.get("/hgbregular", (req, res) => { res.sendFile(__dirname + "/HGBRegular.html"); });
+app.get("/pie", (req, res)     => { res.sendFile(__dirname + "/BalancePie.html"); });
+app.get("/pattern", (req, res)  => {res.sendFile(__dirname + "/PatternList.html"); });
+app.get("/transfer", (req, res)    => { res.sendFile(__dirname + "/Transfer.html"); });
+app.get("/closeandsave", (req, res) => { res.sendFile(__dirname + "/CloseAndSave.html"); });
+
+
+
+// set Event Listener for LOAD/client/year/prefix/ext/
+// internal client page response 
+app.get('/SHOW/', (req, res)    => { 
+    console.log("\n\n");
+
+    console.log("0010 app.get SHOW req.query.sessionId="+req.query.sessionId);
+
+    // load session via id
+    let session = Sheets.get(req.query.sessionId);
+    
+    //var strSession=['Session']; for(let key in session) strSession.push(key); console.log("Server.js SHOW session="+strSession.join(','));
+
+    let balance = phaseOne(session.addrT,session.logT, session.sheetCells);
+
+    console.dir("0200 app.get SHOW sends Balance ="+JSON.stringify(balance));
+
+    //var strBalance=['Balance']; for(let key in balance) strBalance.push(key); console.log("Server.js SHOW balance="+strBalance.join(','));
+
+    res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
+
+    Sender.send(res,balance); 
+})
+
 
 
 /*
