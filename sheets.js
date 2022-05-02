@@ -175,7 +175,7 @@ async function setFileNameS(root,session,client,year,start,ext) {
 
             if (err) { console.dir(err);  }        
             // files object contains all files names
-            session.sheetFile=dir+lStart+'.'+lExt;
+            session.sheetFile=dir+"BOOK"+lStart+'.'+lExt;
             let sFile=getLatestFile(dir,files,lStart,lExt);
             if(sFile && sFile.length>session.sheetFile.length) {
                 session.sheetFile=sFile;
