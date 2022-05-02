@@ -175,12 +175,12 @@ async function setFileNameS(root,session,client,year,start,ext) {
 
             if (err) { console.dir(err);  }        
             // files object contains all files names
-            session.sheetFile=dir+client+Slash+year+lStart+lExt;
+            session.sheetFile=dir+lStart+'.'+lExt;
             let sFile=getLatestFile(dir,files,lStart,lExt);
             if(sFile && sFile.length>session.sheetFile.length) {
                 session.sheetFile=sFile;
                 
-            } else if(debug) console.log("fs.readDir in "+dir+" sets default "+sFile);
+            } else if(debug) console.log("fs.readDir in "+dir+" sets default "+session.sheetFile);
         })
     });
 // unreached code
