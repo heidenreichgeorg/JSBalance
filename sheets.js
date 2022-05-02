@@ -488,8 +488,8 @@ function xlsxWrite(sessionId,tBuffer) {
                             if(debugWrite) console.log("sheets.xlsxWrite UPDATE SHEET ("+client+year+") #"+numLines);
                             workBook.Sheets[session.sheetName]=xSheet;                
                         } else {
-                            // did not work
-                            console.dir("1485 sheets.xlsxWrite CREATE SHEET "+sesssion.sheetName+" for ("+client+","+year+") #"+numLines);
+                            // append did not work, so make a new one
+                            console.dir("1485 sheets.xlsxWrite CREATE SHEET "+session.sheetName+" for ("+client+","+year+") #"+numLines);
                             XLSX.utils.book_append_sheet(workBook, xSheet, session.sheetName);
                         }
                         if(debugWrite) console.log("sheets.xlsxWrite SHEET ("+client+year+")  OK ");
