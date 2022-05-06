@@ -260,24 +260,32 @@ app.post("/UPLOAD", (req, res) => {
         let sessionId = req.body.id;
         let fileId = strSymbol(time+client+year+time);
 
-        if(sessionId===fileId) {
+        if(sessionId===fileId) { // 20220506
             
+            // GH20220506 FIND OTHER YEAR.*JSON file
+            // and compare the timestamps
+            let dir = Sheets.getClientDir(client);
+           
+            Sheets.findLatestJSON(client,year); // async - writes it into Sheets.found, Sheets.getJSON()
+
+            if(0) { // later async check sheets found
+                res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+                res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD FOUND "+found+"</TITLE>FOUND A NEWER FILE "+found+"</HTML>\n"); 
+            }
+
             // save file on server, not on client
             console.dir("0015 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
-
             Sheets.save2Server(req.body,client,year);
 
             console.dir("0020 app.post UPLOADED to SERVER");
-
             Sheets.start(sessionId,client,year,time,remote,phaseOne);
 
             console.log ( "0030 app.post UPLOAD STARTED  ");
-
             banner = makeBanner(sessionId,year);
 
             console.log ( "0040 app.post UPLOAD responds with  " +banner);
 
-        } else console.log ( "UPLOAD "+sessionId+" INVALID session id "+fileId);
+        } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
     }
 
     // send back sessionId to client brwoser or file
@@ -292,10 +300,16 @@ app.post("/BOOK", (req, res) => {
     // from TransferForm.html       
     console.log("0010 app.post BOOK doBook('"+JSON.stringify(req.body)+"')");
 
-    // SECURITY SANITIZE req.body
-    let tBuffer = doBook(req.query.sessionId,req.body);
 
-    Sheets.xlsxWrite(req.query.sessionId,tBuffer); // state change in main.json
+    //if(req.query.client && req.query.year) {
+        // SECURITY SANITIZE req.body
+        let tBuffer = doBook(req.query.sessionId,req.body);
+
+        let sessionTime=timeSymbol();
+        let nextSessionId= sessionTime; 
+        // strSymbol(sessionTime+eq.query.client+eq.query.year+sessionTime);
+        Sheets.xlsxWrite(req.query.sessionId,tBuffer,sessionTime,nextSessionId); // state change in main.json
+    //}
 
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});       
     res.end("\nSERVER BOOKED.\n");
@@ -344,7 +358,7 @@ app.post('/SAVE', (req, res) => {
     console.log("/SAVE/ req.query.sessionId="+req.query.sessionId);
     console.log("/SAVE/ req.body.sessionId="+req.body.sessionId);
 
-    Sheets.xlsxWrite(req.body.sessionId,null); 
+    Sheets.xlsxWrite(req.body.sessionId,null,'',''); 
 
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
     res.end("\nSAVED.\n");
@@ -845,14 +859,14 @@ function makeBanner(sessionId,year) {
             let target = ""; // http://${localhost}:${PORT}
 
             vbanner.push(buttonOpenTile(target+`/account?sessionId=${sessionId}`,'AcctHistory'));
-            vbanner.push(buttonOpenWide(target+`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
+            vbanner.push(buttonOpenTile(target+`/hgbbeginyear?sessionId=${sessionId}`,'BalanceOpen'));
             vbanner.push(buttonOpenTile(target+`/openbalance?sessionId=${sessionId}`,'AcctOpen'));
+            vbanner.push(buttonOpenWide(target+`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
             vbanner.push(buttonOpenTile(target+`/history?sessionId=${sessionId}`,'History'));
             vbanner.push(buttonOpenTile(target+`/gainloss?sessionId=${sessionId}`,'GainLoss'));
             vbanner.push(buttonOpenTile(target+`/assets?sessionId=${sessionId}`,'Assets'));
             vbanner.push(buttonOpenTile(target+`/balance?sessionId=${sessionId}`,'AcctClose'));
             vbanner.push(buttonOpenTile(target+`/galshgb?sessionId=${sessionId}`,'GainlossHGB'));
-            vbanner.push(buttonOpenTile(target+`/hgbbeginyear?sessionId=${sessionId}`,'BalanceOpen'));
             vbanner.push(buttonOpenTile(target+`/hgbregular?sessionId=${sessionId}`,'BalanceClose'));
             if(Sheets.isSameFY(year)) {
                 vbanner.push(buttonOpenTile(target+`/transfer?sessionId=${sessionId}`,'Transfer'));
@@ -993,7 +1007,7 @@ function doBook(sessionId,reqBody) {
  
         if(Sheets.isSameFY(year) || jFlag) {
 
-            if(debugBook>0) console.log("server.js doBook() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
+            if(debug>0) console.log("server.js doBook() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
 
 
             var total = balance[D_Schema].total;
@@ -1030,4 +1044,14 @@ function doBook(sessionId,reqBody) {
     return bookingForm;
 
 }
+function timeSymbol() { // same as in client.js
+    var u = new Date(Date.now()); 
+    return ''+ u.getUTCFullYear()+
+      ('0' + (1+u.getUTCMonth())).slice(-2) +
+      ('0' + u.getUTCDate()).slice(-2) + 
+      ('0' + u.getUTCHours()).slice(-2) +
+      ('0' + u.getUTCMinutes()).slice(-2) +
+      ('0' + u.getUTCSeconds()).slice(-2) +
+      (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
+};     
 

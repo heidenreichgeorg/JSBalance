@@ -155,11 +155,11 @@ function getLatestFile(dir,files,lStart,lExt) {
 
 
 
-async function setFileNameS(root,session,client,year,start,ext) {
+async function setFileNameS(session,client,year,start,ext) {
 
     // directory path
     var result=null;
-    var dir = root+client+Slash; // GH20220430
+    var dir = getClientDir(client); // GH20220430
 
     var lStart =year; // =start.toLowerCase();   // GH20220430
     var lExt= ext.toLowerCase();
@@ -185,8 +185,42 @@ async function setFileNameS(root,session,client,year,start,ext) {
     });
 // unreached code
 }
-//module.exports['getFromFile']=getFromFile;
 
+
+var found='';
+function getJSON() {
+    return found;
+}
+module.exports['getJSON']=getJSON;
+
+
+async function findLatestJSON(client,year) {
+    // directory path
+    var result=null;
+    var dir = getClientDir(client); // GH20220430
+    var lStart =year; 
+    var lExt= ".json";
+
+    if(debug) console.log("sheet.getLatestJSON SEARCH in "+dir+" for "+lStart+"*"+lExt);
+
+    result = await new Promise((resolve) => {
+        // GH20211231
+        // list all files in the directory
+        fs.readdir(dir, (err, files) => {
+            if (err) { console.dir(err);  }        
+            // files object contains all files names
+            //session.sheetFile=dir+"BOOK"+lStart+'.'+lExt;
+            let sFile=getLatestFile(dir,files,lStart,lExt);
+            if(sFile && sFile.length>10) {
+                found=sFile;
+                console.log("getLatestJSON fs.readDir in "+dir+" finds "+found);
+
+            } else if(debug) console.log("getLatestJSON fs.readDir in "+dir+" finds NO LATEST ");
+        })
+    });
+// unreached code
+}
+module.exports['findLatestJSON']=findLatestJSON;
 
 
 
@@ -383,7 +417,7 @@ module.exports['start']=start;
 
 
 
-function xlsxWrite(sessionId,tBuffer) {
+function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
 
     var session = get(sessionId);
 
@@ -453,9 +487,13 @@ function xlsxWrite(sessionId,tBuffer) {
                         arrTransaction.push(CEND);
                         excelData.push(arrTransaction); 
 
+                        session.time=sessionTime;
+                        session.id=nextSessionId;
+
                         // add new txn to JSON
                         let len=session.sheetName.length;
                         if(len>6) {
+
                             if(debugWrite) console.log("1450 sheets.xlsxWrite saveLatest("+arrTransaction+") to "+client+","+year);
                             save2Server(session,client,year);
                             
@@ -547,9 +585,9 @@ function create(client,year,time,remote,sessionId) {
     
     var session = { 'client':client,  'year':year,  'remote':remote,  'time':time,  'sheetCells':'', 'sheetName':client+year, 'id':sessionId, 'logT':[] };
 
-    setFileNameS(SERVEROOT,session,client,year,'BOOK','xlsx'); // async find a XLSX file and sets session.sheetFile
+    setFileNameS(session,client,year,'BOOK','xlsx'); // async find a XLSX file and sets session.sheetFile
     
-    var sFile=jsonMain(SERVEROOT,client,year,sessionId);
+    var sFile=jsonMain(client,year,sessionId);
     try {
         console.log("0021 sheets.create MAIN "+sFile);
         var json = JSON.parse(fs.readFileSync(sFile,{'encoding':'utf8'})); // was latin1 GH20211120
@@ -634,7 +672,7 @@ function create(client,year,time,remote,sessionId) {
 function getFromFile(client,year,sFile,time,sName) {
 
     var sheetCells=[];
-    var dir = SERVEROOT+client+Slash; // GH20220430
+    var dir = getRoot()+client+Slash; // GH20220430
 
     if(debug) console.log("getFromFile "+sFile+" in "+dir);
 
@@ -669,7 +707,7 @@ async function saveLatest(session,client,year) {
 
     let sessionId=session.id;
 
-    var pSave = fs.writeFileSync(jsonMain(SERVEROOT,client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
+    var pSave = fs.writeFileSync(jsonMain(client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
         if (err) {
             console.log(" sheets.saveLatest: "+err);          
             throw err;
@@ -682,20 +720,20 @@ module.exports['saveLatest']=saveLatest;
 */
 
 async function save2Server(session,client,year) {
-    console.log("0016 save2Server Saving(JSON) to "+SERVEROOT);        
+    console.log("0016 save2Server Start saving(JSON) to "+SERVEROOT);        
 
     const data = JSON.stringify(session);
 
     let sessionId=session.id;
-
-    var pSave = fs.writeFileSync(jsonMain(SERVEROOT,client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
+    let jsonFileName=jsonMain(client,year,sessionId);
+    fs.writeFileSync(jsonFileName, data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
         if (err) {
-            console.log("0017  sheets.save2Server: "+err);          
+            console.log("0017 sheets.save2Server: "+err);          
             throw err;
         }
-        console.log("save2Server Saving("+data+")");          
+        console.log("save2Server Saving("+jsonFileName+")");          
     });
-    console.log("0018 save2Server: JSON main is saved.");
+    console.log("0018 save2Server: JSON main save to "+jsonFileName+" started.");
 }
 module.exports['save2Server']=save2Server;
 
@@ -756,15 +794,25 @@ module.exports['isSameFY']=isSameFY;
 
 
 
+function getClientDir(client) {
+    return getRoot()+client+Slash; 
+}
+module.exports['getClientDir']=getClientDir;
+
 // GH20211119
-function jsonMain(root,client,year,sid) {
-    return root+client+Slash+year+fileFromSession(sid)+".json";
-    // return root+client+Slash+year+Slash+fileFromSession(sid)+".json"; GH20220430
+function jsonMain(client,year,sid) {
+    return getClientDir(client)+year+"main.json";
+}
+
+function jsonFile(client,year,sid) {
+    return getClientDir(client)+year+fileFromSession(sid)+".json";
+    // return root+client+Slash+year+Slash+fileFromSession(sid)+".json"; 
 }
 
 function jsonLogf(client) {
-    return SERVEROOT+client+Slash+"logf.json";
+    return getClientDir(client)+"logf.json";
 }
+
 
 
 function unixYear() {

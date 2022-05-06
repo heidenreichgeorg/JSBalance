@@ -944,9 +944,9 @@ function select(target,num) {
 }
 
 
-function timeSymbol() {
+function timeSymbol() { // same as in server.js
     var u = new Date(Date.now()); 
-    return ''+
+    return ''+ u.getUTCFullYear()+
       ('0' + (1+u.getUTCMonth())).slice(-2) +
       ('0' + u.getUTCDate()).slice(-2) + 
       ('0' + u.getUTCHours()).slice(-2) +
