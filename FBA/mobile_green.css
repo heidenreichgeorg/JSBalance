@@ -125,7 +125,7 @@ body {
 .scalesC {
   font-family: Inconsolata, Times, 'Lucida Sans', Verdana, sans-serif;
   font-size: 6px;
-  stroke: #77FF44;
+  stroke: #88FF55;
   opacity: 1.0;
   stroke-width: 0.3pt;
 }
@@ -133,19 +133,19 @@ body {
 
 .scalesD {
   font-family:Inconsolata, 'Times', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  font-size: 6px;
-  stroke: #CCFFCC;
+  font-size: 7px;
+  stroke: #FFDDFF;
   opacity: 1.0;
-  stroke-width: 0.4px;
+  stroke-width: 0.2pt;
 }
 
 
 .scalesE {
   font-family:Inconsolata, 'Times', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   font-size: 14px;
-  stroke: #FFFFCC;
+  stroke: #EEFFEE;
   opacity: 1.0;
-  stroke-width: 0.4px;
+  stroke-width: 0.3px;
 }
 
 
