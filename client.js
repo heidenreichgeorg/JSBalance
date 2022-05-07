@@ -32,6 +32,7 @@ function getFromServer(responseHandler) {
     let paramString = strTarget.split('?')[1];
     var url=strServerDNS+'SHOW?'+paramString;
   
+
     request.open('GET',url, true);				
     console.dir("client.getFromServer GET url="+url);
 
@@ -56,6 +57,7 @@ function getFromServer(responseHandler) {
     request.send();
 
 }	
+
 
 
 function postToServer(strTarget,strParams,callBack) {
@@ -100,6 +102,8 @@ function postAndDisplay(strCommand,jBody,target) {
 
     let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';
     const url = strServerDNS+strCommand;
+
+    jBody.sessionId=getId();
 
     // request options
     const options =  { method: 'POST', body: JSON.stringify(jBody), headers: { 'Content-Type': 'application/json' }}
@@ -470,6 +474,8 @@ function showClose(txnForm,nextFuncName) {
 function save(jInfo) {
 
     var date = jInfo.date;
+
+    jInfo.sessionId=getId();
 
     var sInfo = JSON.stringify(jInfo);
 
@@ -941,6 +947,17 @@ function select(target,num) {
         eHistory.style.display="block";
         document.getElementById('windowBorder').className="dosBorder"; 
     }
+}
+
+
+function getId() {
+    
+    var searchParams = new URL(window.location.href).searchParams;
+    //Iteriert über die Suchparameter
+    for (let p of searchParams) {
+      console.log("CLIENT "+p);
+    }
+    return searchParams.get("sessionId");
 }
 
 

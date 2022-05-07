@@ -225,7 +225,7 @@ app.post("/LOGIN", (req, res) => {
 
     console.dir("0020 app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
 
-    let balance = Sheets.start(sessionId,client,year,time,remote,phaseOne);
+    Sheets.start(sessionId,client,year,time,remote,phaseOne);
     
     let banner = makeBanner(sessionId,year);
 
@@ -274,7 +274,7 @@ app.post("/UPLOAD", (req, res) => {
             }
 
             // save file on server, not on client
-            console.dir("0015 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
+            console.dir("0013 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
             Sheets.save2Server(req.body,client,year);
 
             console.dir("0020 app.post UPLOADED to SERVER");
@@ -298,21 +298,28 @@ app.post("/UPLOAD", (req, res) => {
 app.post("/BOOK", (req, res) => { 
     console.log("\n\n");
     // from TransferForm.html       
-    console.log("0010 app.post BOOK doBook('"+JSON.stringify(req.body)+"')");
+    console.log("0010 app.post BOOK prepareTXN('"+JSON.stringify(req.body)+"')");
 
+    var result="SERVER BOOKED";
+    let sessionId = req.body.sessionId;
+    if(sessionId) {
 
-    //if(req.query.client && req.query.year) {
         // SECURITY SANITIZE req.body
-        let tBuffer = doBook(req.query.sessionId,req.body);
+        let tBuffer = prepareTXN(req.query.sessionId,req.body);
+
+        let session=Sheets.get(sessionId);
 
         let sessionTime=timeSymbol();
-        let nextSessionId= sessionTime; 
-        // strSymbol(sessionTime+eq.query.client+eq.query.year+sessionTime);
+        let nextSessionId= strSymbol(sessionTime+session.client+session.year+sessionTime);
+
         Sheets.xlsxWrite(req.query.sessionId,tBuffer,sessionTime,nextSessionId); // state change in main.json
-    //}
+    } else {
+        result="NO SESSION ID";
+        console.log("0015 app.post BOOK NO sessionId");
+    }
 
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});       
-    res.end("\nSERVER BOOKED.\n");
+    res.end("\n"+result+".\n");
 });
 
 
@@ -339,7 +346,7 @@ app.post("/STORE", (req, res) => {
     
     let delta = req.body.delta;
 
-    console.log("0015 app.post STORE LOG with session id=("+req.body.sessionId+")");
+    console.log("0019 app.post STORE LOG with session id=("+req.body.sessionId+")");
 
     if(delta) Sheets.saveSessionLog(req.body.sessionId,req.body);
     else console.log("0021 app.post STORE LOG Id=("+req.body.sessionId+") did not save: no transaction!");
@@ -976,10 +983,10 @@ function strSymbol(pat) {
 }
 
 
-function doBook(sessionId,reqBody) {
+function prepareTXN(sessionId,reqBody) {
 
     //if(debugBook) 
-    console.dir("server.js doBook("+sessionId+") book "+JSON.stringify(reqBody));
+    console.dir("server.js prepareTXN("+sessionId+") book "+JSON.stringify(reqBody));
 
     let session = Sheets.get(sessionId);
 
@@ -1007,7 +1014,7 @@ function doBook(sessionId,reqBody) {
  
         if(Sheets.isSameFY(year) || jFlag) {
 
-            if(debug>0) console.log("server.js doBook() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
+            if(debug>0) console.log("server.js prepareTXN() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
 
 
             var total = balance[D_Schema].total;
@@ -1035,10 +1042,10 @@ function doBook(sessionId,reqBody) {
                 if(i>aLen) factor=1;
                 bookingForm[i]=moneyString(setMoney(factor * jDebit[money].cents));
             }
-        } else { console.dir("server.js doBook() rejects other fiscal year:"+year);
+        } else { console.dir("server.js prepareTXN() rejects other fiscal year:"+year);
             return null;
         }
-    } else console.error("server.js doBook("+sessionId+") no BALANCE table ");
+    } else console.error("server.js prepareTXN("+sessionId+") no BALANCE table ");
 
     // receiver will append this to sheetCells
     return bookingForm;

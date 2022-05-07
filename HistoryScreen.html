@@ -54,6 +54,7 @@
                 let aInfo = info.split(CSEP);
 
                 var jInfo = { "date":aInfo[0], "sender":aInfo[1], "acct":aInfo[2], "svwz":aInfo[3], "svwz2":aInfo[4], "delta":txn  };
+                jInfo.sessionId = getId();
 
                 var sInfo = JSON.stringify(jInfo);
 
@@ -250,6 +251,7 @@
                 if(!info5) info5=".";
 
                 var jInfo = { "date":date, "sender":sender, "acct":refAcct, "svwz":info4, "svwz2":info5, "credit":creditList, "debit":debitList };
+                jInfo.sessionId = getId();
 
                 var sInfo = JSON.stringify(jInfo);
 

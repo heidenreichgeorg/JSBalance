@@ -93,7 +93,16 @@ function sy_purgeCell(str) {
 //var sessionList = [];
 var sessionABC = {};
 function setSession(aSession) { sessionABC=aSession; }
-function get(id) { return sessionABC; }
+function get(id) { 
+
+    let result=sessionABC;
+
+    if(result) {
+        console.log("\n1800 "+id+" => (id="+result.id+"  time="+result.time+"  client="+result.client+"  year="+result.year+")");
+    }
+
+    return result; 
+}
 
 module.exports['get']=get;
 
