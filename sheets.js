@@ -1,6 +1,9 @@
 const debug=1;
 const debugWrite=1;
 
+
+const HTTP_OK = 200;
+
 // ASSETS BEFORE OTHER ACCOUNTS
 // NO NEGATIVE RESULTS in distribute()
 // EXTEND sy_purge ;EXCEL if needed
@@ -111,34 +114,6 @@ module.exports['get']=get;
 
 
 
-/*
-function load(sessionId,phaseOneFunction) {
-    // INSTEAD OF SESSION BAlANCE MEMBER
-    var balance = [];
-
-    let addrT= 0;
-
-    var session = get(sessionId);
-
-    if(session && session.time && session.time.length>4 && session.client && session.client.length>2 && session.year && session.year.length>3) {
-
-        session = create(session.client,session.year,session.time,session.remote,session.id);
-
-        if(session.sheetCells && session.sheetCells.length>H_LEN) {
-
-            if(debug) console.log("sheets.load() with "+session.id);    
-            balance = phaseOneFunction(addrT,session.logT, session.sheetCells);
-
-        } else { console.error("sheets.load() NO SHEET CELLS"); }
-
-    } else { console.error("sheets.load("+sessionId+") NO  SESSION"); }
-
-    return balance; 
-}
-//module.exports['load']=load;
-*/
-
-
 
 function getLatestFile(dir,files,lStart,lExt) {
     // log them on console
@@ -188,13 +163,13 @@ async function setFileNameS(session,client,year,start,ext) {
             let sFile=getLatestFile(dir,files,lStart,lExt);
             if(sFile && sFile.length>session.sheetFile.length) {
                 session.sheetFile=sFile;
+                if(debug) console.log("sheet.setFileNameS fs.readDir in "+dir+" FOUND: sets default "+session.sheetFile);
                 
-            } else if(debug) console.log("fs.readDir in "+dir+" sets default "+session.sheetFile);
+            } else if(debug) console.log("sheet.setFileNameS fs.readDir in "+dir+" NOT FOUND: sets default "+session.sheetFile);
         })
     });
 // unreached code
 }
-
 
 var found='';
 function getJSON() {
@@ -708,41 +683,46 @@ function getFromFile(client,year,sFile,time,sName) {
 }
 
 
-/*
-async function saveLatest(session,client,year) {
-    console.log("saveLatest Saving(JSON)");        
 
-    const data = JSON.stringify(session);
-
-    let sessionId=session.id;
-
-    var pSave = fs.writeFileSync(jsonMain(client,year,sessionId), data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
-        if (err) {
-            console.log(" sheets.saveLatest: "+err);          
-            throw err;
-        }
-        console.log("saveLatest Saving("+data+")");          
-    });
-    console.log("JSON main is saved.");
-}
-module.exports['saveLatest']=saveLatest;
-*/
-
-async function save2Server(session,client,year) {
-    console.log("0016 save2Server Start saving(JSON) to "+SERVEROOT);        
+async function save2Server(session,client,year,res,forwardURL) {
+    console.log("0014 save2Server Start saving(JSON) to "+SERVEROOT);        
 
     const data = JSON.stringify(session);
 
     let sessionId=session.id;
     let jsonFileName=jsonMain(client,year,sessionId);
+
+
+    // REJECT IF FILE EXISTS
+    if(checkExist(getClientDir(client),year)) {
+        console.log("0017 sheets.save2Server: DETECTS COLLISION ");   
+        return null;
+    }
+
+
+    // WRITE SESSION   1st PARAMETER
     fs.writeFileSync(jsonFileName, data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
         if (err) {
-            console.log("0017 sheets.save2Server: "+err);          
+            console.log("0019 sheets.save2Server: "+err);          
             throw err;
         }
-        console.log("save2Server Saving("+jsonFileName+")");          
+        //console.log("0016 save2Server Saving("+jsonFileName+")");          
     });
-    console.log("0018 save2Server: JSON main save to "+jsonFileName+" started.");
+    console.log("0016 save2Server: JSON main save to "+jsonFileName+" started.");
+
+
+    // REDIRECT TO FORWARD PAGE
+    if(res && forwardURL) {
+        console.log("0018 save2Server: redirecting to "+forwardURL);
+
+        //res.redirect(forwardURL);
+        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+        res.end("<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LOGIN</TITLE><BODY><A class='keyPanel' HREF="+
+            forwardURL+">LOGIN</A></BODY><HTML>\n\n");
+   
+    }
+
+    return jsonFileName;
 }
 module.exports['save2Server']=save2Server;
 
@@ -800,7 +780,23 @@ module.exports['isSameFY']=isSameFY;
 
 
 
+// returns YEARmain.json file FOUND
+// also sets found variable as a side-effect
+function checkExist(dir,year) {
+    console.log("sheets.checkExist fs.readDir in "+dir+" for file '"+year+"main.json'");
+    var found=null;
+    fs.readdir(dir, (err, files) => {
+        if (err) { console.dir(err);  }        
+        // files object contains all files names
+    
+        found=getLatestFile(dir,files,year+"main",".json");
+        if(found && found.length>8) {
+            console.log("sheets.checkExist fs.readDir in "+dir+" FINDS EXISTING '"+found+"'");
+        } else if(debug) console.log("sheets.checkExist fs.readDir in "+dir+" CLEARED "+year+"main.json");
+    })
 
+    return found;
+}
 
 
 function getClientDir(client) {

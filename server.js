@@ -209,35 +209,6 @@ app.get('/', (req, res) => {
 
 
 
-// LOGIN to an existing session
-app.post("/LOGIN", (req, res) => { 
-    console.log("\n\n");
-
-    console.log("0010 app.post LOGIN "+JSON.stringify(req.body));
-    let remote = req.socket.remoteAddress;
-    let client = req.body.client;
-    let year   = req.body.year;
-    let time   = req.body.time;    
-    //let sessionId = req.body.sessionId;
-    
-    let sessionId = strSymbol(time+client+year+time);
-    //            let sessionId = Sheets.symbolic(time+client+year+time);
-
-    console.dir("0020 app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
-
-    Sheets.start(sessionId,client,year,time,remote,phaseOne);
-    
-    let banner = makeBanner(sessionId,year);
-
-    console.dir("0030 app.post LOGIN responds with banner="+banner);
-
-    // send back sessionId to client brwoser or file
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-    res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
-    
-});
-
-
 //start session with uploading a session file for a known client
 app.post("/UPLOAD", (req, res) => { 
     console.log("\n\n");
@@ -245,8 +216,6 @@ app.post("/UPLOAD", (req, res) => {
     // client sends client_year.JSON file
     // this json has to be stored as <SESSION>.json
 
-    var banner = "0031 NO VALID CLIENT FILE";
-    
     let remote = req.socket.remoteAddress;
     console.log("0010 app.post UPLOAD from "+remote);
 
@@ -261,34 +230,48 @@ app.post("/UPLOAD", (req, res) => {
         let fileId = strSymbol(time+client+year+time);
 
         if(sessionId===fileId) { // 20220506
-            
-           
-          
 
-            // save file on server, not on client
+            // save file on server, not on client and forward to LOGIN page
             console.dir("0012 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
-            if(Sheets.save2Server(req.body,client,year)) {
+            Sheets.save2Server(req.body,client,year,res,"./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId);
 
-                console.dir("0020 app.post UPLOADED to SERVER");
-                Sheets.start(sessionId,client,year,time,remote,phaseOne);
-
-                console.log ( "0030 app.post UPLOAD STARTED  ");
-                banner = makeBanner(sessionId,year);
-
-                console.log ( "0040 app.post UPLOAD responds with  " +banner);
-            }
-            else {
-                // GH20220506 FIND OTHER YEAR.*JSON file
-                console.log ( "0013 app.post UPLOAD COLLIDES");
-                res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-                res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOADED FILE COLLIDES</TITLE>UPLOADED FILE COLLIDES</HTML>\n"); 
-            }
         } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
     }
 
+    // send back sessionId to client browser or file
+    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+    res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE</HTML>\n\n"); 
+    
+});
+
+
+
+
+// LOGIN to an existing session
+app.post("/LOGIN", (req, res) => { 
+    console.log("\n\n");
+
+    console.log("0020 app.post LOGIN "+JSON.stringify(req.body));
+    let remote = req.socket.remoteAddress;
+    let client = req.body.client;
+    let year   = req.body.year;
+    let time   = req.body.time;    
+    //let sessionId = req.body.sessionId;
+    
+    let sessionId = strSymbol(time+client+year+time);
+    //            let sessionId = Sheets.symbolic(time+client+year+time);
+
+    console.dir("0030 app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
+
+    Sheets.start(sessionId,client,year,time,remote,phaseOne);
+    
+    let banner = makeBanner(sessionId,year);
+
+    console.dir("0040 app.post LOGIN responds with banner="+banner);
+
     // send back sessionId to client brwoser or file
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-    res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>"+banner+"</HTML>\n"); 
+    res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
     
 });
 
