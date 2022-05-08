@@ -1,0 +1,15 @@
+app.get("/account", (req, res)  => { res.sendFile(__dirname + "/AccountHistory.html"); });
+app.get("/assetl", (req, res)   => { res.sendFile(__dirname + "/AssetList.html"); });
+app.get("/assets", (req, res)   => { res.sendFile(__dirname + "/AssetScreen.html"); });
+app.get("/balance", (req, res)  => { res.sendFile(__dirname + "/BalanceTable.html"); });
+app.get("/dashboard", (req, res)  => { res.sendFile(__dirname + "/DashBoard.html"); });
+app.get("/galshgb", (req, res) => { res.sendFile(__dirname + "/HGB275S2OTC.html"); });
+app.get("/gainloss", (req, res) => { res.sendFile(__dirname + "/GainLoss.html"); });
+app.get("/history", (req, res)  => { res.sendFile(__dirname + "/HistoryScreen.html"); });
+app.get("/hgbbeginyear", (req, res) => { res.sendFile(__dirname + "/HGBBeginYear.html"); });
+app.get("/openbalance", (req, res) => {res.sendFile(__dirname + "/OpenBalance.html"); });
+app.get("/hgbregular", (req, res) => { res.sendFile(__dirname + "/HGBRegular.html"); });
+app.get("/pie", (req, res)     => { res.sendFile(__dirname + "/BalancePie.html"); });
+app.get("/pattern", (req, res)  => {res.sendFile(__dirname + "/PatternList.html"); });
+app.get("/transfer", (req, res)    => { res.sendFile(__dirname + "/Transfer.html"); });
+app.get("/closeandsave", (req, res) => { res.sendFile(__dirname + "/CloseAndSave.html"); });
