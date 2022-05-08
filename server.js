@@ -262,29 +262,27 @@ app.post("/UPLOAD", (req, res) => {
 
         if(sessionId===fileId) { // 20220506
             
-            // GH20220506 FIND OTHER YEAR.*JSON file
-            // and compare the timestamps
-            let dir = Sheets.getClientDir(client);
            
-            Sheets.findLatestJSON(client,year); // async - writes it into Sheets.found, Sheets.getJSON()
-
-            if(0) { // later async check sheets found
-                res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-                res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD FOUND "+found+"</TITLE>FOUND A NEWER FILE "+found+"</HTML>\n"); 
-            }
+          
 
             // save file on server, not on client
-            console.dir("0013 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
-            Sheets.save2Server(req.body,client,year);
+            console.dir("0012 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
+            if(Sheets.save2Server(req.body,client,year)) {
 
-            console.dir("0020 app.post UPLOADED to SERVER");
-            Sheets.start(sessionId,client,year,time,remote,phaseOne);
+                console.dir("0020 app.post UPLOADED to SERVER");
+                Sheets.start(sessionId,client,year,time,remote,phaseOne);
 
-            console.log ( "0030 app.post UPLOAD STARTED  ");
-            banner = makeBanner(sessionId,year);
+                console.log ( "0030 app.post UPLOAD STARTED  ");
+                banner = makeBanner(sessionId,year);
 
-            console.log ( "0040 app.post UPLOAD responds with  " +banner);
-
+                console.log ( "0040 app.post UPLOAD responds with  " +banner);
+            }
+            else {
+                // GH20220506 FIND OTHER YEAR.*JSON file
+                console.log ( "0013 app.post UPLOAD COLLIDES");
+                res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+                res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOADED FILE COLLIDES</TITLE>UPLOADED FILE COLLIDES</HTML>\n"); 
+            }
         } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
     }
 
@@ -516,10 +514,9 @@ function phaseOne(addrT, logT, aoaCells) {
                         result[D_Schema].residence = row[3];
 
 
-                        // GH20211015 result[D_Schema]={ "Names": aNames }; crashes
-                        console.dir();
-                        console.dir("SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
-                        console.dir();
+                        // GH20211015 result[D_Schema]={ "Names": aNames }; crashes                        
+                        console.dir("0114 SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
+                        
                     }
                     else if(key && key==='C') {
                         const aDesc=row;
@@ -815,7 +812,7 @@ function phaseOne(addrT, logT, aoaCells) {
                 console.dir('0125 server.js phaseOne:'+err);
             }
 
-            console.log("0191 server.phaseOne.Schema="+JSON.stringify(result[D_Schema]));
+            console.log("0192 server.phaseOne.Schema="+JSON.stringify(result[D_Schema]));
 
         } else console.error('0111 server.js phaseOne NO BALANCE');
 
