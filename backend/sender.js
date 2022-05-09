@@ -38,11 +38,11 @@ const xbrlEqlReg = "de-gaap-ci_bs.regularIncome";
 
 
 // Imports
-const { addEUMoney, moneyString, iScaleMoney, setEUMoney , setMoney, negMoney, lessMoney, cents2EU } = require('./money.js');
+const { addEUMoney, moneyString, iScaleMoney, setEUMoney , setMoney, negMoney, lessMoney, cents2EU } = require('../money.js');
 
 // Modules
 const Account = require('./account.js');
-const Server = require('./server');
+const Server = require('../server');
 
 
 
