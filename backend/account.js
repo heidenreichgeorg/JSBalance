@@ -1,6 +1,6 @@
 const debug=null;
 
-const Money = require('../money.js');
+const Money = require('./money.js');
 
 function makeAccount(n,x,d,c) { return { "name":n, "index":c, "xbrl":x, "desc":(d?d:n), "init":"0,00", "min":"0,00",  "credit":"0,00", "debit":"0,00" }; }
 module.exports['makeAccount']=makeAccount;
