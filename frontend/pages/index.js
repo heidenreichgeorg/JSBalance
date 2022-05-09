@@ -1,7 +1,239 @@
-export default function Home() {
+import { useState } from 'react';
+
+import styles from '../styles/Home.module.scss';
+
+import { Group, Input, Modal, InputWrapper, PasswordInput, Space, Button, Anchor, LoadingOverlay, Text, Avatar } from '@mantine/core';
+import { Mail, Lock } from 'tabler-icons-react';
+
+function SignUp({setLoading, setOpened}) {
+    const [firstname, setFirstname] = useState({data: ''});
+    const [lastname, setLastname] = useState({data: ''});
+    const [email, setEmail] = useState({data: ''});
+    const [password, setPassword] = useState({data: ''});
+    const [passwordConfirm, setPasswordConfirm] = useState({data: ''});
+
+    const handleFirstnameChange = (e) => {
+        setFirstname({'data': e.target.value});
+    }
+    const handleLastnameChange = (e) => {
+        setLastname({'data': e.target.value});
+    }
+    const handleEmailChange = (e) => {
+        setEmail({'data': e.target.value});
+    }
+    const handlePasswordChange = (e) => {
+        setPassword({'data': e.target.value});
+    }
+    const handlePasswordConfirmChange = (e) => {
+        setPasswordConfirm({'data': e.target.value});
+    }
+    const handleSubmit = (e) => {
+        setLoading(true);
+
+        if(firstname.data == '') setFirstname({error: 'Firstname is required', data: firstname.data});
+        else if(!/[a-zA-Z]+$/.test(firstname.data)) setFirstname({error: 'Firstname must be alphabetic', data: firstname.data});
+        else setFirstname({data: firstname.data});
+        
+        if(lastname.data == '') setLastname({error: 'Lastname is required', data: lastname.data});
+        else if(!/[a-zA-Z]+$/.test(lastname.data)) setLastname({error: 'Lastname must be alphabetic', data: lastname.data});
+        else setLastname({data: lastname.data});
+
+        if(email.data == '') setEmail({error: 'Email is required', data: email.data});
+        else if(!/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(email.data)) setEmail({error: 'Email must be valid', data: email.data});
+        else setEmail({data: email.data});
+
+        if(password.data == '') setPassword({error: 'Password is required', data: password.data});
+        // at least 8 characters
+        else if(password.data.length < 8) setPassword({error: 'Password must at least 8 characters', data: password.data});
+        // at least one number
+        else if(!/\d/.test(password.data)) setPassword({error: 'Password must contain at least one number', data: password.data});
+        // at least one uppercase letter
+        else if(!/[A-Z]/.test(password.data)) setPassword({error: 'Password must contain at least one uppercase letter', data: password.data});
+        // at least one special character
+        else if(!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password.data)) setPassword({error: 'Password must contain at least one special character', data: password.data});
+        else setPassword({data: password.data});
+
+        if(passwordConfirm.data == '') setPasswordConfirm({error: 'Password is required', data: passwordConfirm.data});
+        else if(password.data !== passwordConfirm.data) setPasswordConfirm({error: 'Passwords must match', data: passwordConfirm.data});
+        else setFirstname({data: passwordConfirm.data});
+
+        console.log(firstname, lastname, email, password, passwordConfirm);
+
+        setLoading(false);
+    }
     return (
-        <div>
-            <h1>Welcome to JSBalance</h1>
+        <>
+            <Group grow>
+                <InputWrapper label="First name" required error={firstname.error}>
+                    <Input
+                        placeholder="Your first name"
+                        onChange={handleFirstnameChange}
+                    ></Input>
+                </InputWrapper>
+                <InputWrapper label="Last name" required error={lastname.error}>
+                    <Input
+                        placeholder="Your last name"
+                        onChange={handleLastnameChange}
+                    ></Input>
+                </InputWrapper>
+            </Group>
+            <InputWrapper label="Email" required error={email.error}>
+                <Input
+                    icon={<Mail color='gray'/>}
+                    placeholder="Your email"
+                    onChange={handleEmailChange}
+                ></Input>
+            </InputWrapper>
+            <InputWrapper label="Password" required>
+                <PasswordInput
+                    icon={<Lock color='gray'/>}
+                    placeholder="Your password"
+                    onChange={handlePasswordChange}
+                    error={password.error}
+                ></PasswordInput>
+            </InputWrapper>
+            <InputWrapper label="Confirm Password" required>
+                <PasswordInput
+                    icon={<Lock color='gray'/>}
+                    placeholder="Confirm password"
+                    onChange={handlePasswordConfirmChange}
+                    error={passwordConfirm.error}
+                ></PasswordInput>
+            </InputWrapper>
+            <Space
+                h="xl"
+            />
+            <Group style={{padding: '0 1rem'}}>
+                <Anchor onClick={() => setOpened('Sign in')} style={{color: 'gray'}}>Have an account? Sign in</Anchor>
+                <Button style={{marginLeft: 'auto'}} onClick={handleSubmit}>Sign up</Button>
+            </Group>
+        </>
+    )
+}
+
+function SignIn({setLoading, setOpened}) {
+    const [email, setEmail] = useState({data: ''});
+    const [password, setPassword] = useState({data: ''});
+    const [error, setError] = useState('');
+
+    const handleEmailChange = (e) => {
+        setEmail({data: e.target.value});
+    }
+    const handlePasswordChange = (e) => {
+        setPassword({data: e.target.value});
+    }
+    const handleSubmit = (e) => {
+        setLoading(true);
+
+        setError('');
+
+        if(email.data == '') setEmail({error: 'Email is required', data: email.data});
+        else if(!/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(email.data)) setEmail({error: 'Email must be valid', data: email.data});
+        else setEmail({data: email.data});
+
+        //check if password
+        // is at least 8 characters
+        // at least one number
+        // at least one uppercase letter
+        // at least one special character
+        if(password.data == '') setPassword({error: 'Password is required', data: password.data});
+        else setPassword({data: password.data});
+
+        if(!email.error && !password.error && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password.data)) setError('Email or password is wrong');
+
+        console.log();
+
+        setLoading(false);
+    }
+
+    return (
+        <>
+            <InputWrapper label="Email" required error={email.error}>
+                <Input
+                    icon={<Mail color='gray'/>}
+                    placeholder="Your email"
+                    onChange={handleEmailChange}
+                ></Input>
+            </InputWrapper>
+            <InputWrapper label="Password" required>
+                <PasswordInput
+                    error={password.error}
+                    icon={<Lock color='gray'/>}
+                    placeholder="Your password"
+                    onChange={handlePasswordChange}
+                ></PasswordInput>
+            </InputWrapper>
+            {error ?
+                <>
+                    <Space h='sm' />
+                    <Text color="red">{error}</Text>
+                </>
+            : null}
+            <Space h="xl" />
+            <Group style={{padding: '0 1rem'}}>
+                <Anchor onClick={() => setOpened('Sign up')} style={{color: 'gray'}}>Don't have an account? Sign up</Anchor>
+                <Button style={{marginLeft: 'auto'}} onClick={handleSubmit}>Sign in</Button>
+            </Group>
+        </>
+    )
+}
+
+function Login() {
+
+    const [opened, setOpened] = useState(undefined);
+    const [loading, setLoading] = useState(false);
+
+    return (
+        <>
+            <a onClick={() => setOpened('Sign in')}>Sign in</a>
+            <a className="button" onClick={() => setOpened('Sign up')}>Sign Up</a>
+            <Modal
+                opened={opened === 'Sign in'}
+                onClose={() => setOpened(undefined)}
+                title={opened}
+                centered
+                overlayOpacity={0.5}
+                overlayBlur={.8}
+            >
+                <LoadingOverlay visible={loading} />
+                <SignIn setLoading={setLoading} setOpened={setOpened} />
+            </Modal>
+            <Modal
+                opened={opened === 'Sign up'}
+                onClose={() => setOpened(undefined)}
+                title={opened}
+                centered
+                overlayOpacity={0.5}
+                overlayBlur={.8}
+            >
+                <LoadingOverlay visible={loading} />
+                <SignUp setLoading={setLoading} setOpened={setOpened} />
+            </Modal>
+        </>
+    );
+}
+
+function User() {
+    return (
+        <Avatar
+            src=""
+            size="lg"
+            color='gray'
+            radius='xl'
+        >AC</Avatar>
+    );
+}
+
+export default function HomePage({isLoggedIn}) {
+    return (
+        <div className={styles.page}>
+            <div className={styles.header}>
+                <div className={styles.login}>{isLoggedIn ? <Login /> : <User />}</div>
+            </div>
         </div>
     )
+}
+
+export async function getServerSideProps() {
+    return {props: {isLoggedIn: Math.random() > .5}}
 }
