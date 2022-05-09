@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&family=Roboto:wght@500&display=swap');
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: 'Roboto Flex', sans-serif;
+  background-color: #18191d;
+  color: #FEFCFB;
 }
 
 a {
@@ -13,4 +16,45 @@ a {
 
 * {
   box-sizing: border-box;
+  color: #FEFCFB;
+}
+
+*:focus {
+  outline: none;
+}
+
+::selection {
+  background-color: #38AECC;
+}
+
+a {
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  margin: 0.3rem;
+  transition: border-color .2s, color .2s;
+}
+
+a:hover {
+  border-color: #ffffffb7;
+  color: #c9c9c9;
+}
+
+a:active {
+  border-color: #ffffffa6;
+  color: #cacaca;
+}
+
+.button {
+  border-radius: .5rem;
+  background-color: transparent;
+  border: 1px solid #FEFCFB;
+  padding: .4rem 0.8rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
 }
