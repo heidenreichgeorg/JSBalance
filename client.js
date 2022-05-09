@@ -96,7 +96,7 @@ function postToServer(strTarget,strParams,callBack) {
 
 
 
-function postAndDisplay(strCommand,jBody,target) {
+function postAndDisplay(strCommand,jBody,height) {
 
 // show modal message window
 
@@ -108,7 +108,9 @@ function postAndDisplay(strCommand,jBody,target) {
     // request options
     const options =  { method: 'POST', body: JSON.stringify(jBody), headers: { 'Content-Type': 'application/json' }}
 
-    let panel = window.open("", 'Panel',' height=50, width=1480, left=1, top=1080, resizable=no , scrollbars=no  ,toolbar=no ,menubar=no ,location=no ,directories=no ,status=no ');
+    if(!height) height=55;
+    var top=1080-height;
+    let panel = window.open("", 'Panel',' height='+height+', width=1480, left=1, top='+top+', resizable=no , scrollbars=no  ,toolbar=no ,menubar=no ,location=no ,directories=no ,status=no ');
 
     // send POST request
     fetch(url, options)

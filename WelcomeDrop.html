@@ -11,8 +11,10 @@
       <!--DIV action="LOGIN" method="post" id="login" -->
       <h1 id="SignUp">Sign Up</h1>
          <div class="keyPanel" ondragover="dragOverHandler(event);" ondrop="dropHandler(event);">  
+            <!--
             <label for="name">Client:</label>
             <input type="text" id="CLIENT" name="client" placeholder="Enter client name" />
+            -->
             <div  class="instRow"  >&nbsp;</div>            
             <div  class="instRow" id="fileupload">&nbsp;</div>            
              </div>
@@ -83,11 +85,17 @@ function dropHandler(ev) {
                
                let jData = JSON.parse(fileBuffer);
 
-               let cClient = document.getElementById('CLIENT')
-               if(cClient && cClient.value==jData.client) {
-                
-                  postAndDisplay("UPLOAD",jData,'mainpage');
-               }
+
+
+
+               //let cClient = document.getElementById('CLIENT')
+               //if(cClient && cClient.value==jData.client) {
+               
+                  
+                  postAndDisplay("UPLOAD",jData);
+               //}
+
+
             }
             fr.readAsText(item);
          }
