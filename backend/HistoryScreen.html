@@ -58,7 +58,8 @@
 
                 var sInfo = JSON.stringify(jInfo);
 
-                postToServer("STORE",sInfo);
+                // GH20220509 postToServer("STORE",sInfo);
+                postAndDisplay("STORE",sInfo);
                 console.log('HistoryList.html storeInLog() postToServer STORE '+sInfo);
 
             }
@@ -255,13 +256,11 @@
 
                 var sInfo = JSON.stringify(jInfo);
 
-
                 var target = document.getElementById("display");
                 if(date.length>6) {
                     let txnForm=validateCD(creditList,debitList).diff
                     if(txnForm.diff==0) {
                         showClose(txnForm);
-
 
                         // LOG button: store transaction pattern  and show it in PatternList
                         postToServer("STORE",sInfo);

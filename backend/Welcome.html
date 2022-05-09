@@ -38,18 +38,6 @@
    var reader;
    var content;
 
-   var readFile = function(event) {
-      var input = event.target;
-
-      reader = new FileReader();
-      reader.onload = function(){
-          var text = reader.result;
-          console.log("WELCOME.HTML readFile() MAINFILE "+text);  
-
-          postToServer("MAINFILE",text);
-      };
-      reader.readAsText(input.files[0]);
-    };
 </SCRIPT>
 
 
@@ -89,19 +77,7 @@
 
  
       function login(event,elements) {       
-/*
-         let check = localStorage.getItem("mysession");
-         if(check && check.length>10) {
-            const credentials = {
-            'sessionId':  localStorage.getItem("mysession"),
-            'time': timeSymbol()
-           };
-           console.log("login() WITH PREVIOUS SESSION");
-           // postAndDisplay("LOGIN",credentials);
-           // SERVER NOT RECOGNIZING CERT Strings
-
-         } else console.dir("login() NO PREVIOUS SESSION");
-*/      
+      
 
          for(let name in [ 'client', 'year', 'sessionId']) 
             console.log("Form["+name+"] ="+form[name].value);

@@ -140,7 +140,8 @@
             
             let jInfo = { "sessionId" :sessionId };
             let sInfo = JSON.stringify(jInfo);
-            postToServer("SAVE",  sInfo  );
+            // 20220509 postToServer("SAVE",  sInfo  );
+            postAndDisplay("SAVE",  sInfo , 80 );
 
             console.log("1200 CloseAndSave Download EXIT");
             // closeWindow();
