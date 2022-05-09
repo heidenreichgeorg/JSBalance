@@ -96,6 +96,8 @@ function sy_purgeCell(str) {
 //var sessionList = [];
 var sessionABC = {};
 function setSession(aSession) { sessionABC=aSession; }
+module.exports['setSession']=setSession;
+
 function get(id) { 
 
     let result=sessionABC;
@@ -106,8 +108,8 @@ function get(id) {
 
     return result; 
 }
-
 module.exports['get']=get;
+
 
 
 
@@ -390,7 +392,7 @@ function start(sessionId,client,year,time,remote,phaseOneFunction) {
             // GLOBAL STATE CHANGE  without balance member GH20211120
             setSession(session);
 
-            balance = phaseOneFunction(addrT,session.logT,session.sheetCells);
+            balance = phaseOneFunction(session.addrT,session.logT,session.sheetCells);
             console.dir("0410 sheets.start() uses sessionId: "+sessionId);    
 
         } else { console.log("0401 sheets.start() NO SHEET CELLS"); }
@@ -611,7 +613,7 @@ function create(client,year,time,remote,sessionId) {
         console.error(' sheets.getSheet ADDRT ERROR:'+err);
         console.ADDR(' sheets.getFromFile ADDRT used '+lFile);
     }
-    */
+    
    // bootstrap
     session.addrT = { 
         "BundesanzeigerVerlag": [ "",                  "Amsterdamerstraße 192","Köln",   "50735"  ],
@@ -621,7 +623,7 @@ function create(client,year,time,remote,sessionId) {
         "Roby Vau":             [ "Familie"           ,"Am Dummetsweiher 6", "Erlangen", "91056"  ],
         "Kristina":             [ "Heidenreich"       ,"Hützel Bahnhof", "Bispingen",    "29646"  ]
     };
-
+*/
 
     setTimeout(function(){
         let sFile = session.sheetFile;

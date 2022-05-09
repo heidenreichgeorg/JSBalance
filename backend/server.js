@@ -233,7 +233,20 @@ app.post("/UPLOAD", (req, res) => {
 
             // save file on server, not on client and forward to LOGIN page
             console.dir("0012 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
-            Sheets.save2Server(req.body,client,year,res,"./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId);
+            //Sheets.save2Server(req.body,client,year,res,"./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId);
+            // INSTEAD OF LOCAL FILE STORAGE
+            Sheets.setSession(data);
+            let forwardURL = "./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId
+            // REDIRECT TO FORWARD PAGE
+            if(res && forwardURL) {
+                console.log("0014 app.post UPLOAD: redirecting to "+forwardURL);
+
+                //res.redirect(forwardURL);
+                res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+                res.end("<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LOGIN</TITLE><BODY><A class='keyPanel' HREF="+
+                    forwardURL+">LOGIN</A></BODY><HTML>\n\n");
+            }
+            
 
         } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
     }
@@ -263,11 +276,14 @@ app.post("/LOGIN", (req, res) => {
 
     console.dir("0030 app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
 
-    Sheets.start(sessionId,client,year,time,remote,phaseOne);
+    let session = Sheets.get(sessionId);
+
+    balance = phaseOne(session.addrT,session.logT,session.sheetCells);
+    console.dir("0040 app.post LOGIN creates balance");
     
     let banner = makeBanner(sessionId,year);
 
-    console.dir("0040 app.post LOGIN responds with banner="+banner);
+    console.dir("0050 app.post LOGIN responds with banner="+banner);
 
     // send back sessionId to client brwoser or file
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
