@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import styles from '../styles/Home.module.scss';
 
-import { Group, Input, Modal, InputWrapper, PasswordInput, Space, Button, Anchor, LoadingOverlay, Text, Avatar } from '@mantine/core';
-import { Mail, Lock } from 'tabler-icons-react';
+import { Group, Input, Modal, InputWrapper, PasswordInput, Space, Button, Anchor, LoadingOverlay, Text, Card, Image, Badge } from '@mantine/core';
+import { Mail, Lock} from 'tabler-icons-react';
 
 function SignUp({setLoading, setOpened}) {
     const [firstname, setFirstname] = useState({data: ''});
@@ -232,54 +232,85 @@ function Login() {
     const [loading, setLoading] = useState(false);
 
     return (
-        <>
-            <a onClick={() => setOpened('Sign in')}>Sign in</a>
-            <a className="button" onClick={() => setOpened('Sign up')}>Sign Up</a>
-            <Modal
-                opened={opened === 'Sign in'}
-                onClose={() => setOpened(undefined)}
-                title={opened}
-                centered
-                overlayOpacity={0.5}
-                overlayBlur={.8}
-            >
-                <LoadingOverlay visible={loading} />
-                <SignIn setLoading={setLoading} setOpened={setOpened} />
-            </Modal>
-            <Modal
-                opened={opened === 'Sign up'}
-                onClose={() => setOpened(undefined)}
-                title={opened}
-                centered
-                overlayOpacity={0.5}
-                overlayBlur={.8}
-            >
-                <LoadingOverlay visible={loading} />
-                <SignUp setLoading={setLoading} setOpened={setOpened} />
-            </Modal>
-        </>
+        <div className={styles.page}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>JSBalance</h1>
+                <div className={styles.login}>
+                    <a onClick={() => setOpened('Sign in')}>Sign in</a>
+                    <a className="button" onClick={() => setOpened('Sign up')}>Sign Up</a>
+                    <Modal
+                        opened={opened === 'Sign in'}
+                        onClose={() => setOpened(undefined)}
+                        title={opened}
+                        centered
+                        overlayOpacity={0.5}
+                        overlayBlur={.8}
+                    >
+                        <LoadingOverlay visible={loading} />
+                        <SignIn setLoading={setLoading} setOpened={setOpened} />
+                    </Modal>
+                    <Modal
+                        opened={opened === 'Sign up'}
+                        onClose={() => setOpened(undefined)}
+                        title={opened}
+                        centered
+                        overlayOpacity={0.5}
+                        overlayBlur={.8}
+                    >
+                        <LoadingOverlay visible={loading} />
+                        <SignUp setLoading={setLoading} setOpened={setOpened} />
+                    </Modal>
+                </div>
+            </div>
+            <Space h={50} />
+            <Group position='center' spacing='xl'>
+                <Card shadow="sm" p="lg" style={{height: 500, width: 400}}>
+                    <Card.Section>
+                        <Image height={200} width={400} src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80' alt="logo" />
+                    </Card.Section>
+                    <Space h="xl" />
+                    <Group>
+                        <Text size="lg" weight="bold">Lorem ipsum</Text>
+                        <Badge color='pink'>NEW</Badge>
+                    </Group>
+                    <Text size="sm">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </Text>
+                </Card>
+                <Card shadow="sm" p="lg" style={{height: 500, width: 400}}>
+                    <Card.Section>
+                        <Image height={200} width={400} src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80' alt="logo" />
+                    </Card.Section>
+                    <Space h="xl" />
+                    <Text size="lg" weight="bold">Lorem ipsum</Text>
+                    <Text size="sm">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </Text>
+                </Card>
+                <Card shadow="sm" p="lg" style={{height: 500, width: 400}}>
+                    <Card.Section>
+                        <Image height={200} width={400} src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80' alt="logo" />
+                    </Card.Section>
+                    <Space h="xl" />
+                    <Text size="lg" weight="bold">Lorem ipsum</Text>
+                    <Text size="sm">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    </Text>
+                </Card>
+            </Group>
+        </div>
     );
 }
 
-function User() {
+function Account() {
     return (
-        <Avatar
-            src=""
-            size="lg"
-            color='gray'
-            radius='xl'
-        >AC</Avatar>
+        <h2>Account</h2>
     );
 }
 
 export default function HomePage({isLoggedIn}) {
-    return (
-        <div className={styles.page}>
-            <div className={styles.header}>
-                <div className={styles.login}>{isLoggedIn ? <Login /> : <User />}</div>
-            </div>
-        </div>
-    )
+    if(isLoggedIn) return <Account />
+    else return <Login />
 }
 
 export async function getServerSideProps() {
