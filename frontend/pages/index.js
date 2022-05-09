@@ -12,6 +12,8 @@ function SignUp({setLoading, setOpened}) {
     const [password, setPassword] = useState({data: ''});
     const [passwordConfirm, setPasswordConfirm] = useState({data: ''});
 
+    const [error, setError] = useState('');
+
     const handleFirstnameChange = (e) => {
         setFirstname({'data': e.target.value});
     }
@@ -27,7 +29,7 @@ function SignUp({setLoading, setOpened}) {
     const handlePasswordConfirmChange = (e) => {
         setPasswordConfirm({'data': e.target.value});
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         setLoading(true);
 
         if(firstname.data == '') setFirstname({error: 'Firstname is required', data: firstname.data});
@@ -57,9 +59,31 @@ function SignUp({setLoading, setOpened}) {
         else if(password.data !== passwordConfirm.data) setPasswordConfirm({error: 'Passwords must match', data: passwordConfirm.data});
         else setFirstname({data: passwordConfirm.data});
 
-        console.log(firstname, lastname, email, password, passwordConfirm);
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        setLoading(false);
+        if(!firstname.error && !lastname.error && !email.error && !password.error && !passwordConfirm.error) {
+            if(!firstname.data || !lastname.data || !email.data || !password.data || !passwordConfirm.data) return setLoading(false);
+            fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    firstname: firstname.data,
+                    lastname: lastname.data,
+                    email: email.data,
+                    password: password.data
+                })
+            }).then(res => res.json())
+            .then(data => {
+                setLoading(false)
+                if(data.success) setOpened('');
+                else setError(data.error[0]);
+            }).catch(e => {
+                setLoading(false)
+                setError('An error occured');
+            })
+        } else setLoading(false)
     }
     return (
         <>
@@ -100,9 +124,13 @@ function SignUp({setLoading, setOpened}) {
                     error={passwordConfirm.error}
                 ></PasswordInput>
             </InputWrapper>
-            <Space
-                h="xl"
-            />
+            {error ?
+                <>
+                    <Space h='sm' />
+                    <Text color="red">{error}</Text>
+                </>
+            : null}
+            <Space h="xl" />
             <Group style={{padding: '0 1rem'}}>
                 <Anchor onClick={() => setOpened('Sign in')} style={{color: 'gray'}}>Have an account? Sign in</Anchor>
                 <Button style={{marginLeft: 'auto'}} onClick={handleSubmit}>Sign up</Button>
@@ -122,7 +150,7 @@ function SignIn({setLoading, setOpened}) {
     const handlePasswordChange = (e) => {
         setPassword({data: e.target.value});
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         setLoading(true);
 
         setError('');
@@ -139,11 +167,31 @@ function SignIn({setLoading, setOpened}) {
         if(password.data == '') setPassword({error: 'Password is required', data: password.data});
         else setPassword({data: password.data});
 
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         if(!email.error && !password.error && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password.data)) setError('Email or password is wrong');
 
-        console.log();
-
-        setLoading(false);
+        if(!email.error && !password.error) {
+            if(!email.data || !password.data) return setLoading(false);
+            fetch('/api/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email.data,
+                    password: password.data
+                })
+            }).then(res => res.json())
+            .then(data => {
+                setLoading(false)
+                if(data.success) setOpened('');
+                else setError(data.error[0]);
+            }).catch(e => {
+                setLoading(false)
+                setError('An error occured');
+            })
+        } else setLoading(false)
     }
 
     return (
