@@ -132,51 +132,11 @@ function postAndDisplay(strCommand,jBody,height) {
 }
 
 
-function unixYYYYMM() {
-    var u = new Date(Date.now()); 
-    return u.getUTCFullYear() +
-    '-' + ('0' + (1+u.getUTCMonth())).slice(-2);
-}
-
-function unixYYYYQQ() {
-    var u = new Date(Date.now()); 
-    return u.getUTCFullYear() +
-    '-' + ('Q' + (1+(u.getUTCMonth()%3))).slice(-2);
-}
-
-function unixYYYY() {
-    var u = new Date(Date.now()); 
-    return ''+u.getUTCFullYear();
-}
-
-function unixYYYYNNNN() {
-    var u = new Date(Date.now()); 
-    let yy=u.getUTCFullYear();
-    return ''+yy+'/'+(yy+1);
-}
-
-function unixPPPPYYYY() {
-    var u = new Date(Date.now()); 
-    let yy=u.getUTCFullYear()-1;
-    return ''+yy+'/'+(yy+1);
-}
-
-function unixTime() {
-    var u = new Date(Date.now()); 
-    return u.getUTCFullYear() +
-    '-' + ('0' + (1+u.getUTCMonth())).slice(-2) +
-    '-' + ('0' + u.getUTCDate()).slice(-2) + 
-    ' ' + ('0' + u.getUTCHours()).slice(-2) +
-    ':' + ('0' + u.getUTCMinutes()).slice(-2) 
-  +  ':' + ('0' + u.getUTCSeconds()).slice(-2) 
- // +  '.' + (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) 
-}
-
 
 
 function handleEvent(event) { 
-    if(event) console.log(unixTime()+'--'+event.type+': '+event.message+' '+event.filename+'\n'); 
-    else console.log(unixTime()+'--EMPTY');
+    if(event) console.log(timeSymbol()+'--'+event.type+': '+event.message+' '+event.filename+'\n'); 
+    else console.log(timeSymbol()+'--EMPTY');
 }
 
 
@@ -963,6 +923,37 @@ function getId() {
     }
     return searchParams.get("sessionId");
 }
+
+
+function unixYYYYMM() {
+    var u = new Date(Date.now()); 
+    return u.getUTCFullYear() +
+    '-' + ('0' + (1+u.getUTCMonth())).slice(-2);
+}
+
+function unixYYYYQQ() {
+    var u = new Date(Date.now()); 
+    return u.getUTCFullYear() +
+    '-' + ('Q' + (1+(u.getUTCMonth()%3))).slice(-2);
+}
+
+function unixYYYY() {
+    var u = new Date(Date.now()); 
+    return ''+u.getUTCFullYear();
+}
+
+function unixYYYYNNNN() {
+    var u = new Date(Date.now()); 
+    let yy=u.getUTCFullYear();
+    return ''+yy+'/'+(yy+1);
+}
+
+function unixPPPPYYYY() {
+    var u = new Date(Date.now()); 
+    let yy=u.getUTCFullYear()-1;
+    return ''+yy+'/'+(yy+1);
+}
+
 
 
 function timeSymbol() { // same as in server.js

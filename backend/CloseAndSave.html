@@ -23,7 +23,7 @@
                     <DIV class="attrLine" id="welcome"></DIV>            
                     <DIV  id='selAccount'></DIV>
                     <DIV id='tabHistory'></DIV>
-                    <DIV  id='display'>CLOSE</DIV>
+                    <DIV  id='display'></DIV>
                     <div class="attrLine">
                     <div class="R165" id="credit" ><div>Soll: 0,00</div></div>
                     <div class="C100"  >&nbsp;</div>
@@ -126,7 +126,7 @@
                 // override other year 
                 jInfo.flag = 1;
 
-                showClose(validateCD(creditList,debitList),'download');
+                showClose(validateCD(creditList,debitList),'downloadJSON');
             
             }               
         }
@@ -141,13 +141,34 @@
             let jInfo = { "sessionId" :sessionId };
             let sInfo = JSON.stringify(jInfo);
             // 20220509 postToServer("SAVE",  sInfo  );
-            postAndDisplay("SAVE",  sInfo , 80 );
+            postAndDisplay("SAVE",  jInfo , 80 ); // writes CLSX file, no JSON
 
-            console.log("1200 CloseAndSave Download EXIT");
+            console.log("1190 CloseAndSave Download EXIT");
             // closeWindow();
         }
     
-        
+        function downloadJSON(event) {
+            console.log("1200 CloseAndSave downloadJSON ENTER with paramstring="+paramString);
+            handleEvent(event);
+            let sessionId = paramString.split('=')[1];
+            console.log("1210 CloseAndSave downloadJSON sessionId = "+sessionId);
+            
+
+            //(A) sk the server
+            //let jInfo = { "sessionId" :sessionId };
+            //let sInfo = JSON.stringify(jInfo);
+            // 20220509 postToServer("SAVE",  sInfo  );
+            // postAndDisplay("DOWNLOAD",  jInfo , 80 ); // writes CLSX file, no JSON
+
+
+            window.open('/DOWNLOAD?sessionId='+sessionId);
+
+
+            console.log("1290 CloseAndSave downloadJSON EXIT");
+            // closeWindow();
+        }
+
+
         function closeWindow() {
             console.log("1300 CloseAndSave Close IN");
             window.close();

@@ -264,6 +264,8 @@ app.post("/UPLOAD", (req, res) => {
 
         res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
         res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
+
+        return;
     }
 
     // send back sessionId to client browser or file
@@ -378,6 +380,25 @@ app.post("/STORE", (req, res) => {
     res.end("\nSTORED.");
 });
 
+
+app.get("/DOWNLOAD", (req, res) => { 
+    // DOWNLOAD to client     
+
+    console.log("\n\n");
+    console.log("1500 app.post DOWNLOAD JSON for with session id=("+req.body.sessionId+")");
+
+    session = Sheets.get(req.body.sessionId);
+    console.log("1510 app.post DOWNLOAD for year"+session.year);
+    
+    console.log("1520 app.post DOWNLOAD main.json('"+JSON.stringify(session).length+"')");
+
+    //res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
+    //res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
+    
+    res.set('Content-Disposition', 'attachment; filename='+session.year+'server'+datetime()+'.json')
+    res.json(session);
+    
+});
 
 
 app.post('/SAVE', (req, res) => {
@@ -515,7 +536,7 @@ function phaseOne(addrT, logT, aoaCells) {
                     if(key && key==='N') {
                         const aNames=row;
                         result[D_Schema]["Names"]=aNames;
-                        result.writeTime = unixTime();
+                        result.writeTime = timeSymbol();
                         if(debug>1) console.log("N at "+result.writeTime);
                         var column;
                         for(column=0;column<aNames.length && !(aNames[column].length>0 && aNames[column].length<4 && aNames[column].includes(CEND));column++) {
@@ -967,7 +988,7 @@ function getCost(idnt,nmbr,init) {
 }
 
 
-function unixTime() {
+function timeSymbol() {
     var u = new Date(Date.now()); 
     return u.getUTCFullYear() +
     '-' + ('0' + (1+u.getUTCMonth())).slice(-2) +
@@ -983,12 +1004,22 @@ function unixYear() {
 };
 
 
+function datetime() { // same as in server.js
+    var u = new Date(Date.now()); 
+    return ''+ u.getUTCFullYear()+
+      ('0' + (1+u.getUTCMonth())).slice(-2) +
+      ('0' + u.getUTCDate()).slice(-2) + 
+      ('0' + u.getUTCHours()).slice(-2) +
+      ('0' + u.getUTCMinutes()).slice(-2);
+};     
+
+
 function strSymbol(pat) {
     let cypher = "BC0DF1GH2JK3LM4NP5QR6ST7VW8XZ9A";
     let base=31;
     var res = 0;
     var out = [];
-    if(!pat) pat = unixTime();
+    if(!pat) pat = timeSymbol();
     {
         let factor = 23;
         var sequence = ' '+pat+pat+pat;

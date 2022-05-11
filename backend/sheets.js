@@ -487,7 +487,7 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
 
                         if(debugWrite) console.log("1460 sheets.xlsxWrite APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
                     }
-                    else if(debugWrite) console.log("1465 sheets.xlsxWrite SAVE("+client+","+year+") #"+numLines);
+                    else if(debugWrite) console.log("1465 sheets.xlsxWrite SAVE NO JSON ("+client+","+year+") #"+numLines);
 
 
 

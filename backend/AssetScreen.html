@@ -95,7 +95,7 @@
                             printFormat(cursor,[date,ident,type,init,nmbr,rest,cost]);
                     }
 
-                   printFormat(cursor,['Gesamt',unixTime(),'&nbsp;','&nbsp;','&nbsp;',cents2EU(cCurrent),'&nbsp;']);
+                   printFormat(cursor,['Gesamt',timeSymbol(),'&nbsp;','&nbsp;','&nbsp;',cents2EU(cCurrent),'&nbsp;']);
 
 
                 } else  console.log('Assets --> '+JSON.stringify(gAssets));
