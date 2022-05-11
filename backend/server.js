@@ -215,6 +215,7 @@ app.post("/UPLOAD", (req, res) => {
 
     // client sends client_year.JSON file
     // this json has to be stored as <SESSION>.json
+    var banner = "NO SESSION";
 
     let remote = req.socket.remoteAddress;
     console.log("0010 app.post UPLOAD from "+remote);
@@ -236,19 +237,33 @@ app.post("/UPLOAD", (req, res) => {
             //Sheets.save2Server(req.body,client,year,res,"./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId);
             // INSTEAD OF LOCAL FILE STORAGE
             Sheets.setSession(data);
-            let forwardURL = "./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId
-            // REDIRECT TO FORWARD PAGE
-            if(res && forwardURL) {
-                console.log("0014 app.post UPLOAD: redirecting to "+forwardURL);
 
-                //res.redirect(forwardURL);
+            
+            
+            if(res) {
+            
+
+                // (A) REDIRECT TO FORWARD PAGE
+                //console.log("0014 app.post UPLOAD: redirecting to "+forwardURL);
+                //let forwardURL = "./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId
+                // -- NO PARMETERS res.redirect(forwardURL);
+                
+                /* B ETXRA WINDOW
                 res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
                 res.end("<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LOGIN</TITLE><BODY><A class='keyPanel' HREF="+
                     forwardURL+">LOGIN</A></BODY><HTML>\n\n");
+                */
+
+         
             }
+
+            banner = login(sessionId);
             
 
         } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
+
+        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+        res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
     }
 
     // send back sessionId to client browser or file
@@ -276,20 +291,31 @@ app.post("/LOGIN", (req, res) => {
 
     console.dir("0030 app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
 
-    let session = Sheets.get(sessionId);
-
-    balance = phaseOne(session.addrT,session.logT,session.sheetCells);
-    console.dir("0040 app.post LOGIN creates balance");
-    
-    let banner = makeBanner(sessionId,year);
-
-    console.dir("0050 app.post LOGIN responds with banner="+banner);
+    let banner = login(sessionId);
 
     // send back sessionId to client brwoser or file
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
     res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
     
 });
+
+
+function login(sessionId) {
+
+    let session = Sheets.get(sessionId);
+    console.log("0014 login() "+sessionId);
+
+
+    let balance = phaseOne(session.addrT,session.logT,session.sheetCells);
+    console.dir("0040 login() creates balance");
+    
+    let banner = makeBanner(sessionId,session.year);
+
+    console.dir("0050 login() responds with banner="+banner);
+
+    return banner;
+}
+
 
 
 app.post("/BOOK", (req, res) => { 

@@ -100,8 +100,9 @@ function postAndDisplay(strCommand,jBody,height) {
 
 // show modal message window
 
-    let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';
-    const url = strServerDNS+strCommand;
+    //let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';
+    //const url = strServerDNS+strCommand;
+    const url ="./"+strCommand;
 
     jBody.sessionId=getId();
 
@@ -111,6 +112,7 @@ function postAndDisplay(strCommand,jBody,height) {
     if(!height) height=55;
     var top=1080-height;
     let panel = window.open("", 'Panel',' height='+height+', width=1480, left=1, top='+top+', resizable=no , scrollbars=no  ,toolbar=no ,menubar=no ,location=no ,directories=no ,status=no ');
+    panel.document.open();
 
     // send POST request
     fetch(url, options)
