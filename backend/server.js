@@ -899,12 +899,9 @@ function makeBanner(sessionId,year) {
             vbanner.push(buttonOpenTile(target+`/hgbregular?sessionId=${sessionId}`,'BalanceClose'));
             if(Sheets.isSameFY(year)) {
                 vbanner.push(buttonOpenTile(target+`/transfer?sessionId=${sessionId}`,'Transfer'));
-//                vbanner.push(buttonTab(target+`/xfer?sessionId=${sessionId}`,de_DE['Transfer']));
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
             vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
-//            vbanner.push(buttonOpenTile(target+`/assetl?sessionId=${sessionId}`,'Assets']));
-            //vbanner.push(buttonTab(target+`/SAVE?sessionId=${sessionId}`,de_DE['Closing']));
             vbanner.push(buttonTab(target+`/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
         vbanner.push('</DIV>');
 
