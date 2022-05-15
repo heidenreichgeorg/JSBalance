@@ -209,44 +209,14 @@ app.get('/', (req, res) => {
 
 
 
-// LOGIN to an existing session
-app.post("/LOGIN", (req, res) => { 
-    console.log("\n\n");
-
-    console.log("0010 app.post LOGIN "+JSON.stringify(req.body));
-    let remote = req.socket.remoteAddress;
-    let client = req.body.client;
-    let year   = req.body.year;
-    let time   = req.body.time;    
-    //let sessionId = req.body.sessionId;
-    
-    let sessionId = strSymbol(time+client+year+time);
-    //            let sessionId = Sheets.symbolic(time+client+year+time);
-
-    console.dir("0020 app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
-
-    Sheets.start(sessionId,client,year,time,remote,phaseOne);
-    
-    let banner = makeBanner(sessionId,year);
-
-    console.dir("0030 app.post LOGIN responds with banner="+banner);
-
-    // send back sessionId to client brwoser or file
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-    res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
-    
-});
-
-
 //start session with uploading a session file for a known client
 app.post("/UPLOAD", (req, res) => { 
     console.log("\n\n");
 
     // client sends client_year.JSON file
     // this json has to be stored as <SESSION>.json
+    var banner = "NO SESSION";
 
-    var banner = "0031 NO VALID CLIENT FILE";
-    
     let remote = req.socket.remoteAddress;
     console.log("0010 app.post UPLOAD from "+remote);
 
@@ -261,38 +231,93 @@ app.post("/UPLOAD", (req, res) => {
         let fileId = strSymbol(time+client+year+time);
 
         if(sessionId===fileId) { // 20220506
-            
-            // GH20220506 FIND OTHER YEAR.*JSON file
-            // and compare the timestamps
-            let dir = Sheets.getClientDir(client);
-           
-            Sheets.findLatestJSON(client,year); // async - writes it into Sheets.found, Sheets.getJSON()
 
-            if(0) { // later async check sheets found
+            // save file on server, not on client and forward to LOGIN page
+            console.dir("0012 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
+            //Sheets.save2Server(req.body,client,year,res,"./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId);
+            // INSTEAD OF LOCAL FILE STORAGE
+            Sheets.setSession(data);
+
+            
+            
+            if(res) {
+            
+
+                // (A) REDIRECT TO FORWARD PAGE
+                //console.log("0014 app.post UPLOAD: redirecting to "+forwardURL);
+                //let forwardURL = "./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId
+                // -- NO PARMETERS res.redirect(forwardURL);
+                
+                /* B ETXRA WINDOW
                 res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-                res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD FOUND "+found+"</TITLE>FOUND A NEWER FILE "+found+"</HTML>\n"); 
+                res.end("<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LOGIN</TITLE><BODY><A class='keyPanel' HREF="+
+                    forwardURL+">LOGIN</A></BODY><HTML>\n\n");
+                */
+
+         
             }
 
-            // save file on server, not on client
-            console.dir("0013 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
-            Sheets.save2Server(req.body,client,year);
-
-            console.dir("0020 app.post UPLOADED to SERVER");
-            Sheets.start(sessionId,client,year,time,remote,phaseOne);
-
-            console.log ( "0030 app.post UPLOAD STARTED  ");
-            banner = makeBanner(sessionId,year);
-
-            console.log ( "0040 app.post UPLOAD responds with  " +banner);
+            banner = login(sessionId);
+            
 
         } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
+
+        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+        res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
+
+        return;
     }
+
+    // send back sessionId to client browser or file
+    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+    res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE</HTML>\n\n"); 
+    
+});
+
+
+
+
+// LOGIN to an existing session
+app.post("/LOGIN", (req, res) => { 
+    console.log("\n\n");
+
+    console.log("0020 app.post LOGIN "+JSON.stringify(req.body));
+    let remote = req.socket.remoteAddress;
+    let client = req.body.client;
+    let year   = req.body.year;
+    let time   = req.body.time;    
+    //let sessionId = req.body.sessionId;
+    
+    let sessionId = strSymbol(time+client+year+time);
+    //            let sessionId = Sheets.symbolic(time+client+year+time);
+
+    console.dir("0030 app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
+
+    let banner = login(sessionId);
 
     // send back sessionId to client brwoser or file
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-    res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>"+banner+"</HTML>\n"); 
+    res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
     
 });
+
+
+function login(sessionId) {
+
+    let session = Sheets.get(sessionId);
+    console.log("0014 login() "+sessionId);
+
+
+    let balance = phaseOne(session.addrT,session.logT,session.sheetCells);
+    console.dir("0040 login() creates balance");
+    
+    let banner = makeBanner(sessionId,session.year);
+
+    console.dir("0050 login() responds with banner="+banner);
+
+    return banner;
+}
+
 
 
 app.post("/BOOK", (req, res) => { 
@@ -355,6 +380,25 @@ app.post("/STORE", (req, res) => {
     res.end("\nSTORED.");
 });
 
+
+app.get("/DOWNLOAD", (req, res) => { 
+    // DOWNLOAD to client     
+
+    console.log("\n\n");
+    console.log("1500 app.post DOWNLOAD JSON for with session id=("+req.body.sessionId+")");
+
+    session = Sheets.get(req.body.sessionId);
+    console.log("1510 app.post DOWNLOAD for year"+session.year);
+    
+    console.log("1520 app.post DOWNLOAD main.json('"+JSON.stringify(session).length+"')");
+
+    //res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
+    //res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
+    
+    res.set('Content-Disposition', 'attachment; filename='+session.year+'server'+datetime()+'.json')
+    res.json(session);
+    
+});
 
 
 app.post('/SAVE', (req, res) => {
@@ -492,7 +536,7 @@ function phaseOne(addrT, logT, aoaCells) {
                     if(key && key==='N') {
                         const aNames=row;
                         result[D_Schema]["Names"]=aNames;
-                        result.writeTime = unixTime();
+                        result.writeTime = timeSymbol();
                         if(debug>1) console.log("N at "+result.writeTime);
                         var column;
                         for(column=0;column<aNames.length && !(aNames[column].length>0 && aNames[column].length<4 && aNames[column].includes(CEND));column++) {
@@ -516,10 +560,9 @@ function phaseOne(addrT, logT, aoaCells) {
                         result[D_Schema].residence = row[3];
 
 
-                        // GH20211015 result[D_Schema]={ "Names": aNames }; crashes
-                        console.dir();
-                        console.dir("SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
-                        console.dir();
+                        // GH20211015 result[D_Schema]={ "Names": aNames }; crashes                        
+                        console.dir("0114 SCHEMA N assets="+iAssets+ " eqLiab="+iEqLiab+ " Total="+iTotal);
+                        
                     }
                     else if(key && key==='C') {
                         const aDesc=row;
@@ -815,7 +858,7 @@ function phaseOne(addrT, logT, aoaCells) {
                 console.dir('0125 server.js phaseOne:'+err);
             }
 
-            console.log("0191 server.phaseOne.Schema="+JSON.stringify(result[D_Schema]));
+            console.log("0192 server.phaseOne.Schema="+JSON.stringify(result[D_Schema]));
 
         } else console.error('0111 server.js phaseOne NO BALANCE');
 
@@ -877,12 +920,9 @@ function makeBanner(sessionId,year) {
             vbanner.push(buttonOpenTile(target+`/hgbregular?sessionId=${sessionId}`,'BalanceClose'));
             if(Sheets.isSameFY(year)) {
                 vbanner.push(buttonOpenTile(target+`/transfer?sessionId=${sessionId}`,'Transfer'));
-//                vbanner.push(buttonTab(target+`/xfer?sessionId=${sessionId}`,de_DE['Transfer']));
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
             vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
-//            vbanner.push(buttonOpenTile(target+`/assetl?sessionId=${sessionId}`,'Assets']));
-            //vbanner.push(buttonTab(target+`/SAVE?sessionId=${sessionId}`,de_DE['Closing']));
             vbanner.push(buttonTab(target+`/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
         vbanner.push('</DIV>');
 
@@ -948,7 +988,7 @@ function getCost(idnt,nmbr,init) {
 }
 
 
-function unixTime() {
+function timeSymbol() {
     var u = new Date(Date.now()); 
     return u.getUTCFullYear() +
     '-' + ('0' + (1+u.getUTCMonth())).slice(-2) +
@@ -964,12 +1004,22 @@ function unixYear() {
 };
 
 
+function datetime() { // same as in server.js
+    var u = new Date(Date.now()); 
+    return ''+ u.getUTCFullYear()+
+      ('0' + (1+u.getUTCMonth())).slice(-2) +
+      ('0' + u.getUTCDate()).slice(-2) + 
+      ('0' + u.getUTCHours()).slice(-2) +
+      ('0' + u.getUTCMinutes()).slice(-2);
+};     
+
+
 function strSymbol(pat) {
     let cypher = "BC0DF1GH2JK3LM4NP5QR6ST7VW8XZ9A";
     let base=31;
     var res = 0;
     var out = [];
-    if(!pat) pat = unixTime();
+    if(!pat) pat = timeSymbol();
     {
         let factor = 23;
         var sequence = ' '+pat+pat+pat;

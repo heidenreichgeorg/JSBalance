@@ -96,19 +96,23 @@ function postToServer(strTarget,strParams,callBack) {
 
 
 
-function postAndDisplay(strCommand,jBody,target) {
+function postAndDisplay(strCommand,jBody,height) {
 
 // show modal message window
 
-    let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';
-    const url = strServerDNS+strCommand;
+    //let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';
+    //const url = strServerDNS+strCommand;
+    const url ="./"+strCommand;
 
     jBody.sessionId=getId();
 
     // request options
     const options =  { method: 'POST', body: JSON.stringify(jBody), headers: { 'Content-Type': 'application/json' }}
 
-    let panel = window.open("", 'Panel',' height=50, width=1480, left=1, top=1080, resizable=no , scrollbars=no  ,toolbar=no ,menubar=no ,location=no ,directories=no ,status=no ');
+    if(!height) height=55;
+    var top=1080-height;
+    let panel = window.open("", 'Panel',' height='+height+', width=1480, left=1, top='+top+', resizable=no , scrollbars=no  ,toolbar=no ,menubar=no ,location=no ,directories=no ,status=no ');
+    panel.document.open();
 
     // send POST request
     fetch(url, options)
@@ -128,51 +132,11 @@ function postAndDisplay(strCommand,jBody,target) {
 }
 
 
-function unixYYYYMM() {
-    var u = new Date(Date.now()); 
-    return u.getUTCFullYear() +
-    '-' + ('0' + (1+u.getUTCMonth())).slice(-2);
-}
-
-function unixYYYYQQ() {
-    var u = new Date(Date.now()); 
-    return u.getUTCFullYear() +
-    '-' + ('Q' + (1+(u.getUTCMonth()%3))).slice(-2);
-}
-
-function unixYYYY() {
-    var u = new Date(Date.now()); 
-    return ''+u.getUTCFullYear();
-}
-
-function unixYYYYNNNN() {
-    var u = new Date(Date.now()); 
-    let yy=u.getUTCFullYear();
-    return ''+yy+'/'+(yy+1);
-}
-
-function unixPPPPYYYY() {
-    var u = new Date(Date.now()); 
-    let yy=u.getUTCFullYear()-1;
-    return ''+yy+'/'+(yy+1);
-}
-
-function unixTime() {
-    var u = new Date(Date.now()); 
-    return u.getUTCFullYear() +
-    '-' + ('0' + (1+u.getUTCMonth())).slice(-2) +
-    '-' + ('0' + u.getUTCDate()).slice(-2) + 
-    ' ' + ('0' + u.getUTCHours()).slice(-2) +
-    ':' + ('0' + u.getUTCMinutes()).slice(-2) 
-  +  ':' + ('0' + u.getUTCSeconds()).slice(-2) 
- // +  '.' + (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) 
-}
-
 
 
 function handleEvent(event) { 
-    if(event) console.log(unixTime()+'--'+event.type+': '+event.message+' '+event.filename+'\n'); 
-    else console.log(unixTime()+'--EMPTY');
+    if(event) console.log(timeSymbol()+'--'+event.type+': '+event.message+' '+event.filename+'\n'); 
+    else console.log(timeSymbol()+'--EMPTY');
 }
 
 
@@ -959,6 +923,37 @@ function getId() {
     }
     return searchParams.get("sessionId");
 }
+
+
+function unixYYYYMM() {
+    var u = new Date(Date.now()); 
+    return u.getUTCFullYear() +
+    '-' + ('0' + (1+u.getUTCMonth())).slice(-2);
+}
+
+function unixYYYYQQ() {
+    var u = new Date(Date.now()); 
+    return u.getUTCFullYear() +
+    '-' + ('Q' + (1+(u.getUTCMonth()%3))).slice(-2);
+}
+
+function unixYYYY() {
+    var u = new Date(Date.now()); 
+    return ''+u.getUTCFullYear();
+}
+
+function unixYYYYNNNN() {
+    var u = new Date(Date.now()); 
+    let yy=u.getUTCFullYear();
+    return ''+yy+'/'+(yy+1);
+}
+
+function unixPPPPYYYY() {
+    var u = new Date(Date.now()); 
+    let yy=u.getUTCFullYear()-1;
+    return ''+yy+'/'+(yy+1);
+}
+
 
 
 function timeSymbol() { // same as in server.js

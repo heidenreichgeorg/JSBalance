@@ -9,53 +9,54 @@
   
 </head>
 
-<body>
+<SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
+
+
+<body onLoad="setParams();">
 
 <SCRIPT>
+
+   function setParams() {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+
+      let sidControl = document.getElementById("sessionId");
+      if(sidControl) sidControl.value=urlParams.get('sessionId');
+      else console.log("no sessionId Control");
+
+
+      let clientControl = document.getElementById("client");
+      if(clientControl) clientControl.value=urlParams.get('client');
+      else console.log("no client Control");
+
+      let yearControl = document.getElementById("year");
+      if(yearControl) yearControl.value=urlParams.get('year');
+      else console.log("no year Control");
+   }
+
+
    var reader;
    var content;
 
-   var readFile = function(event) {
-      var input = event.target;
-
-      reader = new FileReader();
-      reader.onload = function(){
-          var text = reader.result;
-          console.log("WELCOME.HTML readFile() MAINFILE "+text);  
-
-          postToServer("MAINFILE",text);
-      };
-      reader.readAsText(input.files[0]);
-    };
 </SCRIPT>
 
 
    <div id='mainpage'>
       <form action="LOGIN" method="post" id="login">
          <h1>Sign Up</h1>
+         <button type="submit">Login</button>
          <div class="field">
-            <label for="name">Client:</label>
-            <input type="text" id="CLIENT" name="client" placeholder="Enter client name" />
-            <small></small>
+            <input type="text" id="client" class="scalesY">Client</input>
          </div>
          <div class="field">
-            <label for="year">Year:</label>
-            <SELECT id="YEAR" name="year" placeholder="Enter report year" >
-               <OPTION value="2016">2016</OPTION>
-               <OPTION value="2017">2017</OPTION>
-               <OPTION value="2018">2018</OPTION>
-               <OPTION value="2019">2019</OPTION>
-               <OPTION value="2020">2020</OPTION>
-               <OPTION value="2021">2021</OPTION>
-               <OPTION value="2022">2022</OPTION>
-            </SELECT>
-            <small></small>
+            <input type="text" id="year" class="scalesY">Year</input>
          </div>        
-         <button type="submit">Login</button>
-      </form>
+        <div class="field">            
+            <input type="text" id="sessionId">SessionId</input> 
+         </div>
+       </form>
    </div>
    
-   <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
 
    <SCRIPT>
 
@@ -76,37 +77,27 @@
 
  
       function login(event,elements) {       
-
-         let check = localStorage.getItem("mysession");
-         if(check && check.length>10) {
-            const credentials = {
-            'sessionId':  localStorage.getItem("mysession"),
-            'time': timeSymbol()
-           };
-           console.log("login() WITH PREVIOUS SESSION");
-           // postAndDisplay("LOGIN",credentials,'mainpage');
-           // SERVER NOT RECOGNIZING CERT Strings
-
-         } else console.dir("login() NO PREVIOUS SESSION");
       
 
-         for(let name in ['CLIENT', 'YEAR', 'JSON']) 
+         for(let name in [ 'client', 'year', 'sessionId']) 
             console.log("Form["+name+"] ="+form[name].value);
 
-         console.log("WELCOME C  "+form[0].value);
-         console.log("WELCOME Y  "+form[1].value);
-        // console.log("WELCOME J  "+form[2].value);
+
+         console.log("WELCOME C  "+form[1].value);
+         console.log("WELCOME Y  "+form[2].value);
+         console.log("WELCOME S  "+form[3].value);
+
 
             // post body data 
          const credentials = {
-            'client':form[0].value,
-            'year':  form[1].value,
-            'sessionId':  localStorage.getItem("mysession"),
+            'client':form[1].value,
+            'year':  form[2].value,
+            'sessionId': form[3].value,
             'time': timeSymbol()
          };
        
 
-         postAndDisplay("LOGIN",credentials,'mainpage');
+         postAndDisplay("LOGIN",credentials,100);
          
       }
      

@@ -11,8 +11,10 @@
       <!--DIV action="LOGIN" method="post" id="login" -->
       <h1 id="SignUp">Sign Up</h1>
          <div class="keyPanel" ondragover="dragOverHandler(event);" ondrop="dropHandler(event);">  
+            <!--
             <label for="name">Client:</label>
             <input type="text" id="CLIENT" name="client" placeholder="Enter client name" />
+            -->
             <div  class="instRow"  >&nbsp;</div>            
             <div  class="instRow" id="fileupload">&nbsp;</div>            
              </div>
@@ -33,19 +35,6 @@
    var formClient="";
    var formYear="";
 
-
-   function readFile(event) {
-      var input = event.target;
-
-      reader = new FileReader();
-      reader.onload = function(){
-          var text = reader.result;
-          console.log("WELCOMEDROP.HTML readFile() MAINFILE "+text);  
-
-          postToServer("MAINFILE",text);
-      };
-      reader.readAsText(input.files[0]);
-   }
 
    function dragOverHandler(ev) {
       console.log('File(s) in drop zone');
@@ -83,11 +72,17 @@ function dropHandler(ev) {
                
                let jData = JSON.parse(fileBuffer);
 
-               let cClient = document.getElementById('CLIENT')
-               if(cClient && cClient.value==jData.client) {
-                
-                  postAndDisplay("UPLOAD",jData,'mainpage');
-               }
+
+
+
+               //let cClient = document.getElementById('CLIENT')
+               //if(cClient && cClient.value==jData.client) {
+               
+                  
+                  postAndDisplay("UPLOAD",jData);
+               //}
+
+
             }
             fr.readAsText(item);
          }
