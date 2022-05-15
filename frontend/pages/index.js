@@ -219,7 +219,7 @@ function SignIn({setLoading, setOpened}) {
             : null}
             <Space h="xl" />
             <Group style={{padding: '0 1rem'}}>
-                <Anchor onClick={() => setOpened('Sign up')} style={{color: 'gray'}}>Don't have an account? Sign up</Anchor>
+                <Anchor onClick={() => setOpened("Sign up")} style={{color: "gray"}}>Don't have an account? Sign up</Anchor>
                 <Button style={{marginLeft: 'auto'}} onClick={handleSubmit}>Sign in</Button>
             </Group>
         </>
