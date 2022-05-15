@@ -6,7 +6,7 @@ services:
       - network
     container_name: jsbalance-backend
     ports:
-      - "3000:81"
+      - "81:81"
   frontend:
     build: ./frontend
     networks:
