@@ -19,87 +19,87 @@
      		</DIV>
 		</DIV>
        
-        <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
-        <SCRIPT type="text/javascript" src="/money.js"></SCRIPT>
-       
-        <SCRIPT type="text/javascript">            
+    <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
+    <SCRIPT type="text/javascript" src="/money.js"></SCRIPT>
+    
+    <SCRIPT type="text/javascript">            
 
-            // character count for notmal columns
-            let iCpField = 16;
+        // character count for notmal columns
+        let iCpField = 16;
 
-            let debug=1;
+        let debug=1;
 
-            // data-sharing amoing different functions
-            var gResponse;
-            var gAccounts;
-            var gHistory;
-            var gSchema;
-            var gAssets;
-            var page;
+        // data-sharing amoing different functions
+        var gResponse;
+        var gAccounts;
+        var gHistory;
+        var gSchema;
+        var gAssets;
+        var page;
 
-            var accountPages={};
+        var accountPages={};
 
-            const TARGET = 'file-contents';
+        const TARGET = 'file-contents';
 
-            var cCent=0;
+        var cCent=0;
 
-            var creditList={}; // { "COGK":{cents:"1370,00" }}
-            var debitList={}; // { "COGK":{cents:"1370,00" }}
+        var creditList={}; // { "COGK":{cents:"1370,00" }}
+        var debitList={}; // { "COGK":{cents:"1370,00" }}
 
-            function listCreditAccount(i,name) {
-                if(cCent>0) {
-                    creditList[name]= {"index":i, "cents":cCent};
-                } else delete creditList[name];
+        function listCreditAccount(i,name) {
+            if(cCent>0) {
+                creditList[name]= {"index":i, "cents":cCent};
+            } else delete creditList[name];
 
+            showTransfer(validateCD(creditList,debitList));
+        }
+
+        function listDebitAccount(i,name) {
+            if(cCent>0) {
+                debitList[name]= {"index":i, "cents":cCent}
+            } else delete debitList[name];
+
+            showTransfer(validateCD(creditList,debitList));
+        }
+
+        function toggleC2D(name) {
+            console.log("toggleC2D="+name);
+            if(name && creditList[name]) {
+                var account=creditList[name];
+                debitList[name]=account;
+                delete creditList[name]; 
                 showTransfer(validateCD(creditList,debitList));
             }
+        }
 
-            function listDebitAccount(i,name) {
-                if(cCent>0) {
-                    debitList[name]= {"index":i, "cents":cCent}
-                } else delete debitList[name];
-
+        function toggleD2C(name) {
+            console.log("toggleD2C="+name);
+            if(name && debitList[name]) {
+                var account=debitList[name];
+                creditList[name]=account;
+                delete debitList[name]; 
                 showTransfer(validateCD(creditList,debitList));
             }
+        }
 
-            function toggleC2D(name) {
-                console.log("toggleC2D="+name);
-                if(name && creditList[name]) {
-                    var account=creditList[name];
-                    debitList[name]=account;
-                    delete creditList[name]; 
-                    showTransfer(validateCD(creditList,debitList));
-                }
-            }
+        var creditDivs="";
+        var debitDivs="";
 
-            function toggleD2C(name) {
-                console.log("toggleD2C="+name);
-                if(name && debitList[name]) {
-                    var account=debitList[name];
-                    creditList[name]=account;
-                    delete debitList[name]; 
-                    showTransfer(validateCD(creditList,debitList));
-                }
-            }
-
-            var creditDivs="";
-            var debitDivs="";
-
-            function clearCD() { 
-                creditList={}; 
-                debitList={}; 
-                showTransfer(validateCD(creditList,debitList));
-            }
+        function clearCD() { 
+            creditList={}; 
+            debitList={}; 
+            showTransfer(validateCD(creditList,debitList));
+        }
 
 
-            function setNull() {
-                cCent=0;
-                showTransfer(validateCD(creditList,debitList));
-            }
+        function setNull() {
+            cCent=0;
+            showTransfer(validateCD(creditList,debitList));
+        }
 
-            function allowDrop(ev) {
-                ev.preventDefault();
-            }
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
 
         // GH20211015
         function addInfo(row,parts) {
@@ -119,70 +119,74 @@
                 +row+'</button></DIV>');
         }
 
-                        
-            function putResponse(strTarget,strText) {       
+                    
+        function putResponse(strTarget,strText) {       
 
-                response = JSON.parse(strText);
+            response = JSON.parse(strText);
 
-                gHistory  = response[D_History];
-                gAccounts= response[D_Balance];
-                gSchema  = response[D_Schema];
-                gAssets = response[D_FixAss];
-                page = response[D_Page];
+            gHistory  = response[D_History];
+            gAccounts= response[D_Balance];
+            gSchema  = response[D_Schema];
+            gAssets = response[D_FixAss];
+            page = response[D_Page];
 
-                cCent=0;
-                creditList={}; 
-                debitList={}; 
+            cCent=0;
+            creditList={}; 
+            debitList={}; 
 
-                showTransfer(validateCD(creditList,debitList));
-            }  
-
-
+            showTransfer(validateCD(creditList,debitList));
+        }  
 
 
-            function doCommand(cmd) {  
-                var mCredit=cents2EU(cCent);
-                console.log("CREDIT="+mCredit+" APPEND '"+cmd+"'");
 
-                if(cmd==='X') mCredit="0,00";
-                
-                else {
-                    if(cmd==='<') mCredit=mCredit.slice(0,-1);
-                    else mCredit=mCredit+cmd;
-                }
 
-                cCent = parseInt(mCredit.replace(".","").replace(",",""));
-                
-                showTransfer(validateCD(creditList,debitList));
-            }
+        function doCommand(cmd) {  
+            var mCredit=cents2EU(cCent);
+            console.log("doCommand1 CREDIT="+mCredit+" APPEND '"+cmd+"'");
+
+            if(cmd==='X') mCredit="0,00";
             
-
-
-            function book() {
-                var cdate = document.getElementById('date');
-                var cSender = document.getElementById('sender');
-                var cInfo3 = document.getElementById('refAcct');
-                var cInfo4 = document.getElementById('info4');
-                var cInfo5 = document.getElementById('info5');
-
-                var date=cdate.value; // date
-                var sender=cSender.value;
-                var refAcct=cInfo3.value;
-                var info4=cInfo4.value;
-                var info5=cInfo5.value; // SVWZ2
-
-                if(!date) date=".";
-                if(!sender) sender=".";
-                if(!refAcct) refAcct=".";
-                if(!info4) info4=".";
-                if(!info5) info5=".";
-
-                // effective transaction: no flag
-                var jInfo = { /*"flag":1,*/ "date":date, "sender":sender, "refAcct":refAcct, "svwz":info4, "svwz2":info5, "credit":creditList, "debit":debitList };
-
-
-                save(jInfo);
+            else {
+                if(cmd==='<') mCredit=mCredit.slice(0,-1);
+                else mCredit=mCredit+cmd;
             }
+
+            cCent = parseInt(mCredit.replace(".","").replace(",",""));
+            console.log("doCommand2 mCredit="+mCredit+"   cCent '"+cCent+"'");
+            
+            var cdList = validateCD(creditList,debitList);
+            delete cdList.diff; // 20220516
+            showTransfer(cdList); 
+            // override .diff from validateCD 
+        }
+        
+
+
+        function book() {
+            var cdate = document.getElementById('date');
+            var cSender = document.getElementById('sender');
+            var cInfo3 = document.getElementById('refAcct');
+            var cInfo4 = document.getElementById('info4');
+            var cInfo5 = document.getElementById('info5');
+
+            var date=cdate.value; // date
+            var sender=cSender.value;
+            var refAcct=cInfo3.value;
+            var info4=cInfo4.value;
+            var info5=cInfo5.value; // SVWZ2
+
+            if(!date) date=".";
+            if(!sender) sender=".";
+            if(!refAcct) refAcct=".";
+            if(!info4) info4=".";
+            if(!info5) info5=".";
+
+            // effective transaction: no flag
+            var jInfo = { /*"flag":1,*/ "date":date, "sender":sender, "refAcct":refAcct, "svwz":info4, "svwz2":info5, "credit":creditList, "debit":debitList };
+
+
+            save(jInfo);
+        }
 
        </script>
    </BODY> 
