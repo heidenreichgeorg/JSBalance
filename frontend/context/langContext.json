@@ -1,0 +1,13 @@
+{
+    "en": {
+        "title": "JSBalance",
+        "upload": "To get started, upload a .json file containing your balance data.",
+        "drag files": "Drag files here or click to select files",
+        "upload file": "You can only upload one file and it must be a .json file"
+    },
+    "de": {
+        "upload": "Um zu starten, laden Sie eine .json Datei mit Ihrem Guthaben hoch.",
+        "drag files": "Ziehen Sie Dateien hierher oder klicken Sie, um Dateien auszuwählen",
+        "upload file": "Sie können nur eine Datei hochladen und diese muss eine .json Datei sein"
+    }
+}
