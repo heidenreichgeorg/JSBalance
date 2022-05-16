@@ -1,9 +1,9 @@
 import isProduction from '../../../modules/isProduction'
 import fetch from 'node-fetch';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
 
-    if(!isProduction()) res.json({ accepted: true })
+    if(!isProduction()) return res.json({ accepted: true })
 
     const content = req.body
 
