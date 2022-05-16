@@ -56,6 +56,7 @@
 # all amounts are in Euros, column for the cents fraction and . for powers of thousands 
 
 
+# OUTPUT FROM SERVER /SHOW
 # Documentation of server RESPONSE object
 # [    D_Page     ]  current language strings for general terms
 # [    D_XBRL     ]  XBRLs for each account

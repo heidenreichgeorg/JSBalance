@@ -1,2 +1,2 @@
 cd backend
-sudo node server.js
+sudo node server.js &
