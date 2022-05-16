@@ -1,19 +1,26 @@
 import isProduction from '../../../modules/isProduction'
+import fetch from 'node-fetch';
 
 export default function handler(req, res) {
 
     if(!isProduction()) res.json({ accepted: true })
 
     const content = req.body
-    // fetch to backend
 
-    // if success
-    res.json({
-        accepted: true
+    const apiRes = await fetch('http://backend:81/UPLOAD', {
+        method: 'POST',
+        body: content
     })
-
-    // if fail
-    res.json({
-        accepted: false
-    })
+    
+    if(apiRes.ok) {
+        // if success
+        res.json({
+            accepted: true
+        })
+    } else {
+        // if error
+        res.json({
+            accepted: false
+        })
+    }
 }
