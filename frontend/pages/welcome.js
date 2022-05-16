@@ -1,11 +1,56 @@
+import { useState } from 'react';
+
 import { Group, Text, Title, Center, Space } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone'
 import { FileCode2 } from 'tabler-icons-react';
 import useLang from '../modules/lang';
 
+function readFile(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onabort = () => reject('file reading was aborted')
+        reader.onerror = () => reject('file reading has failed')
+        reader.onload = () => resolve(reader.result)
+        reader.readAsText(file)
+    })
+}
+
 export default function WelcomePage() {
 
     const lang = useLang();
+
+    const [loading, setLoading] = useState(false);
+    const [rejected, setRejected] = useState(false);
+
+    async function handleDrop(files) {
+        setRejected(false);
+        setLoading(true);
+        
+        const fileContent = await readFile(files[0]);
+
+        fetch('/api/v1/upload', {
+            method: 'POST',
+            body: fileContent
+        }).then(res => {
+            if(res.ok) return res.json()
+            else throw new Error('Upload failed')
+        })
+        .then(res => {
+            if(res.accepted) {
+                // handle success
+                window.location.href = '/';
+            } else setRejected(true);
+            setLoading(false);
+        })
+        .catch(err => {
+            console.log(err);
+            setLoading(false);
+        });
+    }
+
+    function handleReject() {
+        setRejected(true);
+    }
 
     return (
         <Center
@@ -16,17 +61,18 @@ export default function WelcomePage() {
                 <Text>{lang['upload']}</Text>
                 <Space h="xl" />
                 <Dropzone
-                    onDrop={(files) => console.log('accepted files', files)}
-                    onReject={(files) => console.log('rejected files', files)}
-                    accept={'.json'}
+                    onDrop={handleDrop}
+                    onReject={handleReject}
+                    accept={['.json']}
                     multiple={false}
+                    loading={loading}
                 >
-                    {(status) => (
+                    {() => (
                         <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
                             <FileCode2 color='gray' size={80} />
                             <div>
                                 <Text size="xl" inline>{lang['drag files']}</Text>
-                                <Text size="sm" color="dimmed" inline mt={7}>{lang['upload file']}</Text>
+                                <Text size="sm" color={rejected ? "red" : "dimmed"} inline mt={7}>{lang['upload file']}</Text>
                             </div>
                         </Group>
                     )}
