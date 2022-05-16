@@ -3,11 +3,35 @@
         "title": "JSBalance",
         "upload": "To get started, upload a .json file containing your balance data.",
         "drag files": "Drag files here or click to select files",
-        "upload file": "You can only upload one file and it must be a .json file"
+        "upload file": "You can only upload one file and it must be a .json file",
+        "statement of account": "Statement of Account",
+        "opening balance": "Opening Balance",
+        "account overview": "Account Overview",
+        "status": "Status",
+        "bookings": "Bookings",
+        "profit loss": "Profit/Loss",
+        "investment schedule": "Investment Schedule",
+        "result HGB275A2": "Result HGB275A2",
+        "balance with profit": "Balance with Profit",
+        "templates": "Templates",
+        "close": "Close",
+        "diagram": "Diagram"
     },
     "de": {
         "upload": "Um zu starten, laden Sie eine .json Datei mit Ihrem Guthaben hoch.",
         "drag files": "Ziehen Sie Dateien hierher oder klicken Sie, um Dateien auszuwählen",
-        "upload file": "Sie können nur eine Datei hochladen und diese muss eine .json Datei sein"
+        "upload file": "Sie können nur eine Datei hochladen und diese muss eine .json Datei sein",
+        "statement of account": "Kontoauszug",
+        "opening balance": "Eröffnungsbilanz",
+        "account overview": "Kontenspiegel",
+        "status": "Status",
+        "bookings": "Buchungen",
+        "profit loss": "Gewinn/Verlust",
+        "investment schedule": "Investmentspiegel",
+        "result HGB275A2": "Ergebnis HGB275A2",
+        "balance with profit": "Bilanz mit Gewinn",
+        "templates": "Vorlagen",
+        "close": "Abschluss",
+        "diagram": "Diagramm"
     }
 }
