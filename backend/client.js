@@ -181,7 +181,7 @@ var module = { 'exports':[] }
 }
 
 
-
+// defined in calling SCRIPT / HTML
 // var cCent
 // var creditList
 // var debitList
@@ -199,7 +199,7 @@ function validateCD(creditList,debitList) {
     for(let name in creditList) {
         let value=creditList[name];
         saldoC+=value.cents;
-        var display=moneyString(value);
+        let display=moneyString(value);
         creditDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R110' onclick='toggleC2D("+'"'+name+'"'+")'>"+display+"</div>");
     }
  
@@ -208,7 +208,7 @@ function validateCD(creditList,debitList) {
     for(let name in debitList) {
         let value=debitList[name];
         saldoD+=value.cents;
-        var display=moneyString(value);
+        let display=moneyString(value);
         debitDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R110' onclick='toggleD2C("+'"'+name+'"'+")'>"+display+"</div>");
     }
 
@@ -333,7 +333,7 @@ var terminal=null;
 
     
 // complete Close page
-function showTransfer(txnForm) {
+function showTransfer(txnForm,commandCent,force) {
 
     let cdPairs = txnForm.cdPairs;
 
@@ -387,9 +387,11 @@ function showTransfer(txnForm) {
     +'<DIV class="L120"><input type="edit" id="info5" value="'+info5+'"></input></DIV>';
     print2Terminal(cursor,bookingHead);
 
+    print2Terminal(cursor,'<DIV class="L175">&nbsp;</DIV>'); // 20220516
 
 
     // BOOK button and 'display' for delta = cCent
+    if(txnForm.diff || txnForm.diff==0) cCent = txnForm.diff; // 20220516
     var bookingAmount =  // inner control was button
       "<div class='C100' ><div class='key' id='book-button' onclick='book()' )>Book</div></div>"
     + "<DIV id='display'>"+cents2EU(cCent)+"</DIV>";
@@ -400,6 +402,7 @@ function showTransfer(txnForm) {
         cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div><DIV class='R165' id='display'>&nbsp;</DIV>"+cdPairs[c]);
     }
     
+    print2Terminal(cursor,'<DIV class="L175">&nbsp;</DIV>'); // 20220516
 
     showTerminal(terminal,htmlPage);
 

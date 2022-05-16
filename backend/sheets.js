@@ -3,6 +3,8 @@ const debugWrite=1;
 
 
 const HTTP_OK = 200;
+const HTTP_WRONG = 400;
+
 
 // ASSETS BEFORE OTHER ACCOUNTS
 // NO NEGATIVE RESULTS in distribute()
@@ -706,7 +708,7 @@ async function save2Server(session,client,year,res,forwardURL) {
     fs.writeFileSync(jsonFileName, data, {'encoding':'utf8'}, (err) => { // was latin1 GH20211120
         if (err) {
             console.log("0019 sheets.save2Server: "+err);          
-            throw err;
+            //throw err;
         }
         //console.log("0016 save2Server Saving("+jsonFileName+")");          
     });

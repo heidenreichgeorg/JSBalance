@@ -191,14 +191,18 @@ function initBalance() {
 
 // HTTP
 const HTTP_OK = 200;
+const HTTP_WRONG = 400;
 const PORT = 81;
 
 
 const bodyParser = require("body-parser");
-const { stringify } = require('querystring');
-// const { sign } = require('crypto');
+app.use(bodyParser.json({limit: '500kb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+
+
+const { stringify } = require('querystring');
+
+// const { sign } = require('crypto');
 
 // serve your css and index.html as static
 app.use(express.static(__dirname));
@@ -269,7 +273,7 @@ app.post("/UPLOAD", (req, res) => {
     }
 
     // send back sessionId to client browser or file
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+    res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
     res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE</HTML>\n\n"); 
     
 });
@@ -337,7 +341,8 @@ app.post("/BOOK", (req, res) => {
         let sessionTime=timeSymbol();
         let nextSessionId= strSymbol(sessionTime+session.client+session.year+sessionTime);
 
-        Sheets.xlsxWrite(req.query.sessionId,tBuffer,sessionTime,nextSessionId); // state change in main.json
+        // 20220516 Sheets.xlsxWrite(req.query.sessionId,tBuffer,sessionTime,nextSessionId); 
+        // state change in YYYYCCCC.json
     } else {
         result="NO SESSION ID";
         console.log("0015 app.post BOOK NO sessionId");
@@ -388,16 +393,17 @@ app.get("/DOWNLOAD", (req, res) => {
     console.log("1500 app.post DOWNLOAD JSON for with session id=("+req.body.sessionId+")");
 
     session = Sheets.get(req.body.sessionId);
-    console.log("1510 app.post DOWNLOAD for year"+session.year);
-    
-    console.log("1520 app.post DOWNLOAD main.json('"+JSON.stringify(session).length+"')");
 
-    //res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
-    //res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
-    
-    res.set('Content-Disposition', 'attachment; filename='+session.year+'server'+datetime()+'.json')
-    res.json(session);
-    
+    if(session && session.year && session.client) {
+        let fileName = session.year+session.client+'.json';
+        console.log("1510 app.post DOWNLOAD for year"+fileName);
+        res.set('Content-Disposition', 'attachment; fileName='+fileName);
+        res.json(session);    
+    } else {
+        console.log("1513 app.post NO DOWNLOAD - INVALID SESSION')");
+        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
+        res.end("\nINVALID SESSION.\n");
+    }
 });
 
 
@@ -406,8 +412,8 @@ app.post('/SAVE', (req, res) => {
     console.log("\n\n");
 
     // add closing lines to XLSX balance sheet 
-    console.log("/SAVE/ req.query.sessionId="+req.query.sessionId);
-    console.log("/SAVE/ req.body.sessionId="+req.body.sessionId);
+    console.log("1610 /SAVE/ req.query.sessionId="+req.query.sessionId);
+    console.log("1620 /SAVE/ req.body.sessionId="+req.body.sessionId);
 
     Sheets.xlsxWrite(req.body.sessionId,null,'',''); 
 
