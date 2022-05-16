@@ -1,8 +1,8 @@
 ## Installieren
 ```sh
 sudo yum install git -y
-git clone https://github.com/polycloud-dev/schulshop.git
-cd schulshop
+git clone https://github.com/heidenreichgeorg/JSBalance.git
+cd JSBalance
 sh install.sh
 ```
 Wenn etwas ähnliches wie `Docker Compose version v*.*.*` in der Konsole zu sehen ist, war die Installation erfolgreich.
