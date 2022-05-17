@@ -1,43 +1,3 @@
-<!DOCTYPE HTML>
-<html  id='PageContent'>
-    <link rel="stylesheet" href="./FBA/mobile_green.css"/>
-<head>
-    <TITLE>Mobile Balance - Abschlussbuchung</TITLE>        
-
-    <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
-    <SCRIPT type="text/javascript" src="/money.js"></SCRIPT>
-
-    <script>
-        var debug=null;
-
-        var creditList={};
-        var debitList={};
-       
-    </script>
-</head>
-
-<body>
-    <div class="dosBorder">
-        <div class="mTable" >
-                <div class="ulliTab"  height="700px">
-                    <DIV class="attrLine" id="welcome"></DIV>            
-                    <DIV  id='selAccount'></DIV>
-                    <DIV id='tabHistory'></DIV>
-                    <DIV  id='display'></DIV>
-                    <div class="attrLine">
-                    <div class="R165" id="credit" ><div>Soll: 0,00</div></div>
-                    <div class="C100"  >&nbsp;</div>
-                    <div class="R165" id="debit" ><div>Haben 0,00</div></div>
-                    <div class="L22"  >&nbsp;</div>
-                    <div class="C100" id="buttons" >
-                        <div class="L22"  >&nbsp;</div>
-                        <DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Close</button> </DIV> 
-                </div></div>
-            </div>
-        </div>
-    </div>
-  
-    <SCRIPT type="text/javascript">
 
         // 20220424
         // character count for notmal columns
@@ -174,9 +134,4 @@
             window.close();
             console.log("1310 CloseAndSave Close OUT");
         }
-
-        </script>
-    </body>
-</html>
-
 

@@ -1,31 +1,6 @@
-
-<!DOCTYPE html>    
-<HTML content-type='utf-8' lang="de-DE" id='PageContent'>    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400&display=swap" />
-    <link rel="stylesheet" href="./FBA/mobile_green.css"/>
-    <HEAD>
-        <meta charset="ISO-8859-1">
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />        
-        <TITLE>Mobile Balance - History</TITLE>        
-    </HEAD>        
-    <BODY  onload="getFromServer(putResponse)" style="background-color:#000; ">   
-        <DIV class="dosborder">
-			<DIV class="dostable">                
-				<DIV  class="attrLine"> 
-					<DIV class="L22">&nbsp;</DIV>
-					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
-				</DIV>
-     		</DIV>
-		</DIV>
-
-        
         <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
-        <!--SCRIPT type="text/javascript" src="/money.js"></NOSCRIPT -->
 
 
-        <SCRIPT type="text/javascript">
 
             let debug=null;
                         
@@ -113,6 +88,4 @@
                 });
                 return result;
             }
-       </script>
-   </BODY> 
-</HTML>
+       

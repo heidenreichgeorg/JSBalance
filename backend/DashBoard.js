@@ -1,37 +1,7 @@
-<!DOCTYPE html>    
-<HTML content-type='utf-8' lang="de-DE"  id='PageContent'>    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400&display=swap" />
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Inconsolata" />
-    <link rel="stylesheet" href="./FBA/mobile_green.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <!--link rel="stylesheet" href="./FBA/clock.css" -->
-    
-    
-    <HEAD>
-        <meta charset="ISO-8859-1">
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />        
-        <TITLE>Mobile Balance - Dashboard</TITLE>        
-    </HEAD>        
-
-
-    <BODY onload="getFromServer(putResponse)" style="background-color:#000;">   
-        <DIV class="dosborder" id="pageborder">
-			<DIV class="dostable" id="pageTable">
-				<DIV  class="attrLine"> 
-					<DIV class="L22">&nbsp;</DIV>
-					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
-				</DIV>         
-            </DIV>
-		</DIV>
-
         <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
         <SCRIPT type="text/javascript" src="/money.js"></SCRIPT>
        
 
-      
-        <SCRIPT type="text/javascript">            
 
             // character count for small columns
             let iCpField = 14;
@@ -423,6 +393,4 @@
                 return { 'cents': saldo };
             }
 
-       </script>
-   </BODY> 
-</HTML>
+       

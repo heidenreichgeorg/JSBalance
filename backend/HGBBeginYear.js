@@ -1,29 +1,8 @@
-<!DOCTYPE html>    
-<HTML content-type='utf-8' lang="de-DE"  id='PageContent'>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400&display=swap" />
-    <link rel="stylesheet" href="./FBA/mobile_green.css"/>
-    <HEAD>
-        <meta charset="ISO-8859-1">
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />        
-        <TITLE>Mobile Balance - HGB Eröffnung</TITLE>        
-    </HEAD>        
-    <BODY  onload="getFromServer(putResponse)">   
-        <DIV class="dosborder">
-			<DIV class="dostable" >
-				<DIV  class="attrRow"> 
-					<DIV class="L22">&nbsp;</DIV>
-					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
-				</DIV>
-     		</DIV>
-		</DIV>
 
         
         <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
         <SCRIPT type="text/javascript" src="/money.js"></SCRIPT>
 
-        <SCRIPT type="text/javascript">
 
             let debug=null;
             
@@ -50,28 +29,28 @@
                     var element = jReport[tag];
                     var level = element.level;
                     var account=element.account;
-                    var gross = account.gross;
+                    var init = account.init;
                     var iName = account.name;
                     var full_xbrl = account.xbrl;
 
 
-                    if(gross && iName && full_xbrl) {
+                    if(init && iName && full_xbrl) {
                         // collect compute total right side amount
-                        if(full_xbrl==='de-gaap-ci_bs.eqLiab') { eqliab=parseInt(gross.replace('.','').replace(',',''));  gross=cents2EU(eqliab); }
-                        if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=parseInt(gross.replace('.','').replace(',','')); }
-                        if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { gross=cents2EU(eqliab+income); }
+                        if(full_xbrl==='de-gaap-ci_bs.eqLiab') { eqliab=parseInt(init.replace('.','').replace(',',''));  init=cents2EU(eqliab); }
+                        if(full_xbrl==='de-gaap-ci_is.netIncome.regular') { income=parseInt(init.replace('.','').replace(',','')); }
+                        if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { init=cents2EU(eqliab+income); }
 
                         var xbrl = full_xbrl.split('\.');
                         var xbrl_pre = xbrl.pop()+'.'+xbrl.pop()+'.'+xbrl.pop();
 
                         if(level==1) {
-                            cursor=printFormat(cursor,[iName,' ',' ',' ',gross]);
+                            cursor=printFormat(cursor,[iName,' ',' ',' ',init]);
                         }
                         if(level==2) {
-                            cursor=printFormat(cursor,[iName,' ',gross]);
+                            cursor=printFormat(cursor,[iName,' ',init]);
                         }
                         if(level==3) {
-                            cursor=printFormat(cursor,[iName,gross]);
+                            cursor=printFormat(cursor,[iName,init]);
                         }
 
 
@@ -85,7 +64,3 @@
                 setScreen(document,htmlPage);
 
             }  
-
-       </script>
-   </BODY> 
-</HTML>

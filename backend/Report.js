@@ -1,31 +1,6 @@
-<!DOCTYPE html>    
-<HTML content-type='utf-8' lang="de-DE">    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400&display=swap" />
-    <link rel="stylesheet" href="./FBA/mobile_dash.css"/>
-    <HEAD>
-        <meta charset="ISO-8859-1">
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />        
-        <TITLE>Mobile Balance - Report</TITLE>        
-    </HEAD>        
-    <BODY  onload="getFromServer(putResponse)">   
-        <DIV class="witBorder">
-			<DIV class="mTable">
-				<DIV  class="attrLine"> 
-					<DIV class="L22">&nbsp;</DIV>
-					<DIV class="C100"><button id="read-button" onclick="getFromServer(putResponse)" )>Load</button> </DIV>
-				</DIV>
-                <DIV ><DIV class="ulliTab" id='PageContent'></DIV></DIV>
-                <DIV class="attrLine" id="welcome"></DIV>
-     		</DIV>
-		</DIV>
 
-        
-        
         <SCRIPT type="text/javascript" src="/client.js"></SCRIPT>
 
-        <SCRIPT type="text/javascript">
 
             let debug=null;
 
@@ -90,7 +65,3 @@
                 if(eHistory) eHistory.innerHTML = result.join("");
 
             }  
-
-       </script>
-   </BODY> 
-</HTML>
