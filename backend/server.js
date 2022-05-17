@@ -456,7 +456,7 @@ app.post('/INIT', (req, res) => {
                     ]}
 
     res.set('Content-Disposition', 'attachment; fileName='+fileName);
-    res.json(session);    
+    res.json(result);    
 
 });
 // save to Excel
