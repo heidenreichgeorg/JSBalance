@@ -424,6 +424,43 @@ app.post('/SAVE', (req, res) => {
 // save to Excel
 
 
+app.post('/INIT', (req, res) => {
+    // generate a new sheetFile and download
+    console.log("\n\n");
+
+    // add closing lines to XLSX balance sheet 
+    console.log("1710 /INIT/ req.query.sessionId="+req.query.sessionId);
+    console.log("1720 /INIT/ req.body.sessionId="+req.body.sessionId);
+
+    let time = timeSymbol();
+
+    let year = time.slice(0,4);
+
+    let session = Sheets.get(req.body.sessionId);
+
+    let fileName = session.year+session.client+'.json';
+
+    let result = {
+        "client":session.client,
+        "year":year,
+        "remote":"::ffff:192.168.178.38",
+        "time":time,
+        "sheetCells":[["C","IBAN1","Sender",        "Konto",     "SVWZ1","SVWZ2","Bank","ASSETS","Sales","EQLIAB","Partner"],
+                      ["N","Name","Name Kontakt",   "Wohnort",   ".",    ".",    "BANK","ASSETS","SALE", "EQLIAB","K2UP"   ],
+                      ["I","IBAN2","Registernummer","St.Nummer", "",     "",     "",    "",      "",     "",      ""       ],
+                      ["K","KoNr",year,             "Firmenname",".",    ".",    "1810","",      "4105", "",      "2010"   ],
+                      ["E","Eigenkapital","",       "",          "",     "",     "",    "",      "",     "","de-gaap-ci_table.kke.allKindsOfEquityAccounts.unlimitedPartners.VK"],
+                      ["X","BALANCE","",            "",          "",     "","de-gaap-ci_bs.ass.currAss.cashEquiv.bank",,"","de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit","","de-gaap-ci_bs.eqLiab.equity.subscribed.unlimitedLiablePartners.VK"] 
+                      ["P","Partnername","",        "",          "",     "",     "",    "",      "",     "","Name Partner"],
+                      ["1",year+"-01-01","",        "Eröffnung", "",     "",     "0,00","0,00",  "0,00", "0,00","0,00"]
+                    ]}
+
+    res.set('Content-Disposition', 'attachment; fileName='+fileName);
+    res.json(session);    
+
+});
+// save to Excel
+
 
 
 
