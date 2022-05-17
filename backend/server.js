@@ -196,7 +196,7 @@ const PORT = 81;
 
 
 const bodyParser = require("body-parser");
-app.use(bodyParser.json({limit: '500kb'}));
+app.use(bodyParser.json({limit: '900kb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
@@ -253,9 +253,11 @@ app.post("/UPLOAD", (req, res) => {
                 // -- NO PARMETERS res.redirect(forwardURL);
                 
                 /* B ETXRA WINDOW
-                res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-                res.end("<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LOGIN</TITLE><BODY><A class='keyPanel' HREF="+
-                    forwardURL+">LOGIN</A></BODY><HTML>\n\n");
+                //res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+                res.set('Content-Disposition', 'attachment; fileName='+fileName);
+                let display = "<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LOGIN</TITLE><BODY><A class='keyPanel' HREF="+
+                    forwardURL+">LOGIN</A></BODY><HTML>\n\n";
+                res.status(HTTP_OK).json({ 'display':display }); 
                 */
 
          
@@ -266,15 +268,17 @@ app.post("/UPLOAD", (req, res) => {
 
         } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
 
-        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-        res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
+        //res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+        let display = "\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"; 
+        res.status(HTTP_OK).json({ 'display':display, 'sender':'UPLOAD', 'sessionId':sessionId }); 
 
         return;
     }
 
     // send back sessionId to client browser or file
-    res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
-    res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE</HTML>\n\n"); 
+    //res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
+    let display = "\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE</HTML>\n\n"; 
+    res.status(HTTP_WRONG).json({ 'display':display, 'sender':'UPLOAD' }); 
     
 });
 
@@ -300,9 +304,9 @@ app.post("/LOGIN", (req, res) => {
     let banner = login(sessionId);
 
     // send back sessionId to client brwoser or file
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-    res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
-    
+    //res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
+    let display = "\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"; 
+    res.status(HTTP_OK).json({ 'display':display, 'sender':'LOGIN', 'sessionId':sessionId }); 
 });
 
 
@@ -321,6 +325,40 @@ function login(sessionId) {
 
     return banner;
 }
+
+
+
+// set Event Listener for LOAD/client/year/prefix/ext/
+// internal client page response 
+app.get('/SHOW/', (req, res)    => { 
+    console.log("\n\n");
+
+    console.log("0010 app.get SHOW req.query.sessionId="+req.query.sessionId);
+
+    // load session via id
+    let session = Sheets.get(req.query.sessionId);
+    
+    //var strSession=['Session']; for(let key in session) strSession.push(key); console.log("Server.js SHOW session="+strSession.join(','));
+
+    let balance = phaseOne(session.addrT,session.logT, session.sheetCells);
+
+    console.dir("0200 app.get SHOW sends Balance ="+JSON.stringify(balance));
+
+    //var strBalance=['Balance']; for(let key in balance) strBalance.push(key); console.log("Server.js SHOW balance="+strBalance.join(','));
+
+
+    if(balance && balance[D_Balance]) {
+    
+        let gResponse = phaseTwo(balance);
+        res.status(HTTP_OK).json(gResponse);    
+
+        
+    } else {
+        console.log("0023 send NO BALANCE ");           
+        res.status(HTTP_WRONG).json({ 'display':"\nNO VALID BALANCE\n", 'sender':'SHOW', 'sessionId':req.query.sessionId }); 
+    }
+    
+})
 
 
 
@@ -343,15 +381,19 @@ app.post("/BOOK", (req, res) => {
 
         // 20220516 Sheets.xlsxWrite(req.query.sessionId,tBuffer,sessionTime,nextSessionId); 
         // state change in YYYYCCCC.json
+
+        //res.writeHead(HTTP_OK, {"Content-Type": "text/html"});       
+        let display= "\n"+result+".\n";
+        res.status(HTTP_OK).json({ 'display':display, 'sender':'BOOK', 'sessionId':sessionId }); 
+    
     } else {
         result="NO SESSION ID";
         console.log("0015 app.post BOOK NO sessionId");
+        let display= "\n"+result+".\n";
+        res.status(HTTP_WRONG).json({ 'display':display, 'sender':'BOOK' }); 
     }
 
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});       
-    res.end("\n"+result+".\n");
-});
-
+})
 
 
 app.post("/MAINFILE", (req, res) => { 
@@ -362,8 +404,9 @@ app.post("/MAINFILE", (req, res) => {
     // from Welcome.html       
     console.log("app.post MAINFILE login('"+JSON.stringify(req.body)+"')");
 
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});       
-    res.end("\nCLIENT LOGGED IN.\n");
+    //res.writeHead(HTTP_OK, {"Content-Type": "text/html"});       
+    let display = "\nCLIENT LOGGED IN.\n";
+    res.status(HTTP_OK).json({ 'display':display, 'sender':'MAINFILE' });    
 });
 
 
@@ -378,11 +421,19 @@ app.post("/STORE", (req, res) => {
 
     console.log("0019 app.post STORE LOG with session id=("+req.body.sessionId+")");
 
-    if(delta) Sheets.saveSessionLog(req.body.sessionId,req.body);
-    else console.log("0021 app.post STORE LOG Id=("+req.body.sessionId+") did not save: no transaction!");
-    
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
-    res.end("\nSTORED.");
+    if(delta) {
+        Sheets.saveSessionLog(req.body.sessionId,req.body);
+        console.log("0020 app.post STORE LOG Id=("+req.body.sessionId+") saving!");
+        //res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
+        let display = "\nSTORED.";
+        res.status(HTTP_OK).json({ 'display':display, 'sender':'STORE', 'sessionId':req.body.sessionId });    
+    }
+    else {
+        console.log("0021 app.post STORE LOG Id=("+req.body.sessionId+") did not save: no transaction!");
+        //res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
+        let display = "\nNOT STORED.";
+        res.status(HTTP_WRONG).json({ 'display':display, 'sender':'STORE', 'sessionId':req.body.sessionId });    
+    }
 });
 
 
@@ -398,11 +449,13 @@ app.get("/DOWNLOAD", (req, res) => {
         let fileName = session.year+session.client+'.json';
         console.log("1510 app.post DOWNLOAD for year"+fileName);
         res.set('Content-Disposition', 'attachment; fileName='+fileName);
-        res.json(session);    
+        res.status(HTTP_OK).json(session);    
     } else {
         console.log("1513 app.post NO DOWNLOAD - INVALID SESSION')");
-        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
-        res.end("\nINVALID SESSION.\n");
+        
+        //res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
+        let display="\nINVALID SESSION.\n";
+        res.status(HTTP_WRONG).json({ 'display':display, 'sender':'DOWNLOAD' });    
     }
 });
 
@@ -417,9 +470,9 @@ app.post('/SAVE', (req, res) => {
 
     Sheets.xlsxWrite(req.body.sessionId,null,'',''); 
 
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
-    res.end("\nSAVED.\n");
-
+    //res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
+    let display="\nSAVED.\n";
+    res.status(HTTP_OK).json({ 'display':display, 'sender':'SAVE', 'sessionId':req.body.sessionId  });    
 });
 // save to Excel
 
@@ -433,16 +486,15 @@ app.post('/INIT', (req, res) => {
     console.log("1720 /INIT/ req.body.sessionId="+req.body.sessionId);
 
     let time = timeSymbol();
-
     let year = time.slice(0,4);
-
     let session = Sheets.get(req.body.sessionId);
-
     let fileName = session.year+session.client+'.json';
+    let sessionId = strSymbol(time+session.client+year+time);
 
     let result = {
         "client":session.client,
         "year":year,
+        "sessionId":sessionId,
         "remote":"::ffff:192.168.178.38",
         "time":time,
         "sheetCells":[["C","IBAN1","Sender",        "Konto",     "SVWZ1","SVWZ2","Bank","ASSETS","Sales","EQLIAB","Partner"],
@@ -456,7 +508,7 @@ app.post('/INIT', (req, res) => {
                     ]}
 
     res.set('Content-Disposition', 'attachment; fileName='+fileName);
-    res.json(result);    
+    res.status(HTTP_OK).json(result);    
 
 });
 // save to Excel
@@ -465,7 +517,7 @@ app.post('/INIT', (req, res) => {
 
 
 app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/FBA/50eurobill.jpg"); });
-
+app.get('/welcomedrop', (req, res) => {console.log("\n\n"); res.sendFile('./WelcomeDrop.html', { root: __dirname }); })
 app.get("/account", (req, res)  => { res.sendFile(__dirname + "/AccountHistory.html"); });
 app.get("/assetl", (req, res)   => { res.sendFile(__dirname + "/AssetList.html"); });
 app.get("/assets", (req, res)   => { res.sendFile(__dirname + "/AssetScreen.html"); });
@@ -483,42 +535,6 @@ app.get("/transfer", (req, res)    => { res.sendFile(__dirname + "/Transfer.html
 app.get("/closeandsave", (req, res) => { res.sendFile(__dirname + "/CloseAndSave.html"); });
 
 
-
-// set Event Listener for LOAD/client/year/prefix/ext/
-// internal client page response 
-app.get('/SHOW/', (req, res)    => { 
-    console.log("\n\n");
-
-    console.log("0010 app.get SHOW req.query.sessionId="+req.query.sessionId);
-
-    // load session via id
-    let session = Sheets.get(req.query.sessionId);
-    
-    //var strSession=['Session']; for(let key in session) strSession.push(key); console.log("Server.js SHOW session="+strSession.join(','));
-
-    let balance = phaseOne(session.addrT,session.logT, session.sheetCells);
-
-    console.dir("0200 app.get SHOW sends Balance ="+JSON.stringify(balance));
-
-    //var strBalance=['Balance']; for(let key in balance) strBalance.push(key); console.log("Server.js SHOW balance="+strBalance.join(','));
-
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
-
-    Sender.send(res,balance); 
-})
-
-
-
-/*
-   req.body contains key-value pairs of data submitted in the request body. 
-   By default, it is undefined, and is populated when you use body-parsing middleware such as body-parser.
-*/
-
-
-app.get('/welcomedrop', (req, res) => {
-    console.log("\n\n");
-    res.sendFile('./WelcomeDrop.html', { root: __dirname })
-})
 
 
 // show convenience link to create and load a new browser window

@@ -88,27 +88,6 @@ function makePage(balance) {
     return page;
 }
 
-async function send(res,balance) {
-
-    if(balance && balance[D_Balance]) {
-
-        //gResponse[D_BeginYear]={};
-        let gResponse = phaseTwo(balance);
-
-        // send the whole result
-        let payLoad = JSON.stringify(gResponse);    
-        res.write(payLoad);
-        res.write("\n");
-        //if(debug) console.log("send4 WRITE "+JSON.stringify(gResponse));    
-    } else {
-        if(debugSend) console.log("send NO BALANCE "+JSON.stringify(balance));           
-        res.write("\n");
-    }
-    res.end(); // 
-}
-
-module.exports['send']=send;
-
 
 // generate a copy of the balance, with all accounts closed 
 // and GAIN LOSS being distributed to partners
