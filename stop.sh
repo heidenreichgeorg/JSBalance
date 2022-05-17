@@ -1,1 +1,1 @@
-sudo killall node
+docker-compose down
