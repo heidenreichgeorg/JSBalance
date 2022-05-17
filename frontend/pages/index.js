@@ -1,6 +1,5 @@
 import { useState } from "react";
 import DropPage from "../modules/pages/drop";
-import useLang from "../modules/lang";
 import MenuPage from "../modules/pages/menu";
 
 export default function IndexPage({logged_in}) {
