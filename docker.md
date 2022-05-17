@@ -5,6 +5,7 @@ git clone https://github.com/heidenreichgeorg/JSBalance.git
 cd JSBalance
 sh install.sh
 ```
+Einmal erlauben bei Installation
 Wenn etwas ähnliches wie `Docker Compose version v*.*.*` in der Konsole zu sehen ist, war die Installation erfolgreich.
 
 ---
