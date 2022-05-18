@@ -275,7 +275,7 @@ app.post("/UPLOAD", (req, res) => {
     // send back sessionId to client browser or file
     res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
     res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE</HTML>\n\n"); 
-    
+    res.end()
 });
 
 
