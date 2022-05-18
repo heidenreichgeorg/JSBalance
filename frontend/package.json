@@ -12,6 +12,7 @@
     "@mantine/core": "^4.2.5",
     "@mantine/dropzone": "^4.2.5",
     "@mantine/hooks": "^4.2.5",
+    "chalk": "^5.0.1",
     "next": "12.1.6",
     "node-fetch": "^3.2.4",
     "react": "18.1.0",
