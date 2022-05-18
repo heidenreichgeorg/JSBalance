@@ -104,7 +104,7 @@ Server process reads TABLE (e.g. MS Excel (TM)) with accounting history in Euros
         "Variables Eigenkapital6",
         "Stammkapital1",
         "Stammkapital 2",
-        "Stammkapital PArtner1",
+        "Stammkapital Partner1",
         "Stammkapital Partner2",
         "Stammkapital Partner3",
         "Stammkapital Partner4"
