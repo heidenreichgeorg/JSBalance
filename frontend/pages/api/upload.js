@@ -1,5 +1,5 @@
-import { backendURL } from '../../../modules/url';
-import logger from '../../../modules/logger';
+import { backendURL } from '../../modules/url';
+import logger from '../../modules/logger';
 
 import fetch from 'node-fetch';
 
@@ -11,18 +11,17 @@ export default async function handler(req, res) {
 
     const apiRes = await fetch(backendURL + '/UPLOAD', {
         method: 'POST',
-        body: content
+        body: content,
+        headers: { 'Content-Type': 'application/json' }
     })
     logger.info('Uploaded file.');
-    
+
     if(apiRes.ok) {
-        logger.log('ok')
         // if success
         res.json({
             accepted: true
         })
     } else {
-        logger.log('not ok')
         // if error
         res.json({
             accepted: false
