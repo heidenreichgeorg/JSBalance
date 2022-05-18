@@ -1,13 +1,23 @@
-import { Tabs, Title, Space, Tooltip } from '@mantine/core';
+import { useState } from 'react';
+
+import { Tabs, Title, Space, LoadingOverlay } from '@mantine/core';
 import { ChartPie3, Notes } from 'tabler-icons-react';
 import useLang from '../lang';
+
+import { useQuery } from 'react-query'
 
 export default function MenuPage() {
     
     const lang = useLang();
 
+    const { isLoading, error } = useQuery('session', async () => {
+        const res = await fetch('/api/session')
+        return res.json()
+    })
+
     return (
         <div style={{'padding': '2rem'}}>
+            <LoadingOverlay visible={isLoading || error} />
             <Title>{lang.title}</Title>
             <Space h='lg' />
             <Tabs grow position="center">
