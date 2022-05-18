@@ -341,8 +341,12 @@ app.post("/BOOK", (req, res) => {
         let sessionTime=timeSymbol();
         let nextSessionId= strSymbol(sessionTime+session.client+session.year+sessionTime);
 
+        // modifies session object and stores it under new sessionId
+        Sheets.bookSheet(req.query.sessionId,tBuffer,sessionTime,nextSessionId);
         // 20220516 Sheets.xlsxWrite(req.query.sessionId,tBuffer,sessionTime,nextSessionId); 
         // state change in YYYYCCCC.json
+
+
     } else {
         result="NO SESSION ID";
         console.log("0015 app.post BOOK NO sessionId");
