@@ -28,7 +28,7 @@ export default function DropPage({logIn}) {
         
         const fileContent = await readFile(files[0]);
 
-        fetch('/api/v1/upload', {
+        fetch('/api/upload', {
             method: 'POST',
             body: fileContent
         }).then(res => {
