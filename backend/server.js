@@ -274,8 +274,13 @@ app.post("/UPLOAD", (req, res) => {
 
     // send back sessionId to client browser or file
     res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
+<<<<<<< HEAD
     res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE</HTML>\n\n"); 
     res.end()
+=======
+    res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE 'client' and/or 'year' missing</HTML>\n\n"); 
+    res.end();
+>>>>>>> 0f30f0e46449c53eec0934bb2dc101e5637ff137
 });
 
 
@@ -341,8 +346,12 @@ app.post("/BOOK", (req, res) => {
         let sessionTime=timeSymbol();
         let nextSessionId= strSymbol(sessionTime+session.client+session.year+sessionTime);
 
+        // modifies session object and stores it under new sessionId
+        Sheets.bookSheet(req.query.sessionId,tBuffer,sessionTime,nextSessionId);
         // 20220516 Sheets.xlsxWrite(req.query.sessionId,tBuffer,sessionTime,nextSessionId); 
         // state change in YYYYCCCC.json
+
+
     } else {
         result="NO SESSION ID";
         console.log("0015 app.post BOOK NO sessionId");

@@ -404,7 +404,47 @@ function start(sessionId,client,year,time,remote,phaseOneFunction) {
 module.exports['start']=start;
 
 
+function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
 
+    var session = get(sessionId);
+
+    if(session) {
+        if(session.sheetName) {
+            let client = session.client;
+            let year = session.year;
+
+            if(client && year && session.sheetCells) {
+
+                var numLines = session.sheetCells.length;
+                if(debugWrite) console.log("1810 sheets.bookSheet ENTER "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
+                
+//                let schemaLen = session.sheetCells[H_LEN].length;
+                if(tBuffer) {
+                    // add hash
+                    if(tBuffer[0]>0) tBuffer[0]=symbolic(tBuffer.join('')); 
+
+                    numLines = session.sheetCells.push(tBuffer); 
+
+                    session.time=sessionTime;
+                    session.id=nextSessionId;
+
+                    if(debugWrite) console.log("1820 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
+
+                    setSession(session);
+                }
+                else if(debugWrite) console.log("1821 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
+            }
+            else if(debugWrite) console.log("1823 sheets.bookSheet SAVE NO DATA ("+client+","+year+")") ;
+        }
+        else if(debugWrite) console.log("1825 sheets.bookSheet SAVE NO sheetName"+sessionId);
+    }
+    else if(debugWrite) console.log("1827 sheets.bookSheet SAVE NO session"+sessionId);
+}
+module.exports['bookSheet']=bookSheet;
+
+
+
+// skip tBuffer ??
 function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
 
     var session = get(sessionId);
