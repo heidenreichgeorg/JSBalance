@@ -387,17 +387,18 @@ app.get("/DOWNLOAD", (req, res) => {
 
     console.log("\n\n");
     console.log(timeSymbol());
-    console.log("1500 app.post DOWNLOAD JSON for with session id=("+req.body.sessionId+")");
+    let sessionId = req.query.sessionId;
+    console.log("1500 app.post DOWNLOAD JSON for with session id=("+sessionId+")");
 
-    session = Sheets.get(req.body.sessionId);
+    session = Sheets.get(sessionId);
 
     if(session && session.year && session.client) {
 
         // 20220520
-        console.log("1510 app.post DOWNLOAD for year"+fileName);
+        console.log("1510 app.post DOWNLOAD for year"+session.year);
 
         let sessionTime=timeSymbol();
-        Sheets.xlsxWrite(req.query.sessionId,null,sessionTime,sessionId); 
+        Sheets.xlsxWrite(sessionId,null,sessionTime,sessionId); 
         console.log("1530 app.post DOWNLOAD writing XLSX");
 
 
