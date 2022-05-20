@@ -44,13 +44,10 @@ const XLSX = require('xlsx');
 //const { pseudoRandomBytes } = require('crypto');
 
 
-
 const J_ACCT = 6;
 const H_LEN  = 7; // header length
 
 
-
-const LOCALROOT = 'D:\\Privat\\';
 var SERVEROOT= '/data/sessions/';
 const Slash = '/';
 function setRoot(root) {  
@@ -58,6 +55,8 @@ function setRoot(root) {
     console.dir("Sheets.setRoot = "+SERVEROOT);
 }
 module.exports['setRoot']=setRoot;
+
+
 
 function getRoot() {  return SERVEROOT; }
 module.exports['getRoot']=getRoot;
@@ -447,18 +446,22 @@ module.exports['bookSheet']=bookSheet;
 // skip tBuffer ??
 function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
 
+    // ignore session.sheetFile
+
     var session = get(sessionId);
 
     if(session) {
 
-        if(session.sheetFile) {
+        let sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
+
+        if(sheetFile) {
             if(session.sheetName) {
             let client = session.client;
             let year = session.year;
 
             if(client && year) {
 
-                    if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+session.sheetName+ " for ("+client+","+year+") in file "+session.sheetFile);
+                    if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+session.sheetName+ " for ("+client+","+year+") in file "+sheetFile);
 
                     var excelData=[];            
                     var numLines = 0;
@@ -539,9 +542,9 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
                     var  aSheet = null; if(excelAddrT) aSheet=XLSX.utils.json_to_sheet(excelAddrT,{skipHeader:true }); 
                     var  workBook = null;
                     try{  
-                        workBook = XLSX.readFile(session.sheetFile);
+                        workBook = XLSX.readFile(sheetFile);
                         // GH20220118 workBook.Sheets[session.sheetName]=xSheet;
-                    } catch(err) { console.dir("1475 sheets.xlsxWrite FAILED to OPEN sheetFile "+session.sheetFile+" for ("+client+","+year+") #"+numLines);}
+                    } catch(err) { console.dir("1475 sheets.xlsxWrite FAILED to OPEN sheetFile "+sheetFile+" for ("+client+","+year+") #"+numLines);}
 
                     if(workBook==null) {
                         workBook = XLSX.utils.book_new();
@@ -588,8 +591,8 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
                     }
 
 
-                    XLSX.writeFile(workBook, session.sheetFile);
-                    if(debugWrite)  console.log("1530 sheets.xlsxWrite WRITE FILE "+session.sheetFile);
+                    XLSX.writeFile(workBook, sheetFile);
+                    if(debugWrite)  console.log("1530 sheets.xlsxWrite WRITE FILE "+sheetFile);
                     
                 } else {
                     console.dir("1535 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));
