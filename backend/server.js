@@ -216,6 +216,7 @@ app.get('/', (req, res) => {
 //start session with uploading a session file for a known client
 app.post("/UPLOAD", (req, res) => { 
     console.log("\n\n");
+    console.log(timeSymbol());
 
     // client sends client_year.JSON file
     // this json has to be stored as <SESSION>.json
@@ -284,6 +285,7 @@ app.post("/UPLOAD", (req, res) => {
 // LOGIN to an existing session
 app.post("/LOGIN", (req, res) => { 
     console.log("\n\n");
+    console.log(timeSymbol());
 
     console.log("0020 app.post LOGIN "+JSON.stringify(req.body));
     let remote = req.socket.remoteAddress;
@@ -327,6 +329,7 @@ function login(sessionId) {
 app.post("/BOOK", (req, res) => { 
     console.log("\n\n");
     // from TransferForm.html       
+    console.log(timeSymbol());
     console.log("0010 app.post BOOK prepareTXN('"+JSON.stringify(req.body)+"')");
 
     var result="SERVER BOOKED";
@@ -358,24 +361,13 @@ app.post("/BOOK", (req, res) => {
 
 
 
-app.post("/MAINFILE", (req, res) => { 
-    console.log("\n\n");
-    // FUTURE
-    // upload main.json and take client/year from that file
-    
-    // from Welcome.html       
-    console.log("app.post MAINFILE login('"+JSON.stringify(req.body)+"')");
-
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});       
-    res.end("\nCLIENT LOGGED IN.\n");
-});
-
 
     
 app.post("/STORE", (req, res) => { 
     // STORE txn into LOG for later use
     // from HistoryList.html       
     console.log("\n\n");
+    console.log(timeSymbol());
     console.log("0010 app.post STORE LOG txn into log('"+JSON.stringify(req.body)+"')");
     
     let delta = req.body.delta;
@@ -394,15 +386,27 @@ app.get("/DOWNLOAD", (req, res) => {
     // DOWNLOAD to client     
 
     console.log("\n\n");
+    console.log(timeSymbol());
     console.log("1500 app.post DOWNLOAD JSON for with session id=("+req.body.sessionId+")");
 
     session = Sheets.get(req.body.sessionId);
 
     if(session && session.year && session.client) {
-        let fileName = session.year+session.client+'.json';
+
+        // 20220520
         console.log("1510 app.post DOWNLOAD for year"+fileName);
+
+        let sessionTime=timeSymbol();
+        Sheets.xlsxWrite(req.query.sessionId,null,sessionTime,sessionId); 
+        console.log("1530 app.post DOWNLOAD writing XLSX");
+
+
+        // download JSON
+        let fileName = session.year+session.client+'.json';
+        console.log("1530 app.post DOWNLOAD download JSON as "+fileName);
         res.set('Content-Disposition', 'attachment; fileName='+fileName);
         res.json(session);    
+
     } else {
         console.log("1513 app.post NO DOWNLOAD - INVALID SESSION')");
         res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
@@ -414,6 +418,7 @@ app.get("/DOWNLOAD", (req, res) => {
 app.post('/SAVE', (req, res) => {
     // save  sheetFile into file named by session.sheetFile / sheetName 
     console.log("\n\n");
+    console.log(timeSymbol());
 
     // add closing lines to XLSX balance sheet 
     console.log("1610 /SAVE/ req.query.sessionId="+req.query.sessionId);
@@ -431,6 +436,7 @@ app.post('/SAVE', (req, res) => {
 app.post('/INIT', (req, res) => {
     // generate a new sheetFile and download
     console.log("\n\n");
+    console.log(timeSymbol());
 
     // add closing lines to XLSX balance sheet 
     console.log("1710 /INIT/ req.query.sessionId="+req.query.sessionId);
@@ -492,8 +498,9 @@ app.get("/closeandsave", (req, res) => { res.sendFile(__dirname + "/CloseAndSave
 // internal client page response 
 app.get('/SHOW/', (req, res)    => { 
     console.log("\n\n");
+    console.log(timeSymbol());
 
-    console.log("0010 app.get SHOW req.query.sessionId="+req.query.sessionId);
+    console.log("1910 app.get SHOW req.query.sessionId="+req.query.sessionId);
 
     // load session via id
     let session = Sheets.get(req.query.sessionId);
@@ -502,7 +509,7 @@ app.get('/SHOW/', (req, res)    => {
 
     let balance = phaseOne(session.addrT,session.logT, session.sheetCells);
 
-    console.dir("0200 app.get SHOW sends Balance ="+JSON.stringify(balance));
+    console.dir("1920 app.get SHOW sends Balance ="+JSON.stringify(balance));
 
     //var strBalance=['Balance']; for(let key in balance) strBalance.push(key); console.log("Server.js SHOW balance="+strBalance.join(','));
 
@@ -521,6 +528,7 @@ app.get('/SHOW/', (req, res)    => {
 
 app.get('/welcomedrop', (req, res) => {
     console.log("\n\n");
+    console.log(timeSymbol());
     res.sendFile('./WelcomeDrop.html', { root: __dirname })
 })
 
@@ -528,6 +536,7 @@ app.get('/welcomedrop', (req, res) => {
 // show convenience link to create and load a new browser window
 app.listen(PORT, () => { 
     console.log("\n\n");
+    console.log(timeSymbol());
     console.log(`Server    started from ${PORT} using files in `+__dirname); 
     console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
     console.log(`Local     http://localhost:${PORT}/welcomedrop`); 

@@ -60,6 +60,30 @@ function getFromServer(responseHandler) {
 
 
 
+
+function createJPage(headerInfo) {
+    return printJFormat({ 'lines':[]},headerInfo);
+}
+
+function printJFormat(cursor,arrLine) {
+    let line = arrLine.join(CSEP);
+    var lines = cursor.lines;
+    if(lines.length>=18) { cursor.next = { 'lines':[] }; cursor=cursor.next; }
+
+    lines = cursor.lines;
+    cursor.push(line);
+
+    return cursor;
+}
+
+function setJTrailer(page, cursor) {
+    return printJFormat(cursor,page);
+}
+
+
+
+
+
 function postToServer(strTarget,strParams,callBack) {
 
     let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/'; 

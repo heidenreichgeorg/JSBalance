@@ -3,11 +3,20 @@
 let debug=null;
 
 const Client = require('./client.js');
-const Money  = require('./money.js');
             
-function putResponse(strTarget,strText) {       
+// putResponse is a callback from the server
+// with strText containing the stringified response from SHOW
+//function putResponse(strTarget,strtext) 
 
-    var response = JSON.parse(strText);
+function makeResponse(sessionId) {       
+
+    //var response = JSON.parse(strText);
+    let session = get(sessionId);
+    let balance = phaseOne(session);
+    let response = phaseTwo(balance);
+
+
+
     var jReport = response[D_Report];
     var jBalance = response[D_Balance];
     var gSchema = response[D_Schema];
@@ -15,14 +24,14 @@ function putResponse(strTarget,strText) {
     
     let headerInfo = '['+page["BalanceOpen"]+';'+page["header"]+']';
 
-    let htmlPage = Client.createJPage("headerInfo",'PageContent');
+    let arrStr = Client.createJPage(headerInfo);
     var cursor = htmlPage;
 
     var eqliab=0;
     var income=0;
     
     for (let tag in jReport)   {
-        console.log("Report "+JSON.stringify(jReport[tag]));
+        console.log("apiHGBBeginYear Report "+JSON.stringify(jReport[tag]));
         
         var element = jReport[tag];
         var level = element.level;
@@ -39,7 +48,6 @@ function putResponse(strTarget,strText) {
             if(full_xbrl==='de-gaap-ci_bs.eqLiab.income') { init=cents2EU(eqliab+income); }
 
             var xbrl = full_xbrl.split('\.');
-            var xbrl_pre = xbrl.pop()+'.'+xbrl.pop()+'.'+xbrl.pop();
 
             if(level==1) {
                 cursor=Client.printJFormat(cursor,[iName,' ',' ',' ',init]);
@@ -58,7 +66,13 @@ function putResponse(strTarget,strText) {
         }
     }
 
-    Client.setJTrailer(page, cursor);
-    Client.setJScreen(document,htmlPage);
+    cursor=Client.setJTrailer(page, cursor);
+    //instead of setScreen()
+    return arrStr;
     // return table with response data
+    // as an array of Strings
 }
+module.exports['makeResponse']=makeResponse;
+
+
+
