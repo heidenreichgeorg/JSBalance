@@ -19,6 +19,7 @@ const COLMIN=1; // minimum length of column text
         
 const PORT = 81;
 
+const SCREENLINES=19;
 
 function getFromServer(responseHandler) {
                 
@@ -68,7 +69,7 @@ function createJPage(headerInfo) {
 function printJFormat(cursor,arrLine) {
     let line = arrLine.join(CSEP);
     var lines = cursor.lines;
-    if(lines.length>=18) { cursor.next = { 'lines':[] }; cursor=cursor.next; }
+    if(lines.length>=SCREENLINES) { cursor.next = { 'lines':[] }; cursor=cursor.next; }
 
     lines = cursor.lines;
     cursor.push(line);
@@ -365,7 +366,7 @@ function showTransfer(txnForm,commandCent,force) {
 
     let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
-    if(!terminal) terminal = initTerminal(page,'PageContent',18);  
+    if(!terminal) terminal = initTerminal(page,'PageContent',SCREENLINES);  
 
     var cursor=htmlPage;
 
@@ -444,7 +445,7 @@ function showClose(txnForm,nextFuncName) {
 
     let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
-    if(!terminal) terminal = initTerminal(page,'PageContent',18,  nextFuncName); 
+    if(!terminal) terminal = initTerminal(page,'PageContent',SCREENLINES,  nextFuncName); 
 
     var cursor=htmlPage;
   
@@ -535,7 +536,7 @@ function newPopup(url,command,width,lines) {
 
 function createPage(arrCSS,strHeader,target,lines) {
     var arrStr=[strHeader];
-    if(!lines) lines=18;  
+    if(!lines) lines=SCREENLINES;  
     return { 'arrContent':arrStr, 'arrCSS':arrCSS, 'page':0, 'target':target, 'screenLines':lines }
 }
 

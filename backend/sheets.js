@@ -11,20 +11,6 @@ const HTTP_WRONG = 400;
 // EXTEND sy_purge ;EXCEL if needed
 // N defines number of columns, balance[D_Schema].total 
 
-/*
-C	DE46 7603 0080 0900 4976 10	Buchungssatz	Sender	SVWZ1	SVWZ2	Eifelweg 22
-.	Fürth HRA 10564	Heidenreich Grundbesitz KG		UTF-8	UTF-8	Beträge als Zahl2
-.	216_162_50652	Buchungssatz	Sender	SVWZ1	SVWZ2	Eifelweg 22
-N	Name	Dr. Georg Heidenreich	Erlangen	.	.	GRSB
-I	DE46 7603 0080 0900 4976 10	Fürth HRA 10564	216_162_50652			
-K	Kontennummer	2021	Heidenreich Grundbesitz KG	.	.	200
-S	Shares	100				m m n n n 
-R	Report					x
-E	Eigenkapital			de-gaap-ci_bs.eqLiab.equity.		
-X	BALANCE					de-gaap-ci_bs.ass.fixAss.tan.landBuildings.buildingsOnOwnLand
-P	Partnername					MM MM NN NN NN
-A	Anlagespiegel		1,1,2021			
-*/
 
 const { SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION } = require('constants');
 const { FORMERR } = require('dns');

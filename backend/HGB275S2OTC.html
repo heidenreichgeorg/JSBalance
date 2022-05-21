@@ -60,6 +60,7 @@
                         var chgbB = 0; // Zinseinnahmen
                         var chgbD = 0; // Zinsaufwand
                         var chgbE = 0; // gezahlte Steuern v Einkommen und Ertrag
+                        var chgbF = 0; // Steuerforderung d Gesellschafter
                         // Jahresueberschuss
 
                         var cAvgFix = 0; // betriebsnotwendiges Vermoegen
@@ -81,6 +82,7 @@
                             if(full_xbrl.startsWith('de-gaap-ci_bs.ass.fixAss'))  { cAvgFix+=(setEUMoney(init).cents+setEUMoney(gross).cents)/2; console.log("BNV  "+name+"="+cAvgFix); }
                             if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss')) { cAvgCur+=(setEUMoney(init).cents+setEUMoney(gross).cents)/2; console.log("DUV  "+name+"="+cAvgCur); }
                             if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv')) { cReceiv-=setEUMoney(gross).cents;                     console.log("FOR  "+name+"="+cReceiv); }
+                            if(full_xbrl.startsWith('de-gaap-ci_bs.ass.currAss.receiv.other.otherTaxRec')) { chgbF+=setEUMoney(gross).cents; console.log("TAX  "+name+"("+gross+")="+chgbF);  } // 20220521 keep tax claims separately
 
                             if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.grossTradingProfit')) { chgb1+=setEUMoney(gross).cents; }
                             if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.operatingTC.otherCost.fixingLandBuildings')) { chgb5+=setEUMoney(gross).cents; }
@@ -95,7 +97,7 @@
                             if(full_xbrl.startsWith('de-gaap-ci_is.netIncome.regular.fin.expenses')) { chgbD+=setEUMoney(gross).cents; }
                             if(full_xbrl.startsWith('de-gaap-ci_is.is.netIncome.tax')) { chgbE-=setEUMoney(gross).cents; }
 
-                            console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbD+" "+chgbE);
+                            console.log("READ xbrl="+full_xbrl+" "+chgb5+" "+chgb7+" "+chgb8+" "+chgbA+" "+chgbB+" "+chgbD+" "+chgbE+" "+chgbF);
                         }
 
                     }
@@ -128,6 +130,7 @@
                     cursor=printFormat(cursor,[' ',page.rec,cents2EU(cReceiv)]);
                     cursor=printFormat(cursor,['Capital',' ',page.OpCapital,cents2EU(cOpCapital)]);
                     cursor=printFormat(cursor,['Margin',' ',page.CapMargin,cents2EU(cCapMargin)+"%"]);
+                    cursor=printFormat(cursor,['TaxClaim',' ',page.TaxClaims,cents2EU(chgbF)]);
 
  
                     setTrailer(page, cursor);

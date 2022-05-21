@@ -110,6 +110,7 @@ let de_DE = {
     OpAssets:"betriebsnotw.Vermögen",
     AvgCurrent:"mittl.Umlaufvermögen",
     OpCapital:"betriebsnotw.Kapital",
+    TaxClaims:"Steuerforderung",
     CapMargin:"Kapitalrendite",
 
     // Buttons
