@@ -10,10 +10,13 @@ export default function MenuPage() {
     
     const lang = useLang();
 
-    const { isLoading, error } = useQuery('session', async () => {
+    const { isLoading, error, data } = useQuery('session', async () => {
         const res = await fetch('/api/session')
         return res.json()
     })
+
+    var session;
+    if(!isLoading && !error) session = data.data
 
     return (
         <div style={{'padding': '2rem'}}>
@@ -21,7 +24,7 @@ export default function MenuPage() {
             <Title>{lang.title}</Title>
             <Space h='lg' />
             <Tabs grow position="center">
-                <Tabs.Tab label={lang['statement of account']} icon={<Notes size={16} />}><StatementOfAccount /></Tabs.Tab>
+                <Tabs.Tab label={lang['statement of account']} icon={<Notes size={16} />}><StatementOfAccount isLoading={isLoading} data={session}/></Tabs.Tab>
                 <Tabs.Tab label={lang['opening balance']} icon={<Notes size={16} />}><OpeningBalance /></Tabs.Tab>
                 <Tabs.Tab label={lang['account overview']} icon={<Notes size={16} />}><AccountOverview /></Tabs.Tab>
                 <Tabs.Tab label={lang['status']} icon={<Notes size={16} />}><Status /></Tabs.Tab>
@@ -38,12 +41,24 @@ export default function MenuPage() {
     )
 }
 
-function StatementOfAccount() {
+function StatementOfAccount({ isLoading, data }) {
 
     const lang = useLang();
 
+    if(isLoading) {
+        return <div>{lang.loading}</div>
+    }
+
+    const names = data['Names']
+
     return (
-        <Title>{lang['statement of account']}</Title>
+        <>
+            <Title>{lang['statement of account']}</Title>
+            <Space h='lg' />
+            <p>
+                {JSON.stringify(data)}
+            </p>
+        </>
     )
 }
 
