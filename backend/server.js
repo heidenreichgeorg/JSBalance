@@ -1,4 +1,4 @@
-let debug=0;
+let debug=1;
 
 // Imports
 const { addEUMoney, moneyString, iScaleMoney, setEUMoney , setENMoney, setMoney, subEUMoney, lessMoney, cents2EU } = require('./money.js');
@@ -180,7 +180,7 @@ function initBalance() {
         xbrlRegular: { level:2, xbrl:"de-gaap-ci_is.netIncome.regular", de_DE:'Gewinn/Verlust'},      
         xbrlEqLiab : { level:2, xbrl: "de-gaap-ci_bs.eqLiab", de_DE:'Passiva o G'}, // see HGBBeginYear.html HGBRegular.html
         xbrlIncome: {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.income", de_DE:'Passiva'},
-        // see phaseTwo() in server.js, CloseAndSave.htmlReport.xbrlIncome.closing.split(CSEP);
+        // see sendBalance() in server.js, CloseAndSave.htmlReport.xbrlIncome.closing.split(CSEP);
         //xbrlNIP:    {  level:1, xbrl: "de-gaap-ci_bs.eqLiab.equity.netIncomePartnerships", de_DE:'Bilanzgewinn'},
         // 20220123 previous row is synthetic, from KernTax for HGBRegular
     };
@@ -474,25 +474,56 @@ app.post('/INIT', (req, res) => {
 // save to Excel
 
 
-
-
 app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/FBA/50eurobill.jpg"); });
 
-app.get("/account", (req, res)  => { res.sendFile(__dirname + "/AccountHistory.html"); });
-app.get("/assetl", (req, res)   => { res.sendFile(__dirname + "/AssetList.html"); });
-app.get("/assets", (req, res)   => { res.sendFile(__dirname + "/AssetScreen.html"); });
-app.get("/balance", (req, res)  => { res.sendFile(__dirname + "/BalanceTable.html"); });
-app.get("/dashboard", (req, res)  => { res.sendFile(__dirname + "/DashBoard.html"); });
-app.get("/galshgb", (req, res) => { res.sendFile(__dirname + "/HGB275S2OTC.html"); });
-app.get("/gainloss", (req, res) => { res.sendFile(__dirname + "/GainLoss.html"); });
-app.get("/history", (req, res)  => { res.sendFile(__dirname + "/HistoryScreen.html"); });
-app.get("/hgbbeginyear", (req, res) => { res.sendFile(__dirname + "/HGBBeginYear.html"); });
-app.get("/openbalance", (req, res) => {res.sendFile(__dirname + "/OpenBalance.html"); });
-app.get("/hgbregular", (req, res) => { res.sendFile(__dirname + "/HGBRegular.html"); });
-app.get("/pie", (req, res)     => { res.sendFile(__dirname + "/BalancePie.html"); });
-app.get("/pattern", (req, res)  => {res.sendFile(__dirname + "/PatternList.html"); });
-app.get("/transfer", (req, res)    => { res.sendFile(__dirname + "/Transfer.html"); });
-app.get("/closeandsave", (req, res) => { res.sendFile(__dirname + "/CloseAndSave.html"); });
+
+let API = require('./api.js');
+
+
+app.get("/apiHGBBeginYear", (req, res)  => {   
+    let sessionId = req.query.sessionId;
+    if(sessionId) {
+        let session = Sheets.get(sessionId);
+        if(session) {
+
+            if(debug) console.log("1810 app.get apiHGBBeginYear session="+JSON.stringify(session));
+
+            let balance = phaseOne(session.addrT, session.logT, session.sheetCells);
+            let jPage = API.apiHGBBeginYear(sessionId,balance);
+            res.json(jPage);
+
+
+            // NO session found
+        } else {
+            if(debug) console.log("1811 app.get apiHGBBeginYear NO session");
+            res.end("\n");
+        }
+    
+
+    // NO ?sesssionId=XYZ
+    } else {
+        if(debug) console.log("1801 app.get apiHGBBeginYear NO req.query.sessionId");
+        res.end("\n");
+    }
+});
+
+
+
+app.get("/account", (req, res)   => { res.sendFile(__dirname + "/AccountHistory.html"); });
+app.get("/assetl", (req, res)    => { res.sendFile(__dirname + "/AssetList.html"); });
+app.get("/assets", (req, res)    => { res.sendFile(__dirname + "/AssetScreen.html"); });
+app.get("/balance", (req, res)   => { res.sendFile(__dirname + "/BalanceTable.html"); });
+app.get("/dashboard", (req, res) => { res.sendFile(__dirname + "/DashBoard.html"); });
+app.get("/galshgb",  (req, res)  => { res.sendFile(__dirname + "/HGB275S2OTC.html"); });
+app.get("/gainloss", (req, res)  => { res.sendFile(__dirname + "/GainLoss.html"); });
+app.get("/history",  (req, res)  => { res.sendFile(__dirname + "/HistoryScreen.html"); });
+app.get("/hgbbeginyear",(req,res)=> { res.sendFile(__dirname + "/HGBBeginYear.html"); });
+app.get("/openbalance",(req, res)=> { res.sendFile(__dirname + "/OpenBalance.html"); });
+app.get("/hgbregular",(req, res) => { res.sendFile(__dirname + "/HGBRegular.html"); });
+app.get("/pie", (req, res)       => { res.sendFile(__dirname + "/BalancePie.html"); });
+app.get("/pattern", (req, res)   => { res.sendFile(__dirname + "/PatternList.html"); });
+app.get("/transfer", (req, res)  => { res.sendFile(__dirname + "/Transfer.html"); });
+app.get("/closeandsave",(req,res)=> { res.sendFile(__dirname + "/CloseAndSave.html"); });
 
 
 
@@ -833,7 +864,7 @@ function phaseOne(addrT, logT, aoaCells) {
                     iCap  #Spalte Fest/Kommanditkapital
                     name  Name (Text in Spalte mit FK oder KK)
 
-            phaseTwo
+            sendBalance
                     cyLoss Laufende Verluste aus Veraesserungen VAVA
                     keso
                     kest
@@ -1159,6 +1190,7 @@ function prepareTXN(sessionId,reqBody) {
     return bookingForm;
 
 }
+
 function timeSymbol() { // same as in client.js
     var u = new Date(Date.now()); 
     return ''+ u.getUTCFullYear()+

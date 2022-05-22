@@ -62,27 +62,6 @@ function getFromServer(responseHandler) {
 
 
 
-function createJPage(headerInfo) {
-    return printJFormat({ 'lines':[]},headerInfo);
-}
-
-function printJFormat(cursor,arrLine) {
-    let line = arrLine.join(CSEP);
-    var lines = cursor.lines;
-    if(lines.length>=SCREENLINES) { cursor.next = { 'lines':[] }; cursor=cursor.next; }
-
-    lines = cursor.lines;
-    cursor.push(line);
-
-    return cursor;
-}
-
-function setJTrailer(page, cursor) {
-    return printJFormat(cursor,page);
-}
-
-
-
 
 
 function postToServer(strTarget,strParams,callBack) {
@@ -981,7 +960,6 @@ function unixPPPPYYYY() {
     let yy=u.getUTCFullYear()-1;
     return ''+yy+'/'+(yy+1);
 }
-
 
 
 function timeSymbol() { // same as in server.js
