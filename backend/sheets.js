@@ -11,20 +11,6 @@ const HTTP_WRONG = 400;
 // EXTEND sy_purge ;EXCEL if needed
 // N defines number of columns, balance[D_Schema].total 
 
-/*
-C	DE46 7603 0080 0900 4976 10	Buchungssatz	Sender	SVWZ1	SVWZ2	Eifelweg 22
-.	Fürth HRA 10564	Heidenreich Grundbesitz KG		UTF-8	UTF-8	Beträge als Zahl2
-.	216_162_50652	Buchungssatz	Sender	SVWZ1	SVWZ2	Eifelweg 22
-N	Name	Dr. Georg Heidenreich	Erlangen	.	.	GRSB
-I	DE46 7603 0080 0900 4976 10	Fürth HRA 10564	216_162_50652			
-K	Kontennummer	2021	Heidenreich Grundbesitz KG	.	.	200
-S	Shares	100				m m n n n 
-R	Report					x
-E	Eigenkapital			de-gaap-ci_bs.eqLiab.equity.		
-X	BALANCE					de-gaap-ci_bs.ass.fixAss.tan.landBuildings.buildingsOnOwnLand
-P	Partnername					MM MM NN NN NN
-A	Anlagespiegel		1,1,2021			
-*/
 
 const { SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION } = require('constants');
 const { FORMERR } = require('dns');
@@ -44,13 +30,10 @@ const XLSX = require('xlsx');
 //const { pseudoRandomBytes } = require('crypto');
 
 
-
 const J_ACCT = 6;
 const H_LEN  = 7; // header length
 
 
-
-const LOCALROOT = 'D:\\Privat\\';
 var SERVEROOT= '/data/sessions/';
 const Slash = '/';
 function setRoot(root) {  
@@ -58,6 +41,8 @@ function setRoot(root) {
     console.dir("Sheets.setRoot = "+SERVEROOT);
 }
 module.exports['setRoot']=setRoot;
+
+
 
 function getRoot() {  return SERVEROOT; }
 module.exports['getRoot']=getRoot;
@@ -447,18 +432,22 @@ module.exports['bookSheet']=bookSheet;
 // skip tBuffer ??
 function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
 
+    // ignore session.sheetFile
+
     var session = get(sessionId);
 
     if(session) {
 
-        if(session.sheetFile) {
+        let sheetFile = getClientDir(session.client) + session.year + session.client + ".xlsx"
+
+        if(sheetFile) {
             if(session.sheetName) {
             let client = session.client;
             let year = session.year;
 
             if(client && year) {
 
-                    if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+session.sheetName+ " for ("+client+","+year+") in file "+session.sheetFile);
+                    if(debugWrite) console.log("1400 sheets.xlsxWrite ENTER "+session.sheetName+ " for ("+client+","+year+") in file "+sheetFile);
 
                     var excelData=[];            
                     var numLines = 0;
@@ -539,9 +528,9 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
                     var  aSheet = null; if(excelAddrT) aSheet=XLSX.utils.json_to_sheet(excelAddrT,{skipHeader:true }); 
                     var  workBook = null;
                     try{  
-                        workBook = XLSX.readFile(session.sheetFile);
+                        workBook = XLSX.readFile(sheetFile);
                         // GH20220118 workBook.Sheets[session.sheetName]=xSheet;
-                    } catch(err) { console.dir("1475 sheets.xlsxWrite FAILED to OPEN sheetFile "+session.sheetFile+" for ("+client+","+year+") #"+numLines);}
+                    } catch(err) { console.dir("1475 sheets.xlsxWrite FAILED to OPEN sheetFile "+sheetFile+" for ("+client+","+year+") #"+numLines);}
 
                     if(workBook==null) {
                         workBook = XLSX.utils.book_new();
@@ -588,8 +577,8 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
                     }
 
 
-                    XLSX.writeFile(workBook, session.sheetFile);
-                    if(debugWrite)  console.log("1530 sheets.xlsxWrite WRITE FILE "+session.sheetFile);
+                    XLSX.writeFile(workBook, sheetFile);
+                    if(debugWrite)  console.log("1530 sheets.xlsxWrite WRITE FILE "+sheetFile);
                     
                 } else {
                     console.dir("1535 sheets.xlsxWrite() NO client / year "+JSON.stringify(session));

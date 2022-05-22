@@ -257,7 +257,7 @@
    
 
     // GH20220123
-   // needed in doBook - may well walk into sender.js phaseTwo()
+   // needed in doBook - may well walk into sender.js sendBalance()
    function cents2EU(cents) {
     var sign=""; if(cents<0) { sign="-"; cents=-cents; }
 

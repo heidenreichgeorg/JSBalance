@@ -19,6 +19,7 @@ const COLMIN=1; // minimum length of column text
         
 const PORT = 81;
 
+const SCREENLINES=19;
 
 function getFromServer(responseHandler) {
                 
@@ -57,6 +58,9 @@ function getFromServer(responseHandler) {
     request.send();
 
 }	
+
+
+
 
 
 
@@ -341,7 +345,7 @@ function showTransfer(txnForm,commandCent,force) {
 
     let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
-    if(!terminal) terminal = initTerminal(page,'PageContent',18);  
+    if(!terminal) terminal = initTerminal(page,'PageContent',SCREENLINES);  
 
     var cursor=htmlPage;
 
@@ -420,7 +424,7 @@ function showClose(txnForm,nextFuncName) {
 
     let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
-    if(!terminal) terminal = initTerminal(page,'PageContent',18,  nextFuncName); 
+    if(!terminal) terminal = initTerminal(page,'PageContent',SCREENLINES,  nextFuncName); 
 
     var cursor=htmlPage;
   
@@ -511,7 +515,7 @@ function newPopup(url,command,width,lines) {
 
 function createPage(arrCSS,strHeader,target,lines) {
     var arrStr=[strHeader];
-    if(!lines) lines=18;  
+    if(!lines) lines=SCREENLINES;  
     return { 'arrContent':arrStr, 'arrCSS':arrCSS, 'page':0, 'target':target, 'screenLines':lines }
 }
 
@@ -956,7 +960,6 @@ function unixPPPPYYYY() {
     let yy=u.getUTCFullYear()-1;
     return ''+yy+'/'+(yy+1);
 }
-
 
 
 function timeSymbol() { // same as in server.js

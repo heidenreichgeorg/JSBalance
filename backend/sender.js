@@ -23,11 +23,20 @@ const D_Equity = "Kapital";
 const D_Balance= "Bilanz";
 const D_History= "Historie";
 const D_Partner_NET= "NETPartner";
-const D_SHARES = "Anteile";
+const D_Partner_CAP= "CAPPartner";
+const D_Partner_OTC= "OTCPartner";
+const D_Shares = "Anteile";
 const D_Report = "Report";
 const D_FixAss = "Anlagen";
 const D_Muster = "Muster";
 const D_Adressen="Adressen";
+
+
+
+module.exports = {  CSEP, CEND, J_ACCT, D_Balance, D_History,  D_Muster, D_Page, D_Partner_CAP, D_Partner_OTC, D_Partner_NET, D_Report, D_Schema, D_Shares, D_XBRL, send, sendBalance };
+
+
+
 
 // OBSOLETE extra XML pattern
 // SYNTHETIC
@@ -93,7 +102,7 @@ async function send(res,balance) {
     if(balance && balance[D_Balance]) {
 
         //gResponse[D_BeginYear]={};
-        let gResponse = phaseTwo(balance);
+        let gResponse = sendBalance(balance);
 
         // send the whole result
         let payLoad = JSON.stringify(gResponse);    
@@ -107,12 +116,11 @@ async function send(res,balance) {
     res.end(); // 
 }
 
-module.exports['send']=send;
 
 
 // generate a copy of the balance, with all accounts closed 
 // and GAIN LOSS being distributed to partners
-function phaseTwo(balance) {
+function sendBalance(balance) {
     let bAccounts = balance[D_Balance];
     let bHistory = balance[D_History];
     
@@ -142,7 +150,7 @@ function phaseTwo(balance) {
     let gReport = gResponse[D_Report];
     for(let xbrl in gReport) {
         var element=gReport[xbrl];
-        if(debugReport) console.log("sender.js phaseTwo ACCOUNT "+JSON.stringify(element));           
+        if(debugReport) console.log("sender.js sendBalance ACCOUNT "+JSON.stringify(element));           
         element.account = Account.openAccount(Account.makeAccount(element.de_DE,element.xbrl),"0,00");
     }
 
@@ -158,12 +166,12 @@ function phaseTwo(balance) {
                 //if(axbrl.includes('receiv.other.otherTaxRec.CapTax')) {
                 if(name=='KEST') {
                     kestPaid=Account.getSaldo(account);
-                    if(debugReport) console.log("sender.js phaseTwo KEST Paid="+kestPaid);
+                    if(debugReport) console.log("sender.js sendBalance KEST Paid="+kestPaid);
                 }
 
                 if(name=='KESO') {
                     kesoPaid=Account.getSaldo(account);
-                    if(debugReport) console.log("sender.js phaseTwo KESO Paid="+kesoPaid);
+                    if(debugReport) console.log("sender.js sendBalance KESO Paid="+kesoPaid);
                 }
 
                 // search, find and update corresponding SYNTHETIC report account
@@ -173,7 +181,7 @@ function phaseTwo(balance) {
                     if(collect && axbrl.startsWith(element.xbrl)) {
                         element.account = Account.addEUMoney(collect,Account.getSaldo(account));
                         element.account.init = moneyString(addEUMoney(element.account.init, setEUMoney(account.init))); // GH20220103 GH20220104 wrong gross value, contains init
-                        if(debugReport) console.log("sender.js phaseTwo SYNTHETIC ("+name+"  "+axbrl+") IN "+element.de_DE + "   "+JSON.stringify(element.account));    
+                        if(debugReport) console.log("sender.js sendBalance SYNTHETIC ("+name+"  "+axbrl+") IN "+element.de_DE + "   "+JSON.stringify(element.account));    
                     }
                 }
             }
@@ -182,10 +190,10 @@ function phaseTwo(balance) {
 
 
     var kesoShares = distribute(setEUMoney(kesoPaid),partners,'keso');
-    if(debugSend) console.log("sender.js phaseTwo KESO  G"+kesoShares[0]+" E"+kesoShares[1]+" A"+kesoShares[2]+" K"+kesoShares[3]+" T"+kesoShares[4]+" L"+kesoShares[5]); 
+    if(debugSend) console.log("sender.js sendBalance KESO  G"+kesoShares[0]+" E"+kesoShares[1]+" A"+kesoShares[2]+" K"+kesoShares[3]+" T"+kesoShares[4]+" L"+kesoShares[5]); 
 
     var kestShares = distribute(setEUMoney(kestPaid),partners,'kest');
-    if(debugSend) console.log("sender.js phaseTwo KEST  G"+kestShares[0]+" E"+kestShares[1]+" A"+kestShares[2]+" K"+kestShares[3]+" T"+kestShares[4]+" L"+kestShares[5]); 
+    if(debugSend) console.log("sender.js sendBalance KEST  G"+kestShares[0]+" E"+kestShares[1]+" A"+kestShares[2]+" K"+kestShares[3]+" T"+kestShares[4]+" L"+kestShares[5]); 
 
 
 
@@ -217,7 +225,7 @@ function phaseTwo(balance) {
         }
 
         p_cyLoss = distribute(setEUMoney(all_cyloss),partners,'cyLoss');
-        if(debugSend) console.log("sender.js phaseTwo CYLOSS  G"+p_cyLoss[0]+" E"+p_cyLoss[1]+" A"+p_cyLoss[2]+" K"+p_cyLoss[3]+" T"+p_cyLoss[4]+" L"+p_cyLoss[5]); 
+        if(debugSend) console.log("sender.js sendBalance CYLOSS  G"+p_cyLoss[0]+" E"+p_cyLoss[1]+" A"+p_cyLoss[2]+" K"+p_cyLoss[3]+" T"+p_cyLoss[4]+" L"+p_cyLoss[5]); 
     
     }
     
@@ -237,12 +245,12 @@ function phaseTwo(balance) {
     aEqlinc=Account.addEUMoney(aEqlinc,Account.getTransient(aEqlsum));
 
     if(debugReport) {
-       console.log("sender.js phaseTwo ASSETS = "+JSON.stringify(aAssets));           
-       console.log("sender.js phaseTwo EQLIAB = "+JSON.stringify(aEqliab));           
-       console.log("sender.js phaseTwo EQLREG = "+JSON.stringify(aEqlreg));           
-       console.log("sender.js phaseTwo REGOTC = "+JSON.stringify(aRegOTC));           
-       console.log("sender.js phaseTwo REGFIN = "+JSON.stringify(aRegFin));           
-       console.log("sender.js phaseTwo EQLINC = "+JSON.stringify(aEqlinc));           
+       console.log("sender.js sendBalance ASSETS = "+JSON.stringify(aAssets));           
+       console.log("sender.js sendBalance EQLIAB = "+JSON.stringify(aEqliab));           
+       console.log("sender.js sendBalance EQLREG = "+JSON.stringify(aEqlreg));           
+       console.log("sender.js sendBalance REGOTC = "+JSON.stringify(aRegOTC));           
+       console.log("sender.js sendBalance REGFIN = "+JSON.stringify(aRegFin));           
+       console.log("sender.js sendBalance EQLINC = "+JSON.stringify(aEqlinc));           
     }
         
     // set the gross component in each gReport account
@@ -250,7 +258,7 @@ function phaseTwo(balance) {
         var element = gReport[rxbrl];
         var account = element.account;
         account.gross=Account.getTransient(account);
-        if(debug) console.log("sender.js phaseTwo send1 REPORT("+element.de_DE+") "+JSON.stringify(element.account));           
+        if(debug) console.log("sender.js sendBalance send1 REPORT("+element.de_DE+") "+JSON.stringify(element.account));           
     }
 
 
@@ -278,7 +286,7 @@ function phaseTwo(balance) {
         varcap.netIncomeFin=p.netIncomeFin;
         varcap.gross=Account.getSaldo(varcap);
         varcap.next=Account.getNextYear(varcap);
-        if(debug && debug>1) console.log('Sender phaseTwo MODIFY K2xx accounts '+p.income + '>='+JSON.stringify(varcap));
+        if(debug && debug>1) console.log('Sender sendBalance MODIFY K2xx accounts '+p.income + '>='+JSON.stringify(varcap));
     }
 
 
@@ -294,7 +302,7 @@ function phaseTwo(balance) {
                 var grossAcc=account;
                 grossAcc.gross=Account.getSaldo(grossAcc);
                 gross[name]=grossAcc; 
-                if(debugSend) console.log("sender.js phaseTwo2 ACCOUNT "+JSON.stringify(grossAcc));           
+                if(debugSend) console.log("sender.js sendBalance2 ACCOUNT "+JSON.stringify(grossAcc));           
             }
         }
     }
@@ -303,7 +311,7 @@ function phaseTwo(balance) {
     for (let hash in bHistory)   {
         txns[hash]=bHistory[hash]; 
 
-        if(debugSend) console.log("sender js phaseTwo3 HISTORY "+hash+"="+txns[hash]);           
+        if(debugSend) console.log("sender js sendBalance3 HISTORY "+hash+"="+txns[hash]);           
     }
     
     // transfer all fixed assets
@@ -332,19 +340,19 @@ function phaseTwo(balance) {
             closeIncome['svwz2']=Server.de_DE['Closing'];
 
             let gross = gReport.xbrlRegular.account.gross;
-            if(debugComp) console.log("phaseTwo CLOSING income "+gross);
+            if(debugComp) console.log("sendBalance CLOSING income "+gross);
 
             var aNum=0;
             for(let name in gAccounts) {
                 if(gAccounts[name]) {
-                    // if(debugComp) console.dir("phaseTwo UPDATE CLOSING OTC "+JSON.stringify(gAccounts[name]));
+                    // if(debugComp) console.dir("sendBalance UPDATE CLOSING OTC "+JSON.stringify(gAccounts[name]));
                     let acc = gAccounts[name];
                     let xbrl = acc.xbrl;
                     if(xbrl.includes("netIncome.regular")) {
                         if(negMoney(setEUMoney(acc.gross))) iMoney=closeIncome.debit[name]=setEUMoney(cents2EU(-1 * setEUMoney(acc.gross).cents));
                         else iMoney=closeIncome.credit[name]=setEUMoney(acc.gross);
                         iMoney.index=acc.index; 
-                        if(debugComp) console.log("phaseTwo CLOSING OTC "+JSON.stringify(iMoney));
+                        if(debugComp) console.log("sendBalance CLOSING OTC "+JSON.stringify(iMoney));
                     }
                 }
                 aNum++;
@@ -355,23 +363,23 @@ function phaseTwo(balance) {
                 try {
                     let varcap=gAccounts[p.vk];                   
                     if(varcap) {
-                        // if(debugComp) console.dir("phaseTwo UPDATE CLOSING VAR "+JSON.stringify(p)+"Partner("+i+") "+JSON.stringify(varcap)); 
+                        // if(debugComp) console.dir("sendBalance UPDATE CLOSING VAR "+JSON.stringify(p)+"Partner("+i+") "+JSON.stringify(varcap)); 
                         let name = varcap.name;
                         let aci = varcap.income;
                         if(negMoney(setEUMoney(aci))) iMoney=closeIncome.credit[name]=setEUMoney(cents2EU(-1 * setEUMoney(aci).cents));
                         else iMoney=closeIncome.debit[name]=setEUMoney(aci);
                         iMoney.index=p.iVar; 
-                        if(debugComp) console.log("phaseTwo CLOSING VAR "+JSON.stringify(iMoney));
+                        if(debugComp) console.log("sendBalance CLOSING VAR "+JSON.stringify(iMoney));
                     }
-                } catch(err) { console.error("sender.js phaseTwo UPDATE CLOSING  VARCAP ERROR: "+err); }
+                } catch(err) { console.error("sender.js sendBalance UPDATE CLOSING  VARCAP ERROR: "+err); }
             }
 
-            if(debugComp) console.log("phaseTwo "+gross+" CLOSING "+JSON.stringify(closeIncome));
+            if(debugComp) console.log("sendBalance "+gross+" CLOSING "+JSON.stringify(closeIncome));
 
             gReport.xbrlIncome.closing = JSON.stringify(closeIncome);
 
-        } else console.dir("sender.js phaseTwo UPDATE CLOSING: NO gReport.xbrlRegular.account.gross");
-    } catch(err) { console.error("sender.js phaseTwo UPDATE CLOSING ERROR: "+err); }
+        } else console.dir("sender.js sendBalance UPDATE CLOSING: NO gReport.xbrlRegular.account.gross");
+    } catch(err) { console.error("sender.js sendBalance UPDATE CLOSING ERROR: "+err); }
 
     
 
@@ -386,13 +394,13 @@ function phaseTwo(balance) {
 
     // transfer page header footer information
     var page = makePage(balance); // side-effect
-    if(debugPage) console.log("sender.js phaseTwo PAGE "+JSON.stringify(page));
+    if(debugPage) console.log("sender.js sendBalance PAGE "+JSON.stringify(page));
     if(debugPage) console.log();
     gResponse[D_Page] = page;
 
     return gResponse;
 }
-module.exports['phaseTwo']=phaseTwo;
+module.exports['sendBalance']=sendBalance;
 
 
 
