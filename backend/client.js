@@ -17,6 +17,8 @@ const DOUBLE = ':';
 const CSEP = ';';
 const COLMIN=1; // minimum length of column text
         
+const HTTP_OK = 200;
+const HTTP_WRONG = 400;
 const PORT = 81;
 
 const SCREENLINES=19;
@@ -80,11 +82,16 @@ function postToServer(strTarget,strParams,callBack) {
         */
 
         request.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status>=200) {
+            if (this.readyState == 4 && this.status>=HTTP_OK) {
                 console.log("postToServer "+strTarget+": "+request.responseText);
                 if(callBack) {
-                    if(this.status==200 || this.status==400) callBack( ""+this.status+" OK " );
-                    else callBack( request.responseText );
+                    
+                    if(this.status==HTTP_WRONG) callBack( ""+this.status+" ERROR " );
+
+                    else {
+                        callBack( request.responseText );
+                        console.log("postToServer callback("+request.responseText+")");
+                    }
                 }
             }
         };

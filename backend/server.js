@@ -197,7 +197,7 @@ const PORT = 81;
 
 
 const bodyParser = require("body-parser");
-app.use(bodyParser.json({limit: '500kb'}));
+app.use(bodyParser.json({limit: '900kb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
@@ -243,12 +243,9 @@ app.post("/UPLOAD", (req, res) => {
             //Sheets.save2Server(req.body,client,year,res,"./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId);
             // INSTEAD OF LOCAL FILE STORAGE
             Sheets.setSession(data);
-
-            
-            
+          
             if(res) {
             
-
                 // (A) REDIRECT TO FORWARD PAGE
                 //console.log("0014 app.post UPLOAD: redirecting to "+forwardURL);
                 //let forwardURL = "./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId
@@ -263,13 +260,20 @@ app.post("/UPLOAD", (req, res) => {
          
             }
 
-            banner = login(sessionId);
+            //banner = login(sessionId);           
+
             
+            banner = '<FORM METHOD="GET" ACTION="./LOGIN"><H1>'+year+'&nbsp'+client+'&nbsp;</H1>'+
+                     '<INPUT TYPE="HIDDEN" NAME="year" VALUE="'+year+'"/>'+
+                     '<INPUT TYPE="HIDDEN" NAME="client" VALUE="'+client+'"/>'+
+                     '<INPUT TYPE="HIDDEN" NAME="sessionId" VALUE="'+sessionId+'"/>'+
+                     '<INPUT TYPE="SUBMIT" NAME="submit" VALUE="LOGIN"/>'+
+                     '</FORM>';
 
         } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
 
         res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-        res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
+        res.end("\n<HTML><HEAD><LINK REL='stylesheet' HREF='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
 
         return;
     }
@@ -284,21 +288,21 @@ app.post("/UPLOAD", (req, res) => {
 
 
 // LOGIN to an existing session
-app.post("/LOGIN", (req, res) => { 
+app.get("/LOGIN", (req, res) => { 
     console.log("\n\n");
     console.log(timeSymbol());
 
-    console.log("0020 app.post LOGIN "+JSON.stringify(req.body));
+    console.log("0020 app.post LOGIN "+JSON.stringify(req.query));
     let remote = req.socket.remoteAddress;
-    let client = req.body.client;
-    let year   = req.body.year;
-    let time   = req.body.time;    
-    //let sessionId = req.body.sessionId;
+    let client = req.query.client;
+    let year   = req.query.year;
+    //let time   = req.query.time;    
+    let sessionId = req.query.sessionId;
     
-    let sessionId = strSymbol(time+client+year+time);
-    //            let sessionId = Sheets.symbolic(time+client+year+time);
+    //  let sessionId = strSymbol(time+client+year+time);
+    //  let sessionId = Sheets.symbolic(time+client+year+time);
 
-    console.dir("0030 app.post LOGIN with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+sessionId);
+    console.dir("0030 app.post LOGIN with client="+client+",year="+year+",r="+remote+"  ---> "+sessionId);
 
     let banner = login(sessionId);
 
@@ -312,11 +316,11 @@ app.post("/LOGIN", (req, res) => {
 function login(sessionId) {
 
     let session = Sheets.get(sessionId);
-    console.log("0014 login() "+sessionId);
+    console.log("0040 login() "+sessionId);
 
 
-    let balance = phaseOne(session.addrT,session.logT,session.sheetCells);
-    console.dir("0040 login() creates balance");
+    //let balance = phaseOne(session.addrT,session.logT,session.sheetCells);
+    //console.dir("0040 login() creates balance");
     
     let banner = makeBanner(sessionId,session.year);
 
