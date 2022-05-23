@@ -221,7 +221,7 @@ app.post("/UPLOAD", (req, res) => {
 
     // client sends client_year.JSON file
     // this json has to be stored as <SESSION>.json
-    var banner = "NO SESSION";
+    var signup = "NO SESSION";
 
     let remote = req.socket.remoteAddress;
     console.log("0010 app.post UPLOAD from "+remote);
@@ -260,20 +260,23 @@ app.post("/UPLOAD", (req, res) => {
          
             }
 
-            //banner = login(sessionId);           
+            banner = login(sessionId);           
+            console.dir("0060 app.post UPLOAD "+banner);
 
             
-            banner = '<FORM METHOD="GET" ACTION="./LOGIN"><H1>'+year+'&nbsp'+client+'&nbsp;</H1>'+
+            signup = '<FORM METHOD="GET" ACTION="./LOGIN"><H1>'+year+'&nbsp'+client+'&nbsp;</H1>'+
                      '<INPUT TYPE="HIDDEN" NAME="year" VALUE="'+year+'"/>'+
                      '<INPUT TYPE="HIDDEN" NAME="client" VALUE="'+client+'"/>'+
                      '<INPUT TYPE="HIDDEN" NAME="sessionId" VALUE="'+sessionId+'"/>'+
                      '<INPUT TYPE="SUBMIT" NAME="submit" VALUE="LOGIN"/>'+
                      '</FORM>';
 
+            
+
         } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
 
         res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-        res.end("\n<HTML><HEAD><LINK REL='stylesheet' HREF='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
+        res.end("\n<HTML><HEAD><LINK REL='stylesheet' HREF='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE><BODY>"+signup+"</BODY></HTML>\n"); 
 
         return;
     }
@@ -304,12 +307,15 @@ app.get("/LOGIN", (req, res) => {
 
     console.dir("0030 app.post LOGIN with client="+client+",year="+year+",r="+remote+"  ---> "+sessionId);
 
-    let banner = login(sessionId);
 
-    // send back sessionId to client brwoser or file
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-    res.end("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE>"+banner+"</HTML>\n"); 
-    
+    let banner = login(sessionId);
+    console.dir("0060 app.post LOGIN "+banner);
+
+    // send back sessionId to client browser or file
+    res.writeHead(HTTP_OK);
+    res.end("\n<HTML>"
+            +"<HEAD><meta http-equiv='content-type' content='text/html; charset=utf-8'><LINK REL='stylesheet' HREF='./FBA/mobile_green.css'/><TITLE>Welcome</TITLE></HEAD>"
+            +"<BODY>"+banner+"</BODY></HTML>\n");
 });
 
 
