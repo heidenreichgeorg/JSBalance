@@ -3,9 +3,28 @@ let debug=1;
 // Imports
 const { addEUMoney, moneyString, iScaleMoney, setEUMoney , setENMoney, setMoney, subEUMoney, lessMoney, cents2EU } = require('./money.js');
 
+
+
 // Modules
 const express = require('express');
 const app = express();
+
+
+
+
+const qr = require('qrcode');
+
+
+const ejs = require("ejs");
+//app.set("view engine", "ejs");
+
+
+
+const bodyParser = require("body-parser");
+app.use(bodyParser.json({limit: '900kb'}));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
 
 const Account = require('./account.js');
 const Sheets = require('./sheets');
@@ -195,13 +214,7 @@ const HTTP_OK = 200;
 const HTTP_WRONG = 400;
 const PORT = 81;
 
-
-const bodyParser = require("body-parser");
-app.use(bodyParser.json({limit: '900kb'}));
-app.use(bodyParser.urlencoded({ extended: true }));
-
-
-const { stringify } = require('querystring');
+//const { stringify } = require('querystring');
 
 // const { sign } = require('crypto');
 
@@ -219,8 +232,8 @@ app.post("/UPLOAD", (req, res) => {
     console.log("\n\n");
     console.log(timeSymbol());
 
-    // client sends client_year.JSON file
-    // this json has to be stored as <SESSION>.json
+    // client sends yearclient.JSON file
+    // this json has to be stored in heap
     var signup = "NO SESSION";
 
     let remote = req.socket.remoteAddress;
@@ -240,49 +253,48 @@ app.post("/UPLOAD", (req, res) => {
 
             // save file on server, not on client and forward to LOGIN page
             console.dir("0012 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
-            //Sheets.save2Server(req.body,client,year,res,"./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId);
+         
             // INSTEAD OF LOCAL FILE STORAGE
             Sheets.setSession(data);
-          
-            if(res) {
-            
-                // (A) REDIRECT TO FORWARD PAGE
-                //console.log("0014 app.post UPLOAD: redirecting to "+forwardURL);
-                //let forwardURL = "./WELCOME.HTML?client="+client+"&year="+year+"&sessionId="+sessionId
-                // -- NO PARMETERS res.redirect(forwardURL);
-                
-                /* B ETXRA WINDOW
-                res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-                res.end("<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>LOGIN</TITLE><BODY><A class='keyPanel' HREF="+
-                    forwardURL+">LOGIN</A></BODY><HTML>\n\n");
-                */
-
          
-            }
 
-            banner = login(sessionId);           
+            let banner = login(sessionId);           
             console.dir("0060 app.post UPLOAD "+banner);
 
+            let action = "/LOGIN";
             
-            signup = '<FORM METHOD="GET" ACTION="./LOGIN"><H1>'+year+'&nbsp'+client+'&nbsp;</H1>'+
+            signup = '<FORM METHOD="GET" ACTION=".'+action+'"><H1>'+year+'&nbsp'+client+'&nbsp;</H1>'+
                      '<INPUT TYPE="HIDDEN" NAME="year" VALUE="'+year+'"/>'+
                      '<INPUT TYPE="HIDDEN" NAME="client" VALUE="'+client+'"/>'+
                      '<INPUT TYPE="HIDDEN" NAME="sessionId" VALUE="'+sessionId+'"/>'+
                      '<INPUT TYPE="SUBMIT" NAME="submit" VALUE="LOGIN"/>'+
                      '</FORM>';
 
-            
+            let url = localhost() + ":"+ PORT + action + "?year="+year+"&client="+client+"&sessionId="+sessionId;            
+
+            qr.toDataURL(url, (err, qrCodeDataUrl) => {
+                if (err) res.send("Error occured");
+              
+                // Let us return the QR code image as our response and set it to be the source used in the webpage
+                const html = ejs.render('<img src="<%= qrCodeDataUrl %>" />', { qrCodeDataUrl });
+
+                console.dir("4000 app.post UPLOAD rendering QR code "+html);
+
+
+                res.header('Content-Type', 'text/html');
+                res.write(html+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`,'Closing'));
+                res.end();
+            });
+
+            console.dir("0070 app.post UPLOAD rendering QR code");
 
         } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
-
-        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});
-        res.end("\n<HTML><HEAD><LINK REL='stylesheet' HREF='./FBA/mobile_green.css'/></HEAD><TITLE>Welcome</TITLE><BODY>"+signup+"</BODY></HTML>\n"); 
 
         return;
     }
 
     // send back sessionId to client browser or file
-    res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
+    //res.writeHead(HTTP_WRONG, {"Content-Type": "text/html"});
     res.write("\n<HTML><HEAD><link rel='stylesheet' href='./FBA/mobile_green.css'/></HEAD><TITLE>UPLOAD Welcome</TITLE>INVALID SESSION FILE 'client' and/or 'year' missing</HTML>\n\n"); 
     res.end();
 });
@@ -973,29 +985,33 @@ function phaseOne(addrT, logT, aoaCells) {
 }
 
 
-function makeBanner(sessionId,year) {
-    var vbanner=[];
+function localhost() {
 
     var results = [];
-    if(sessionId) {
-        for (const name of Object.keys(nets)) {
-            for (const net of nets[name]) {
-                // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-                if (net.family === 'IPv4' && !net.internal) {
-                    if (!results[name]) {
-                        results[name] = [];
-                    }
-                    console.dir ( "OS["+name+"] info "+net.address);
-                    results.push({ 'type':name, 'addr':net.address});
+    
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+            if (net.family === 'IPv4' && !net.internal) {
+                if (!results[name]) {
+                    results[name] = [];
                 }
+                console.dir ( "OS["+name+"] info "+net.address);
+                results.push({ 'type':name, 'addr':net.address});
             }
         }
-        console.dir ( "OS.address  "+results[0].addr);
+    }
+    console.dir ( "OS.address  "+results[0].addr);
 
-        localhost = results[0].addr;
+    return results[0].addr;
+
+}
 
 
+function makeBanner(sessionId,year) {
+    var vbanner=[];
     
+    if(sessionId) {
         vbanner.push('<DIV class="attrRow">');
         /*
             vbanner.push('<SCRIPT>let a=document.createElement("a");a.href='
