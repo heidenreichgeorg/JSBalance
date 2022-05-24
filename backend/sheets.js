@@ -80,17 +80,18 @@ function sy_purgeCell(str) {
 
 
 
-//var sessionList = [];
-var sessionABC = {};
-function setSession(aSession) { sessionABC=aSession; }
+
+var arrSession = [];
+function setSession(aSession) { arrSession.push(aSession); }
 module.exports['setSession']=setSession;
 
 function get(id) { 
-
-    let result=sessionABC;
-
+    let result=null;
+    arrSession.forEach(session => {
+        if(session.id===id) result=session;
+    });
     if(result) {
-        console.log("\n1800 "+id+" => (id="+result.id+"  time="+result.time+"  client="+result.client+"  year="+result.year+")");
+        console.log("\n1800  => (SESSION  time="+result.time+"  client="+result.client+"  year="+result.year+")");
     }
 
     return result; 

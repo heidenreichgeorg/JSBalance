@@ -258,8 +258,8 @@ app.post("/UPLOAD", (req, res) => {
             Sheets.setSession(data);
          
 
-            let banner = login(sessionId);           
-            console.dir("0060 app.post UPLOAD "+banner);
+            //let banner = login(sessionId);           
+            //console.dir("0060 app.post UPLOAD "+banner);
 
             let action = "/LOGIN";
             
@@ -272,17 +272,21 @@ app.post("/UPLOAD", (req, res) => {
 
             let url = localhost() + ":"+ PORT + action + "?year="+year+"&client="+client+"&sessionId="+sessionId;            
 
+
+
             qr.toDataURL(url, (err, qrCodeDataUrl) => {
                 if (err) res.send("Error occured");
-              
+
+                res.header('Content-Type', 'text/html');
+                //res.write();
+            
                 // Let us return the QR code image as our response and set it to be the source used in the webpage
-                const html = ejs.render('<img src="<%= qrCodeDataUrl %>" />', { qrCodeDataUrl });
+                const html = ejs.render('<DIV class="attrRow"><img src="<%= qrCodeDataUrl %>" /></DIV>', { qrCodeDataUrl });
 
                 console.dir("4000 app.post UPLOAD rendering QR code "+html);
 
 
-                res.header('Content-Type', 'text/html');
-                res.write(html+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`,'Closing'));
+                res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`+'</DIV>','Closing'));
                 res.end();
             });
 
@@ -1037,8 +1041,8 @@ function makeBanner(sessionId,year) {
                 vbanner.push(buttonOpenTile(target+`/transfer?sessionId=${sessionId}`,'Transfer'));
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
-            vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
-            vbanner.push(buttonTab(target+`/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
+//            vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
+//            vbanner.push(buttonTab(target+`/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
         vbanner.push('</DIV>');
 
         console.log("0300 makeBanner OK");
