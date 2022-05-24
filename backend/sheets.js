@@ -82,8 +82,13 @@ function sy_purgeCell(str) {
 
 
 var arrSession = [];
-function setSession(aSession) { arrSession.push(aSession); }
+
+// GH20220524 HACK because 2nd push crashed
+// function setSession(aSession) {  arrSession= [ aSession ] ; } //
+
+function setSession(aSession) {  arrSession.push(aSession); }
 module.exports['setSession']=setSession;
+
 
 function get(id) { 
     let result=null;
@@ -402,7 +407,7 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
             if(client && year && session.sheetCells) {
 
                 var numLines = session.sheetCells.length;
-                if(debugWrite) console.log("1810 sheets.bookSheet ENTER "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
+                if(debugWrite) console.log("2010 sheets.bookSheet ENTER "+session.sheetName+ " for ("+client+","+year+") with "+numLines+" lines in sheet ");
                 
 //                let schemaLen = session.sheetCells[H_LEN].length;
                 if(tBuffer) {
@@ -414,17 +419,17 @@ function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
                     session.time=sessionTime;
                     session.id=nextSessionId;
 
-                    if(debugWrite) console.log("1820 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
+                    if(debugWrite) console.log("2020 sheets.bookSheet APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
 
                     setSession(session);
                 }
-                else if(debugWrite) console.log("1821 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
+                else if(debugWrite) console.log("2021 sheets.bookSheet SAVE NO booking statement tBuffer ("+client+","+year+") #"+numLines);
             }
-            else if(debugWrite) console.log("1823 sheets.bookSheet SAVE NO DATA ("+client+","+year+")") ;
+            else if(debugWrite) console.log("2023 sheets.bookSheet SAVE NO DATA ("+client+","+year+")") ;
         }
-        else if(debugWrite) console.log("1825 sheets.bookSheet SAVE NO sheetName"+sessionId);
+        else if(debugWrite) console.log("2025 sheets.bookSheet SAVE NO sheetName"+sessionId);
     }
-    else if(debugWrite) console.log("1827 sheets.bookSheet SAVE NO session"+sessionId);
+    else if(debugWrite) console.log("2027 sheets.bookSheet SAVE NO session"+sessionId);
 }
 module.exports['bookSheet']=bookSheet;
 

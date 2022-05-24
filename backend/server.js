@@ -249,8 +249,14 @@ app.post("/UPLOAD", (req, res) => {
         let sessionId = req.body.id;
         let fileId = strSymbol(time+client+year+time);
 
-        if(sessionId===fileId) { // 20220506
+        if(sessionId===fileId) { } 
+        else {
+            data.id  =fileId;
+            sessionId=fileId;
+        }
 
+
+        if(sessionId!=null && fileId!=null && year!=null && client!=null) {
             // save file on server, not on client and forward to LOGIN page
             console.dir("0012 app.post UPLOAD with client="+client+",year="+year+",time="+time+",r="+remote+"  ---> "+fileId);
          
@@ -283,16 +289,16 @@ app.post("/UPLOAD", (req, res) => {
                 // Let us return the QR code image as our response and set it to be the source used in the webpage
                 const html = ejs.render('<DIV class="attrRow"><img src="<%= qrCodeDataUrl %>" /></DIV>', { qrCodeDataUrl });
 
-                console.dir("4000 app.post UPLOAD rendering QR code "+html);
+                console.dir("4000 app.post UPLOAD rendering QR code with #"+html.length+ "chars");
 
 
-                res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`+'</DIV>','Closing'));
+                res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`+'&sender=WELCOME</DIV>','Closing'));
                 res.end();
             });
 
             console.dir("0070 app.post UPLOAD rendering QR code");
 
-        } else console.log ( "0011 UPLOAD "+sessionId+" INVALID session id "+fileId);
+        } else console.log ( "0011 UPLOAD client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+fileId);
 
         return;
     }
@@ -364,15 +370,15 @@ app.post("/BOOK", (req, res) => {
     if(sessionId) {
 
         // SECURITY SANITIZE req.body
-        let tBuffer = prepareTXN(req.query.sessionId,req.body);
+        let tBuffer = prepareTXN(sessionId,req.body);
 
         let session=Sheets.get(sessionId);
 
         let sessionTime=timeSymbol();
-        let nextSessionId= strSymbol(sessionTime+session.client+session.year+sessionTime);
+        let nextSessionId= sessionId; // HACK strSymbol(sessionTime+session.client+session.year+sessionTime);
 
         // modifies session object and stores it under new sessionId
-        Sheets.bookSheet(req.query.sessionId,tBuffer,sessionTime,nextSessionId);
+        Sheets.bookSheet(sessionId,tBuffer,sessionTime,nextSessionId);
         // 20220516 Sheets.xlsxWrite(req.query.sessionId,tBuffer,sessionTime,nextSessionId); 
         // state change in YYYYCCCC.json
 
@@ -565,16 +571,19 @@ app.get('/SHOW/', (req, res)    => {
     let session = Sheets.get(req.query.sessionId);
     
     //var strSession=['Session']; for(let key in session) strSession.push(key); console.log("Server.js SHOW session="+strSession.join(','));
+    if(session) {
+        let balance = phaseOne(session.addrT,session.logT, session.sheetCells);
 
-    let balance = phaseOne(session.addrT,session.logT, session.sheetCells);
+        console.dir("1920 app.get SHOW sends Balance ="+JSON.stringify(balance));
 
-    console.dir("1920 app.get SHOW sends Balance ="+JSON.stringify(balance));
+        //var strBalance=['Balance']; for(let key in balance) strBalance.push(key); console.log("Server.js SHOW balance="+strBalance.join(','));
 
-    //var strBalance=['Balance']; for(let key in balance) strBalance.push(key); console.log("Server.js SHOW balance="+strBalance.join(','));
+        res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
 
-    res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
-
-    Sender.send(res,balance); 
+        Sender.send(res,balance); 
+    }
+    else console.dir("1920 app.get SHOW - NO SESSION KNOWN");
+    res.end();
 })
 
 
@@ -1017,7 +1026,7 @@ function makeBanner(sessionId,year) {
     var vbanner=[];
     
     if(sessionId) {
-        vbanner.push('<DIV class="attrRow">');
+        vbanner.push('<DIV class="dosTable"><DIV class="attrRow">');
         /*
             vbanner.push('<SCRIPT>let a=document.createElement("a");a.href='
                     +`"http://${localhost}:${PORT}/JSIG?sessionId=${sessionId}";`
@@ -1034,6 +1043,7 @@ function makeBanner(sessionId,year) {
             vbanner.push(buttonOpenWide(target+`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
             vbanner.push(buttonOpenTile(target+`/history?sessionId=${sessionId}`,'History'));
             vbanner.push(buttonOpenTile(target+`/gainloss?sessionId=${sessionId}`,'GainLoss'));
+            vbanner.push('</DIV><DIV class="attrRow">');
             vbanner.push(buttonOpenTile(target+`/assets?sessionId=${sessionId}`,'Assets'));
             vbanner.push(buttonOpenTile(target+`/balance?sessionId=${sessionId}`,'AcctClose'));
             vbanner.push(buttonOpenTile(target+`/galshgb?sessionId=${sessionId}`,'GainlossHGB'));
@@ -1044,12 +1054,12 @@ function makeBanner(sessionId,year) {
             vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
 //            vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
 //            vbanner.push(buttonTab(target+`/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
-        vbanner.push('</DIV>');
+        vbanner.push('</DIV></DIV>');
 
         console.log("0300 makeBanner OK");
     
     } else return  '<DIV class = "mTable"><DIV class = "ulliTab"><DIV class = "attrRow">NO SESSION info</DIV></DIV></DIV>';
-    return '<SCRIPT type="text/javascript" src="/client.js"></SCRIPT><DIV class="mTable"><DIV class="wideTab">'+vbanner.join('')+'</DIV></DIV>';
+    return '<SCRIPT type="text/javascript" src="/client.js"></SCRIPT><DIV class="mTable"><DIV class="ulliTab">'+vbanner.join('')+'</DIV></DIV>';
 }
 
 
@@ -1160,64 +1170,69 @@ function prepareTXN(sessionId,reqBody) {
 
     let session = Sheets.get(sessionId);
 
-    var jFlag = reqBody.flag; if(!jFlag) jFlag=0;
-    var jDate = reqBody.date;
-    var jSender = reqBody.sender;
-    var jAcct = reqBody.refAcct;
-    var jSVWZ = reqBody.svwz;
-    var jSVWZ2 = reqBody.svwz2;
-    var jCredit = reqBody.credit;
-    var jDebit = reqBody.debit;
+    var bookingForm=null;
 
-    var bookingForm;
+    if(session) {
+        console.dir("server.js prepareTXN("+sessionId+") book "+JSON.stringify(reqBody));
 
-    // UNNECESSARY CREATION OF NEW SESSION FROM FILE READ !!
-    //var balance = Sheets.load(sessionId,phaseOne);
-    // needs sheets.load via expert as the only reader
-    var balance = phaseOne(session.addrT, session.logT, session.sheetCells);
-    //GH20220127
+        var jFlag = reqBody.flag; if(!jFlag) jFlag=0;
+        var jDate = reqBody.date;
+        var jSender = reqBody.sender;
+        var jAcct = reqBody.refAcct;
+        var jSVWZ = reqBody.svwz;
+        var jSVWZ2 = reqBody.svwz2;
+        var jCredit = reqBody.credit;
+        var jDebit = reqBody.debit;
 
 
-    if(balance && balance[D_Schema]) {
-
-        let year = balance[D_Schema].reportYear;
- 
-        if(Sheets.isSameFY(year) || jFlag) {
-
-            if(debug>0) console.log("server.js prepareTXN() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
+        // UNNECESSARY CREATION OF NEW SESSION FROM FILE READ !!
+        //var balance = Sheets.load(sessionId,phaseOne);
+        // needs sheets.load via expert as the only reader
+        var balance = phaseOne(session.addrT, session.logT, session.sheetCells);
+        //GH20220127
 
 
-            var total = balance[D_Schema].total;
-            var aLen = balance[D_Schema].assets;
+        if(balance && balance[D_Schema]) {
 
-            bookingForm = (CSEP.repeat(total)).split(CSEP);
+            let year = balance[D_Schema].reportYear;
+    
+            if(Sheets.isSameFY(year) || jFlag) {
 
-            bookingForm[0]= 1-jFlag;
-            bookingForm[1]=jDate;
-            bookingForm[2]=jSender;
-            bookingForm[3]=jAcct;
-            bookingForm[4]=jSVWZ;
-            bookingForm[5]=jSVWZ2;
-            
-            for(let money in jCredit) {
-                var factor=1;
-                var i=jCredit[money].index;
-                if(i>aLen) factor=-1;
-                bookingForm[i]=moneyString(setMoney(factor*jCredit[money].cents));
+                if(debug>0) console.log("server.js prepareTXN() "+JSON.stringify(jCredit)+"/ "+JSON.stringify(jDebit));
+
+
+                var total = balance[D_Schema].total;
+                var aLen = balance[D_Schema].assets;
+
+                bookingForm = (CSEP.repeat(total)).split(CSEP);
+
+                bookingForm[0]= 1-jFlag;
+                bookingForm[1]=jDate;
+                bookingForm[2]=jSender;
+                bookingForm[3]=jAcct;
+                bookingForm[4]=jSVWZ;
+                bookingForm[5]=jSVWZ2;
+                
+                for(let money in jCredit) {
+                    var factor=1;
+                    var i=jCredit[money].index;
+                    if(i>aLen) factor=-1;
+                    bookingForm[i]=moneyString(setMoney(factor*jCredit[money].cents));
+                }
+
+                for(let money in jDebit) {
+                    var factor=-1;
+                    var i=jDebit[money].index;
+                    if(i>aLen) factor=1;
+                    bookingForm[i]=moneyString(setMoney(factor * jDebit[money].cents));
+                }
+            } else { console.dir("server.js prepareTXN() rejects other fiscal year:"+year);
+                return null;
             }
+        } else console.error("server.js prepareTXN("+sessionId+") no BALANCE table ");
 
-            for(let money in jDebit) {
-                var factor=-1;
-                var i=jDebit[money].index;
-                if(i>aLen) factor=1;
-                bookingForm[i]=moneyString(setMoney(factor * jDebit[money].cents));
-            }
-        } else { console.dir("server.js prepareTXN() rejects other fiscal year:"+year);
-            return null;
-        }
-    } else console.error("server.js prepareTXN("+sessionId+") no BALANCE table ");
-
-    // receiver will append this to sheetCells
+    } else console.error("server.js prepareTXN("+sessionId+") no SESSION ");
+// receiver will append this to sheetCells
     return bookingForm;
 
 }
