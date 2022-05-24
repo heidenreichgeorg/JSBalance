@@ -1000,9 +1000,10 @@ function localhost() {
                 if (!results[name]) {
                     results[name] = [];
                 }
-                console.dir ( "OS["+name+"] info "+net.address);
+                console.dir ( "OS["+name+"] net info "+net.address);
                 results.push({ 'type':name, 'addr':net.address});
             }
+            console.dir ( "OS["+name+"]  other  "+JSON.stringify(net));
         }
     }
     console.dir ( "OS.address  "+results[0].addr);
