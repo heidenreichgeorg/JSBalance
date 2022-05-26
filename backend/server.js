@@ -45,6 +45,7 @@ const J_MINROW=7;
 
 
 //import { argv } from 'process';
+var instance=null;
 
 // print process.argv
 process.argv.forEach(function (val, index, array) {
@@ -55,6 +56,10 @@ process.argv.forEach(function (val, index, array) {
         if(attribute[0].toLowerCase()==='root') {
             Sheets.setRoot(attribute[1]);
             console.log("0006 Starting server SET ROOT TO " + Sheets.getRoot());
+        }        
+        else if(attribute[0].toLowerCase()==='inst') {
+            instance = attribute[1];
+            console.log("0008 Starting server SET INSTANCE " + instance);
         }        
     }
   });
@@ -276,7 +281,9 @@ app.post("/UPLOAD", (req, res) => {
                      '<INPUT TYPE="SUBMIT" NAME="submit" VALUE="LOGIN"/>'+
                      '</FORM>';
 
-            let url = localhost() + ":"+ PORT + action + "?year="+year+"&client="+client+"&sessionId="+sessionId;            
+
+            let cmd = action + "?year="+year+"&client="+client+"&sessionId="+sessionId;
+            let url = localhost() + ":"+ PORT + cmd;
 
 
 
@@ -292,7 +299,7 @@ app.post("/UPLOAD", (req, res) => {
                 console.dir("4000 app.post UPLOAD rendering QR code with #"+html.length+ "chars");
 
 
-                res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`+'&sender=WELCOME</DIV>','Closing'));
+                res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1><DIV class="attrRow"><A HREF="'+cmd+'">LOGIN</A></DIV>'+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`+'&sender=WELCOME</DIV>','Closing'));
                 res.end();
             });
 
@@ -371,9 +378,6 @@ app.post("/BOOK", (req, res) => {
 
         // SECURITY SANITIZE req.body
         let tBuffer = prepareTXN(sessionId,req.body);
-
-        let session=Sheets.get(sessionId);
-
         let sessionTime=timeSymbol();
         let nextSessionId= sessionId; // HACK strSymbol(sessionTime+session.client+session.year+sessionTime);
 
@@ -999,26 +1003,25 @@ function phaseOne(addrT, logT, aoaCells) {
 
 
 function localhost() {
-
-    var results = [];
-    
-    for (const name of Object.keys(nets)) {
-        for (const net of nets[name]) {
-            // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-            if (net.family === 'IPv4' && !net.internal) {
-                if (!results[name]) {
-                    results[name] = [];
+    if(!instance) {
+        var results = [];
+        for (const name of Object.keys(nets)) {
+            for (const net of nets[name]) {
+                // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+                if (net.family === 'IPv4' && !net.internal) {
+                    if (!results[name]) {
+                        results[name] = [];
+                    }
+                    console.dir ( "OS["+name+"] net info "+net.address);
+                    results.push({ 'type':name, 'addr':net.address});
                 }
-                console.dir ( "OS["+name+"] net info "+net.address);
-                results.push({ 'type':name, 'addr':net.address});
+                console.dir ( "OS["+name+"]  other  "+JSON.stringify(net));
             }
-            console.dir ( "OS["+name+"]  other  "+JSON.stringify(net));
         }
+        console.dir ( "OS.address  "+results[0].addr);
+        instance =  results[0].addr;
     }
-    console.dir ( "OS.address  "+results[0].addr);
-
-    return results[0].addr;
-
+    return instance;
 }
 
 
