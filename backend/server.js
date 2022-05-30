@@ -46,20 +46,25 @@ const J_MINROW=7;
 
 //import { argv } from 'process';
 var instance=null;
+var autoSave=36000000; // ten-hourly-save
 
 // print process.argv
 process.argv.forEach(function (val, index, array) {
-    if(debug>1) console.log("0002 Starting server " + index + ': ' + val);
+    if(debug>1) console.log("0000 Starting server " + index + ': ' + val);
     let attribute=val.split('=');
     if(index>1 && attribute && attribute.length>1) {
-        if(debug>1) console.log("0004 Attribute " + index + ': ' + val);
+        if(debug>1) console.log("0002 Attribute " + index + ': ' + val);
         if(attribute[0].toLowerCase()==='root') {
             Sheets.setRoot(attribute[1]);
-            console.log("0006 Starting server SET ROOT TO " + Sheets.getRoot());
+            console.log("0004 Starting server SET ROOT TO " + Sheets.getRoot());
         }        
         else if(attribute[0].toLowerCase()==='inst') {
             instance = attribute[1];
-            console.log("0008 Starting server SET INSTANCE " + instance);
+            console.log("0006 Starting server SET INSTANCE " + instance);
+        }        
+        else if(attribute[0].toLowerCase()==='auto') {
+            autoSave = parseInt(attribute[1])
+            console.log("0008 Starting server SET autoSave " + autoSave);
         }        
     }
   });
@@ -360,6 +365,22 @@ function login(sessionId) {
     let banner = makeBanner(sessionId,session.year);
 
     console.dir("0050 login() responds with banner="+banner);
+    
+    let autoId = sessionId;
+ 
+    // AUTO-SAVE
+    if(autoSave>10000) {
+        setInterval(function(){
+                console.log("\n********************************************\nTIMER STARTED AFTER "+autoSave);
+                //Sheets.xlsxWrite(autoId,null,'',''); 
+                let session = Sheets.get(autoId);
+                Sheets.save2Server(session,session.client,session.year);
+                console.log("TIMER SAVED JSON ("+session.client+","+session.year+") SESSION "+autoId);
+            }, 
+            autoSave); 
+    }
+
+
 
     return banner;
 }

@@ -369,30 +369,6 @@ function readNumeric(csvLines,makeMoneyFunc) {
 
 
 
-function start(sessionId,client,year,time,remote,phaseOneFunction) {
-    
-    var balance = [];
-    let addrT = null;
-    
-    if(time && time.length>4 && client && client.length>2 && year && year.length>3) {
-        console.dir("0410 sheets.start(sessionId "+sessionId+",client"+client+",year "+year+",time "+time+",remote "+remote+")");    
-
-        var session = create(client,year,time,remote,sessionId);
-        if(session.sheetCells && session.sheetCells.length>H_LEN) {
-
-            session.id = sessionId;
-            // generate session with symbolic string as extra credential parameter
-            // GLOBAL STATE CHANGE  without balance member GH20211120
-            setSession(session);
-
-            balance = phaseOneFunction(session.addrT,session.logT,session.sheetCells);
-            console.dir("0410 sheets.start() uses sessionId: "+sessionId);    
-
-        } else { console.log("0401 sheets.start() NO SHEET CELLS"); }
-    }
-    return balance; 
-}
-module.exports['start']=start;
 
 
 function bookSheet(sessionId,tBuffer,sessionTime,nextSessionId) {
@@ -517,14 +493,14 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
                         let len=session.sheetName.length;
                         if(len>6) {
 
-                            if(debugWrite) console.log("1450 sheets.xlsxWrite saveLatest("+arrTransaction+") to "+client+","+year);
+                            if(debugWrite) console.log("1450 sheets.xlsxWrite JSON save2Server("+arrTransaction+") to "+client+","+year);
                             save2Server(session,client,year);
                             
                         } else console.dir("1455 sheets.xlsxWrite can't write to "+session.sheetName);
 
                         if(debugWrite) console.log("1460 sheets.xlsxWrite APPEND  "+JSON.stringify(tBuffer)+" to ("+client+","+year+") #"+numLines);
                     }
-                    else if(debugWrite) console.log("1465 sheets.xlsxWrite SAVE NO JSON ("+client+","+year+") #"+numLines);
+                    else if(debugWrite) console.log("1465 sheets.xlsxWrite SAVE NO TRANSACTION ("+client+","+year+") #"+numLines);
 
 
 
@@ -602,91 +578,6 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
 module.exports['xlsxWrite']=xlsxWrite;
 
 
-
-function create(client,year,time,remote,sessionId) {
-    let sName=client+year;
-    
-    var session = { 'client':client,  'year':year,  'remote':remote,  'time':time,  'sheetCells':'', 'sheetName':client+year, 'id':sessionId, 'logT':[] };
-
-    setFileNameS(session,client,year,'BOOK','xlsx'); // async find a XLSX file and sets session.sheetFile
-    
-    var sFile=jsonMain(client,year,sessionId);
-    try {
-        console.log("0021 sheets.create MAIN "+sFile);
-        var json = JSON.parse(fs.readFileSync(sFile,{'encoding':'utf8'})); // was latin1 GH20211120
-        session.sheetCells = json.sheetCells;
-        console.log("0022 sheets.create reads MAIN JSON sheetCells#"+session.sheetCells.length);
-
-    }  catch (err) {
-        console.error('0023 sheets.create getSheet MAIN ERROR:'+err);
-        console.log(  '0023 sheets.create getFromFile MAIN used '+sFile);
-    }
-
-    var lFile=jsonLogf(client);
-    try {
-        console.log("0024 sheets.create LOGF "+lFile);
-        var logT = JSON.parse(fs.readFileSync(lFile,{'encoding':'utf8'})); // was latin1 GH20211120
-        if(debug>2) console.log("     sheets.create reads LOGF JSON content: "+JSON.stringify(logT));
-        session.logT = logT;
-        if(debug>0) console.log("     sheets.create reads LOGF JSON logt#"+session.logT.length);
-        
-    }  catch (err) {
-        session.logT = { };
-        console.error('0025 sheets.create LOGT ERROR:'+err);
-        console.log(  '0025 sheets.create LOGT used '+lFile);
-    }
-
-    /*
-    var lFile=jsonADDRf(client);
-    try {
-        console.log("Sheets.getSheet ADDRF "+lFile);
-        var ADDRT = JSON.parse(fs.readFileSync(lFile,{'encoding':'utf8'})); // was latin1 GH20211120
-        if(debug>2) console.log("getSheet reads ADDRF JSON content: "+JSON.stringify(ADDRT));
-        session.ADDRT = ADDRT;
-        if(debug>0) console.log("getSheet reads ADDRF JSON ADDRt#"+session.ADDRT.length);
-        
-    }  catch (err) {
-        session.ADDRT = { };
-        console.error(' sheets.getSheet ADDRT ERROR:'+err);
-        console.ADDR(' sheets.getFromFile ADDRT used '+lFile);
-    }
-    
-   // bootstrap
-    session.addrT = { 
-        "BundesanzeigerVerlag": [ "",                  "Amsterdamerstraße 192","Köln",   "50735"  ],
-        "Reichel":              [ "Schornsteinfeger",  "Bamberger Str. 10","Mühlhausen", "96172"  ],
-        "Joachim Dudek":        [ "Hausmeisterservice","Ritterspornweg 1" ,"Erlangen",   "91056"  ], 
-        "Ferguson":             [ "George",            "Eifelweg 22","Erlangen",         "91056"  ], 
-        "Roby Vau":             [ "Familie"           ,"Am Dummetsweiher 6", "Erlangen", "91056"  ],
-        "Kristina":             [ "Heidenreich"       ,"Hützel Bahnhof", "Bispingen",    "29646"  ]
-    };
-*/
-
-    setTimeout(function(){
-        let sFile = session.sheetFile;
-        if(sFile && sFile.length>3) {
-            session.sheetName=sName;
-            console.log('sheets.create getSheet finds '+sFile);
-        } else console.log('sheets.create getSheet finds NO sheetFile');
-
-
-        // CREATE JSON FROM EXCEL
-        if(!session.sheetCells || session.sheetCells.length<H_LEN) {
-            session.sheetCells = getFromFile(client,year,sFile,time,sName);
-
-            console.dir('sheets.create getSheet getFromFile reads '+session.sheetName+" with "+session.sheetCells.length+" lines.")
-
-            //console.log(' sheets.getFromFile reads '+session.sheetName); 
-            save2Server(session,client,year);       
-        }   
-    }, 2000);
-
-    logS(session,"getSheet");
-
-    console.dir('0026 sheets.create reads '+session.sheetName+" with "+session.sheetCells.length+" lines.")
-
-    return session;
-}
 
 
 
