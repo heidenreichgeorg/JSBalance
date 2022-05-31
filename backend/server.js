@@ -371,7 +371,7 @@ function login(sessionId) {
     // AUTO-SAVE
     if(autoSave>10000) {
         setInterval(function(){
-                console.log("\n********************************************\nTIMER STARTED AFTER "+autoSave);
+                console.log("\n********************************************\n"+autoSave+" passed: Timer saves at "+timeSymbol());
                 //Sheets.xlsxWrite(autoId,null,'',''); 
                 let session = Sheets.get(autoId);
                 Sheets.save2Server(session,session.client,session.year);
@@ -882,12 +882,12 @@ function phaseOne(addrT, logT, aoaCells) {
                                         // GH20220108  amount reduces the CURRent value
                                         var rest = moneyString(addEUMoney(curr,setEUMoney(amnt)));
 
-                                        // GH20220108 price is calculated as the INIT price per number of units
-                                        var price = getCost(idnt,nmbr,init);
+                                        // GH20220108 NEW cost is calculated as the INIT price per number of units
+                                        var cost = getCost(idnt,nmbr,rest);
 
                                         // OPEN
                                         // MUST VERIFY existing identifier
-                                        result[D_FixAss][idnt]={ "date":date, "type":type, "init":iVal,  "nmbr":nmbr, "idnt":idnt, "rest":rest, "cost":price  };
+                                        result[D_FixAss][idnt]={ "date":date, "type":type, "init":iVal,  "nmbr":nmbr, "idnt":idnt, "rest":rest, "cost":cost  };
                                         if(debug>1) console.log("YIELD "+idnt+" = "+result[D_FixAss][idnt].rest);
                                         } else  console.log("YIELD UNKNOWN "+idnt+" ASSET");
                                 } else {
