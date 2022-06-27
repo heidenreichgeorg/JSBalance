@@ -32,7 +32,7 @@ const XLSX = require('xlsx');
 
 const J_ACCT = 6;
 const H_LEN  = 7; // header length
-
+const J_MINROW = 7;
 
 var SERVEROOT= '/data/sessions/';
 const Slash = '/';
@@ -133,8 +133,8 @@ function getLatestFile(dir,files,lStart,lExt) {
 }
 
 
-
-async function setFileNameS(session,client,year,start,ext) {
+/*
+async function __setFileNameS(session,client,year,start,ext) {
 
     // directory path
     var result=null;
@@ -165,6 +165,7 @@ async function setFileNameS(session,client,year,start,ext) {
     });
 // unreached code
 }
+*/
 
 var found='';
 function getJSON() {
@@ -268,7 +269,7 @@ async function saveLogT(client,logT) {
 function readCSVFile(foundPath) {
     var aoaCells = [];
     if(foundPath) {
-        if(debug) console.log("server.readCSVFile reading "+foundPath);
+        if(debug) console.log("sheets.readCSVFile reading "+foundPath);
         try {
             // read contents of the file in ISO-8859-1 = latin1
             const data = fs.readFileSync(foundPath, 'latin1');       
@@ -279,7 +280,7 @@ function readCSVFile(foundPath) {
             aoaCells = readNumeric(csvLines,Money.setEUMoney); 
             
         }  catch (err) {
-            console.error('server.readCSVFile:'+err);
+            console.error('sheets.readCSVFile:'+err);
         }
     }
     return aoaCells;
@@ -411,6 +412,71 @@ module.exports['bookSheet']=bookSheet;
 
 
 
+function getNLine(aoaCells) {
+    // redundant, subset of Server.phaseOne, processes N line only
+    var result = [];
+    result[D_Schema]= {};
+    
+
+    // digest aoaCells and write into balance object
+    var lineCount=0;
+
+    if(aoaCells && aoaCells.length>J_MINROW) {
+
+        var numLines=aoaCells.length;
+
+        console.log("0100 sheets.getNLine() includes "+aoaCells[numLines-1].join('  '));
+
+        if(numLines>J_MINROW) {
+
+            try {
+                var iAssets=0;
+                var iEqLiab=0;
+                var iTotal=0;
+
+                // print all lines
+                aoaCells.forEach(row => {
+
+                    lineCount++;
+                    
+                    if(debug>3) console.log("0110 sheets.getNLine "+JSON.stringify(row));
+                        
+                    var column;
+                    var key=row[0];
+                    if(key && key==='N') {
+                        const aNames=row;
+                        result[D_Schema]["Names"]=aNames;
+                        result.writeTime = timeSymbol();
+                        if(debug>1) console.log("N at "+result.writeTime);
+                        var column;
+                        for(column=0;column<aNames.length && !(aNames[column].length>0 && aNames[column].length<4 && aNames[column].includes(CEND));column++) {
+                            var rawName=aNames[column];
+                            if(rawName && rawName.length>=COLMIN && column>=J_ACCT) {
+                                var aName=rawName.trim();
+                                if(debug>1) console.log("N "+aName);
+                                if(aName==='ASSETS') { iAssets=column;
+                                    result[D_Schema].assets=column;
+                                } else if(aName==='EQLIAB') { iEqLiab=column;
+                                    result[D_Schema].eqliab=column;
+                                } 
+                            }                    
+                        }
+                        iTotal=column;
+                        result[D_Schema].total=column;
+                    }
+                });
+            } catch (err) {
+                console.error('0125 sheets.js getNLine:'+err);
+                console.dir('0125 sheets.js getNLine:'+err);
+            }
+        }
+    }
+    return result;
+}
+
+
+
+
 // skip tBuffer ??
 function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
 
@@ -441,11 +507,23 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
                         numLines = session.sheetCells.length;
                         schemaLen = session.sheetCells[H_LEN].length;
                         // GH20220131
+                        let response = getNLine(session.addrT, session.logT, session.sheetCells);
+                        let aLen = response[D_Schema].assets;
                         console.dir("1410 sheets.xlsxWrite using schemaLen "+schemaLen+" for #"+numLines);
+
                         
                         for(;r<numLines;r++) {
                             var arrTransaction = numericSheet(session.sheetCells[r],schemaLen);
                             arrTransaction.push(CEND);
+
+                            // 20220627 add ASSET sum
+                            /*arrTransaction
+                            var aSum= { 'cents':0 };
+                            for(var i=0;i<aLen;i++) {
+
+                            }
+                            */
+
                             excelData.push(arrTransaction);
                         }
                     } else console.error("1415 sheets.xlsxWrite NO sheetCells");

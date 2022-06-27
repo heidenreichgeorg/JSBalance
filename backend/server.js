@@ -1,3 +1,7 @@
+// cd backend
+// node server.js root=d:\Privat\ auto=900000
+
+
 let debug=1;
 
 // Imports
@@ -46,7 +50,7 @@ const J_MINROW=7;
 
 //import { argv } from 'process';
 var instance=null;
-var autoSave=36000000; // ten-hourly-save
+var autoSave=36000000; // seconds, defaults to ten-hourly-save
 
 // print process.argv
 process.argv.forEach(function (val, index, array) {
@@ -63,8 +67,9 @@ process.argv.forEach(function (val, index, array) {
             console.log("0006 Starting server SET INSTANCE " + instance);
         }        
         else if(attribute[0].toLowerCase()==='auto') {
-            autoSave = parseInt(attribute[1])
-            console.log("0008 Starting server SET autoSave " + autoSave);
+            let autoSec = parseInt(attribute[1]);
+            autoSave = autoSec * 1000;
+            console.log("0008 Starting server SET autoSave " + autoSec+ " [sec.]");
         }        
     }
   });
@@ -369,13 +374,20 @@ function login(sessionId) {
     let autoId = sessionId;
  
     // AUTO-SAVE
-    if(autoSave>10000) {
+    if(autoSave>100000) {
         setInterval(function(){
-                console.log("\n********************************************\n"+autoSave+" passed: Timer saves at "+timeSymbol());
-                //Sheets.xlsxWrite(autoId,null,'',''); 
+                let timeStr = timeSymbol();
+                console.log("\n********************************************\n"+autoSave+" passed: Timer saves at "+dateFormat(timeStr));
+
+                // auto-save XLSX
+                Sheets.xlsxWrite(autoId,null,'',''); 
+                console.log("TIMER SAVED XLSX ("+session.client+","+session.year+") SESSION "+autoId);
+                
+                /*
                 let session = Sheets.get(autoId);
-                Sheets.save2Server(session,session.client,session.year);
+                Sheets.save2Server(session,session.client,session.year);                
                 console.log("TIMER SAVED JSON ("+session.client+","+session.year+") SESSION "+autoId);
+                */
             }, 
             autoSave); 
     }
@@ -384,8 +396,6 @@ function login(sessionId) {
 
     return banner;
 }
-
-
 
 app.post("/BOOK", (req, res) => { 
     console.log("\n\n");
@@ -634,10 +644,6 @@ app.listen(PORT, () => {
     console.log(`Server    http://ec2-A-B-C-D.compute-1.amazonaws.com:${PORT}/welcomedrop`); 
     console.log(`Local     http://localhost:${PORT}/welcomedrop`); 
 })
-
-
-
-
 
 
 
@@ -1076,7 +1082,7 @@ function makeBanner(sessionId,year) {
                 vbanner.push(buttonOpenTile(target+`/transfer?sessionId=${sessionId}`,'Transfer'));
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
-//            vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
+            vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
 //            vbanner.push(buttonTab(target+`/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
         vbanner.push('</DIV></DIV>');
 
@@ -1271,4 +1277,8 @@ function timeSymbol() { // same as in client.js
       ('0' + u.getUTCSeconds()).slice(-2) +
       (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
 };     
+
+function dateFormat(timeStr) {
+    return timeStr.slice(0,4)+"-"+timeStr.slice(4,6)+"-"+timeStr.slice(6,8)+"  "+timeStr.slice(8,10)+":"+timeStr.slice(10,12);
+}
 
