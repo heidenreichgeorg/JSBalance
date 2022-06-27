@@ -1,0 +1,4 @@
+cd JSBalance
+cd backend
+sudo node server.js inst=/data/sessions auto=3600
+
