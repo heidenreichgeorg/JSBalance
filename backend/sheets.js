@@ -30,9 +30,10 @@ const XLSX = require('xlsx');
 //const { pseudoRandomBytes } = require('crypto');
 
 
-const J_ACCT = 6;
 const H_LEN  = 7; // header length
 const J_MINROW = 7;
+const J_ACCT = 6;
+const COLMIN = 2;
 
 var SERVEROOT= '/data/sessions/';
 const Slash = '/';
@@ -227,8 +228,8 @@ function numericSheet(tBuffer,schemaLen) {
             if(i>=J_ACCT && ((tBuffer[0]=='A') || (parseInt(tBuffer[0])>0))) {
                 // EU to EN
                 let value=parseFloat(cell.replace('\.','').replace(',','\.'));
-                //if(typeof value ==='number') result[i]=Money.cents2Excel(Money.setEUMoney(cell).cents);               
-                if(typeof value === 'number') result[i]=value;
+                
+                if(typeof value === 'number' && !Number.isNaN(value)) result[i]=value;
                 
 
                 //GH20211026 side-effect: clean tBuffer
@@ -446,8 +447,6 @@ function getNLine(aoaCells) {
                     if(key && key==='N') {
                         const aNames=row;
                         result[D_Schema]["Names"]=aNames;
-                        result.writeTime = timeSymbol();
-                        if(debug>1) console.log("N at "+result.writeTime);
                         var column;
                         for(column=0;column<aNames.length && !(aNames[column].length>0 && aNames[column].length<4 && aNames[column].includes(CEND));column++) {
                             var rawName=aNames[column];
@@ -507,27 +506,48 @@ function xlsxWrite(sessionId,tBuffer,sessionTime,nextSessionId) {
                         numLines = session.sheetCells.length;
                         schemaLen = session.sheetCells[H_LEN].length;
                         // GH20220131
-                        let response = getNLine(session.addrT, session.logT, session.sheetCells);
-                        let aLen = response[D_Schema].assets;
-                        console.dir("1410 sheets.xlsxWrite using schemaLen "+schemaLen+" for #"+numLines);
+                        let response = getNLine(session.sheetCells);
+                        let aLen = parseInt(response[D_Schema].assets);
+                        let eLen = parseInt(response[D_Schema].eqliab);
+                        console.dir("1410 sheets.xlsxWrite using aLen "+aLen+" schemaLen "+schemaLen+" for #"+numLines);
 
-                        
+                        var aCentsTotal=0;
+                        var eCentsTotal=0;
                         for(;r<numLines;r++) {
-                            var arrTransaction = numericSheet(session.sheetCells[r],schemaLen);
-                            arrTransaction.push(CEND);
+                            let arrNum = session.sheetCells[r];
 
-                            // 20220627 add ASSET sum
-                            /*arrTransaction
-                            var aSum= { 'cents':0 };
-                            for(var i=0;i<aLen;i++) {
+                            if(parseInt(arrNum[0])>0) {
+                            
+                                // 20220627 add all-String ASSET sum to arrTransaction
+                                var centsSum=0;
+                                for(var col=J_ACCT;col<aLen;col++) {
+                                    let cVal = Money.setEUMoney(arrNum[col]).cents;
+                                    if(cVal!=0) centsSum = cVal+centsSum;
+                                }
+                                arrNum[aLen]=Money.cents2EU(centsSum);
+                                if(centsSum!=0) {
+                                    aCentsTotal=aCentsTotal+centsSum;
+                                }
 
+                                // 20220628 add all-String GALS,EQLIAB sum to arrTransaction
+                                centsSum=0;
+                                for(var col=aLen+1;col<schemaLen;col++) {
+                                    let cVal = Money.setEUMoney(arrNum[col]).cents;
+                                    if(cVal!=0 && col!=eLen) centsSum = cVal+centsSum;
+                                }
+                                arrNum[eLen]=Money.cents2EU(centsSum);
+                                if(centsSum!=0) {
+                                    eCentsTotal=eCentsTotal+centsSum;
+                                }
                             }
-                            */
-
+                            
+                            var arrTransaction = numericSheet(arrNum,schemaLen);
+                            arrTransaction.push(CEND);
                             excelData.push(arrTransaction);
                         }
                     } else console.error("1415 sheets.xlsxWrite NO sheetCells");
 
+                    console.dir("1416 sheets.xlsxWrite "+numLines+" lines with ASSETS "+Money.cents2EU(aCentsTotal)+"  and GALS+EQLIAB="+Money.cents2EU(eCentsTotal));
 
                     var excelLogT=[];            
                     var numLogs = 0;

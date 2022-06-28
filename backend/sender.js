@@ -407,7 +407,7 @@ module.exports['sendBalance']=sendBalance;
 function distribute(money,partners,target) {      
     if(debug) console.log('__________');
     var strNumber="0,00";
-    if(typeof(money)=='Number') {
+    if(typeof(money)=='number' && !Number.isNaN(money)) {
         strNumber=(100*money).toString();
         //console.log("sender.js distribute("+target+") format number="+money+ " string="+strNumber);
     } 

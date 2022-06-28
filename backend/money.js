@@ -29,9 +29,6 @@
         if(strAdd) {
 
             
-            //if(typeof strAdd ==='number') { strAdd=strAdd.toString().replace('.', ',').trim(); }
-            //else console.log("addEUMoney "+strAdd+" + "+JSON.stringify(money));
-
             var amount = strAdd.split(',');
             var plain = amount[0].replace('.', '').trim(); 
             if(plain.startsWith('-')) { factor=-1; plain=plain.slice(1); }
@@ -78,10 +75,6 @@
         var factor=1;
         if(strSet && strSet.length>0) {
 
-            //if(typeof strSet ==='number') { strSet=strSet.toString().replace('.', ',').trim(); }
-            //else console.log("addENMoney "+strSet+" + "+JSON.stringify(money));
-
-
             var amount = strSet.split(',');
             var plain = amount[0].replace('.', '').trim(); 
             if(plain.startsWith('-')) { factor=-1; plain=plain.slice(1); }
@@ -109,10 +102,6 @@
         var cents=0;
         var factor=1;
         if(strSet && strSet.length>0) {
-
-            //if(typeof strSet ==='number') { strSet=strSet.toString().replace('.', ',').trim(); }
-            //else console.log("addENMoney "+strSet+" + "+JSON.stringify(money));
-
 
             var amount = strSet.split('.');
             var plain = amount[0].replace(',', '').trim(); 
@@ -153,9 +142,6 @@
         var cents=0;
         var factor=1.0;
         if(strSub) {
-           // if(typeof strSub ==='number') { strSub=strSub.toString().replace('.', ',').trim(); }
-           // else console.log("addENMoney "+strSub+" + "+JSON.stringify(money));
-
 
             var amount = strSub.split(',');
             var plain = amount[0].replace('.', '').trim(); 
@@ -189,15 +175,13 @@
         var euros=0;
         var cents=0;
         if(strAddEN) {
-           // if(typeof strAddEN ==='number') { strAddEN=strAddEN.toString().trim(); }
-           // else console.log("addENMoney "+strAddEN+" + "+JSON.stringify(money));
 
             var amount = strAddEN.split('.');
             var plain = amount[0].replace(',', '').trim(); 
             if(plain.startsWith('-')) { factor=-1 * factor; plain=plain.slice(1); }
             euros = parseInt(('0'+plain),10);
             if(amount.length>1) { // GH 20201117
-    //			if(euros<0) { euros=Math.abs(euros); factor=-1*factor; }
+    
                 const digits=amount[1]+"00";
                 const strDigits=digits[0]+digits[1];
                 cents=parseInt(strDigits,10);
