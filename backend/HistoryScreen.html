@@ -89,6 +89,9 @@
             
             function putResponse(strTarget,strText) {       
 
+                console.log("HistoryScreen.html.putResponse.strTarget="+strTarget);
+
+
                 var response = JSON.parse(strText);
                 var jHistory  = response[D_History];
                 var arrHistory = [];                
@@ -97,6 +100,7 @@
                 var eLen = response[D_Schema].eqliab;
                 var gSchema = response[D_Schema];
                 let page = response[D_Page];
+
 
                 var boxFooter="";
                 if(page) {
@@ -107,8 +111,12 @@
                     let htmlPage = createPage(['C140','C140','C140','C140','C140','C140'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                     var cursor=htmlPage;
 
-                    console.log(JSON.stringify(page))
+
+                    console.log("HistoryScreen.html.putResponse.strText="+JSON.stringify(page))
                     
+                    // 20220701
+                    var pattern = getPattern();
+                    if(pattern && pattern.length<2) pattern=null;
 
 
                     if(gSchema.Names && gSchema.Names.length>0) {
@@ -120,93 +128,91 @@
 
                             var iBalance=0;
 
-                            var txn = jHistory[hash];
-                            if(txn && txn.length>0) {
+                            let parts = jHistory[hash];
+                            if(parts && parts.length>0) {
 
-                                var parts=txn;// server made each line an array already
-                                var entry = [];
-                                var credit = ['&nbsp;'];
-                                var debit = ['','AN'];
-                                var delta = [];
+                                // 20220701
+                                let txnLine = parts.join('');
+                                if(!pattern || txnLine.includes(pattern)) {
 
-                                // skip hash or index
-                                for(var i=1;i<J_ACCT && i<parts.length;i++) {
-                                    if(parts[i] && parts[i].length>COLMIN) entry.push(parts[i].substring(0,iCpField)); 
-                                    else entry.push(' ');
+                                    var entry = [];
+                                    var credit = ['&nbsp;'];
+                                    var debit = ['','AN'];
+                                    var delta = [];
 
-                                }
-                                for(var i=J_ACCT;i<parts.length;i++) {
-                                    if(parts[i] && parts[i].length>0) { 
+                                    // skip hash or index
+                                    for(var i=1;i<J_ACCT && i<parts.length;i++) {
+
+                                        if(parts[i] && parts[i].length>COLMIN) 
+                                            entry.push(parts[i].substring(0,iCpField)); 
+                                        else entry.push(' ');
                                         
-                                        // GH20220307 EU-style numbers
-                                        let item = parseInt(parts[i]);
+                                    }
+                                    for(var i=J_ACCT;i<parts.length;i++) {
+                                        if(parts[i] && parts[i].length>0) { 
+                                            
+                                            // GH20220307 EU-style numbers
+                                            let item = parseInt(parts[i]);
 
-                                        if(item!=0) {
-                                            delta.push(names[i]+DOUBLE+parts[i]); 
+                                            if(item!=0) {
+                                                delta.push(names[i]+DOUBLE+parts[i]); 
 
-                                            // GH20220307
-                                            let value = setEUMoney(parts[i]);
-                                            if(i<aLen) iBalance += value.cents;
-                                            else if(i!=aLen && i!=eLen) iBalance -= value.cents;
-                                            console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
+                                                // GH20220307
+                                                let value = setEUMoney(parts[i]);
+                                                if(i<aLen) iBalance += value.cents;
+                                                else if(i!=aLen && i!=eLen) iBalance -= value.cents;
+                                                console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
+                                            }
+
+                                            // POS ASSET
+                                            if(item>0 && i<aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i]);                                        
+                                        
+                                            // NEG EQLIAB
+                                            if(item<0 && i>aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i].replace('-',''));
+                                        
+                                            // NEG ASSET
+                                            if(item<0 && i<aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i].replace('-',''));
+                                        
+                                            // POS EQLIAB
+                                            if(item>0 && i>aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i]);
                                         }
-
-                                        // POS ASSET
-                                        if(item>0 && i<aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i]);                                        
-                                    
-                                        // NEG EQLIAB
-                                        if(item<0 && i>aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i].replace('-',''));
-                                    
-                                        // NEG ASSET
-                                        if(item<0 && i<aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i].replace('-',''));
-                                    
-                                        // POS EQLIAB
-                                        if(item>0 && i>aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i]);
                                     }
-                                }
-
-                                let deltaText = "'"+delta.join(CSEP)+"'";
-                                let boxHead = "'"+entry.join(CSEP)+"'";   
-                                let boxText = "'"+credit.join(CSEP)+CSEP+debit.join(CSEP)+"'";   
-                                let boxNote = "'"+page["author"].replace('&nbsp;',CSEP)+"'";                 
-                                
                                 
 
-
-                                let balCheck= '<DIV class="L66">'+cents2EU(iBalance)+'</DIV>';
-                                console.dir("LINE "+bLine+" --> "+iBalance);
-                                console.dir();
-
-                                let data = (
-                                          entry.join(CSEP)
-                                    +CSEP+credit.join(CSEP)
-                                    +CSEP+debit.join(CSEP)).split(CSEP);
+                                    let deltaText = "'"+delta.join(CSEP)+"'";
+                                    let boxHead = "'"+entry.join(CSEP)+"'";   
+                                    let boxText = "'"+credit.join(CSEP)+CSEP+debit.join(CSEP)+"'";   
+                                    let boxNote = "'"+page["author"].replace('&nbsp;',CSEP)+"'";                 
+                                    
+                                    
 
 
+                                    let balCheck= '<DIV class="L66">'+cents2EU(iBalance)+'</DIV>';
+                                    console.dir("LINE "+bLine+" --> "+iBalance);
+                                    console.dir();
 
-                                var i=0;
-                                var htmlLine=['<DIV class="key" id="Show'+hash+'" value="'+hash+'" onclick="showModalPopUp('+boxHead+','+boxText+','+boxNote+')">Show</DIV>',
-                                              '<DIV class="key" id="Log'+hash+'"  value="'+hash+'"  onclick="storeInLog('+boxHead+','+deltaText+')">Log</DIV>'];
+                                    let data = (
+                                            entry.join(CSEP)
+                                        +CSEP+credit.join(CSEP)
+                                        +CSEP+debit.join(CSEP)).split(CSEP);
 
-                                for (;i<data.length;i++) {
-                                    let text = '<DIV class="L120">'+data[i]+'</DIV>';
-                                    htmlLine.push(text);
-                                    if(i%6==5 || (i+1)>=data.length) { 
-                                        cursor=printHTML(cursor,htmlLine.join(''));
-                                        htmlLine=[];
+
+
+                                    var i=0;
+                                    var htmlLine=['<DIV class="key" id="Show'+hash+'" value="'+hash+'" onclick="showModalPopUp('+boxHead+','+boxText+','+boxNote+')">Show</DIV>',
+                                                '<DIV class="key" id="Log'+hash+'"  value="'+hash+'"  onclick="storeInLog('+boxHead+','+deltaText+')">Log</DIV>'];
+
+                                    for (;i<data.length;i++) {
+                                        let text = '<DIV class="L120">'+data[i]+'</DIV>';
+                                        htmlLine.push(text);
+                                        if(i%6==5 || (i+1)>=data.length) { 
+                                            cursor=printHTML(cursor,htmlLine.join(''));
+                                            htmlLine=[];
+                                        }
                                     }
+
                                 }
 
-
-
-/*
-                                let butInfo = +
-                                              ;
-                                cursor=printFormat(cursor,entry,(iBalance==0) ? butInfo : balCheck); // 20220307
-
-
-                                cursor=printFormat(cursor,credit.concat(debit));
-*/
 
                             } else {
                                 // ERROR out
@@ -217,13 +223,20 @@
 
                         // GH20211028
                         // modify to show reverse order
-
                         /*
                         if(arrHistory) {
                             arrHistory.push('<DIV class="attrLine">&nbsp;</DIV>');                            
                             arrHistory.reverse();
                         }
                         */
+
+
+                        // 20220701 search pattern 
+                        let sessionId = getId();
+                        let searchForm = "<FORM><DIV class='L120'>&nbsp;"
+                        +"</DIV><DIV class='L280'><INPUT TYPE='edit' NAME='PATTERN'/><INPUT TYPE='hidden' NAME='sessionId' VALUE='"+sessionId+"'/>"
+                        +"</DIV><BUTTON autofocus class='L40'> Search </BUTTON></FORM>";
+                        cursor=printHTML(cursor,searchForm);
 
                         setTrailer(page, cursor);
                         setScreen(document,htmlPage);

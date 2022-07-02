@@ -933,9 +933,20 @@ function getId() {
     var searchParams = new URL(window.location.href).searchParams;
     //Iteriert über die Suchparameter
     for (let p of searchParams) {
-      console.log("CLIENT "+p);
+      console.log("client.getId "+p);
     }
     return searchParams.get("sessionId");
+}
+
+
+function getPattern() {
+    
+    var searchParams = new URL(window.location.href).searchParams;
+    //Iteriert über die Suchparameter
+//    for (let p of searchParams) {
+//        console.log("CLIENT-PATTERN "+p);
+//    }
+    return searchParams.get("PATTERN");
 }
 
 
