@@ -939,14 +939,14 @@ function getId() {
 }
 
 
-function getPattern() {
+function getParam(strParam) {
     
     var searchParams = new URL(window.location.href).searchParams;
     //Iteriert über die Suchparameter
 //    for (let p of searchParams) {
 //        console.log("CLIENT-PATTERN "+p);
 //    }
-    return searchParams.get("PATTERN");
+    return searchParams.get(strParam);
 }
 
 

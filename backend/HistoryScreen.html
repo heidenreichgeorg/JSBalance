@@ -115,8 +115,8 @@
                     console.log("HistoryScreen.html.putResponse.strText="+JSON.stringify(page))
                     
                     // 20220701
-                    var pattern = getPattern();
-                    if(pattern && pattern.length<2) pattern=null;
+                    var lpattern = getParam("LPATTERN");
+                    if(lpattern && lpattern.length<2) lpattern=null;
 
 
                     if(gSchema.Names && gSchema.Names.length>0) {
@@ -131,9 +131,14 @@
                             let parts = jHistory[hash];
                             if(parts && parts.length>0) {
 
-                                // 20220701
+                                // GH20220703
+                                var apattern = getParam("APATTERN");
+                                var txnAcct = (!apattern || apattern.length<2);
+
+
+                                // GH20220701
                                 let txnLine = parts.join('');
-                                if(!pattern || txnLine.includes(pattern)) {
+                                if(!lpattern || txnLine.includes(lpattern)) {
 
                                     var entry = [];
                                     var credit = ['&nbsp;'];
@@ -153,6 +158,11 @@
                                             
                                             // GH20220307 EU-style numbers
                                             let item = parseInt(parts[i]);
+
+                                            
+                                            // GH20220703
+                                            if(names[i].includes(apattern)) txnAcct=true;
+
 
                                             if(item!=0) {
                                                 delta.push(names[i]+DOUBLE+parts[i]); 
@@ -202,6 +212,12 @@
                                     var htmlLine=['<DIV class="key" id="Show'+hash+'" value="'+hash+'" onclick="showModalPopUp('+boxHead+','+boxText+','+boxNote+')">Show</DIV>',
                                                 '<DIV class="key" id="Log'+hash+'"  value="'+hash+'"  onclick="storeInLog('+boxHead+','+deltaText+')">Log</DIV>'];
 
+
+
+                                    // GH 20220703
+                                    if(txnAcct)
+
+
                                     for (;i<data.length;i++) {
                                         let text = '<DIV class="L120">'+data[i]+'</DIV>';
                                         htmlLine.push(text);
@@ -233,9 +249,12 @@
 
                         // 20220701 search pattern 
                         let sessionId = getId();
-                        let searchForm = "<FORM><DIV class='L120'>&nbsp;"
-                        +"</DIV><DIV class='L280'><INPUT TYPE='edit' NAME='PATTERN'/><INPUT TYPE='hidden' NAME='sessionId' VALUE='"+sessionId+"'/>"
-                        +"</DIV><BUTTON autofocus class='L40'> Search </BUTTON></FORM>";
+                        let searchForm = "<FORM><DIV class='L280'>"
+                            +"<BUTTON autofocus class='L66'>Search</BUTTON>"
+                            +"Line:<INPUT TYPE='edit' NAME='LPATTERN'/>&nbsp;"
+                        +"</DIV><DIV class='L280'>"
+                            +"Acct:<INPUT TYPE='edit' NAME='APATTERN'/>"
+                        +"</DIV><INPUT TYPE='hidden' NAME='sessionId' VALUE='"+sessionId+"'/></FORM>";
                         cursor=printHTML(cursor,searchForm);
 
                         setTrailer(page, cursor);
