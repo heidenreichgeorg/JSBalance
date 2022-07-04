@@ -466,12 +466,14 @@ app.get("/DOWNLOAD", (req, res) => {
         console.log("1510 app.post DOWNLOAD for year"+session.year);
 
         let sessionTime=timeSymbol();
+        let monthYearHour = sessionTime.slice(4,10);
+
         Sheets.xlsxWrite(sessionId,null,sessionTime,sessionId); 
         console.log("1530 app.post DOWNLOAD writing XLSX");
 
 
         // download JSON
-        let fileName = session.year+session.client+'.json';
+        let fileName = session.year+session.client+monthYearHour+'.json';
         console.log("1530 app.post DOWNLOAD download JSON as "+fileName);
         res.set('Content-Disposition', 'attachment; fileName='+fileName);
         res.json(session);    

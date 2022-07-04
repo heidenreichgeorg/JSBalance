@@ -20,7 +20,28 @@
     <div class="dosBorder">
         <div class="mTable" >
                 <div class="ulliTab"  height="700px">
-                    <DIV class="attrLine" id="welcome"></DIV>            
+                    <DIV class="attrLine" id="welcome1"></DIV>            
+                    <DIV class="attrLine" id="welcome2"></DIV>            
+                    <DIV class="attrLine" id="welcome3"></DIV>            
+                    <DIV class="attrLine" id="welcome4"></DIV>            
+                    <DIV class="attrLine" id="welcome5"></DIV>            
+                    <DIV class="attrLine" id="welcome6"></DIV>            
+                    <DIV class="attrLine" id="welcome7"></DIV>            
+                    <DIV class="attrLine" id="welcome8"></DIV>            
+                    <DIV class="attrLine" id="welcome9"></DIV>            
+                    <DIV class="attrLine" id="welcomeA"></DIV>            
+                    <DIV class="attrLine" id="welcomeB"></DIV>            
+                    <DIV class="attrLine" id="welcomeC"></DIV>            
+                    <DIV class="attrLine" id="welcomeD"></DIV>            
+                    <DIV class="attrLine" id="welcomeE"></DIV>            
+                    <DIV class="attrLine" id="welcomeF"></DIV>            
+                    <DIV class="attrLine" id="welcomeG"></DIV>            
+                    <DIV class="attrLine" id="welcomeH"></DIV>            
+                    <DIV class="attrLine" id="welcomeI"></DIV>            
+                    <DIV class="attrLine" id="welcomeJ"></DIV>            
+                    <DIV class="attrLine" id="welcomeK"></DIV>            
+                    <DIV class="attrLine" id="welcomeL"></DIV>            
+                    <DIV class="attrLine" id="welcomeM"></DIV>            
                     <DIV  id='selAccount'></DIV>
                     <DIV id='tabHistory'></DIV>
                     <DIV  id='display'></DIV>
@@ -82,15 +103,6 @@
                 var cDisplay = document.getElementById("display");
                 cDisplay.innerHTML = page["Closing"];
 
-                /*
-                var welcome = document.getElementById("welcome");
-                welcome.innerHTML = "<DIV class='L120'>"+client
-                +"</DIV><DIV class='L220'>"+register+"&nbsp;"+taxnumber
-                +"</DIV><DIV class='L220'>"+iban+"&nbsp;"+reportYear
-                +"</DIV><DIV class='L220'>"+author+"&nbsp; "+residence
-                    +'</DIV><DIV class="C100"><button id="read-button" onclick="bookTax()" )>NEXT</button> '
-                +"</DIV>";
-                */
             }
             console.log('Schema='+JSON.stringify(gSchema));
 
@@ -152,17 +164,8 @@
             handleEvent(event);
             let sessionId = paramString.split('=')[1];
             console.log("1210 CloseAndSave downloadJSON sessionId = "+sessionId);
-            
-
-            //(A) sk the server
-            //let jInfo = { "sessionId" :sessionId };
-            //let sInfo = JSON.stringify(jInfo);
-
-            // 20220520 postAndDisplay("DOWNLOAD",  jInfo , 80 ); // writes CLSX file, no JSON
-
 
             window.open('/DOWNLOAD?sessionId='+sessionId);
-
 
             console.log("1290 CloseAndSave downloadJSON EXIT");
             // closeWindow();
