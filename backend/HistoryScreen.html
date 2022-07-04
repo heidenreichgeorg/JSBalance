@@ -138,7 +138,7 @@
 
                                 // GH20220701
                                 let txnLine = parts.join('');
-                                if(!lpattern || txnLine.includes(lpattern)) {
+                                if(!lpattern || txnLine.toLowerCase().includes(lpattern.toLowerCase())) {
 
                                     var entry = [];
                                     var credit = ['&nbsp;'];
@@ -161,7 +161,10 @@
 
                                             
                                             // GH20220703
-                                            if(names[i].includes(apattern)) txnAcct=true;
+                                            if(    !txnAcct
+                                                && names[i] && names[i].length>1 
+                                                && apattern && apattern.length>1 
+                                                && names[i].toLowerCase().includes(apattern.toLowerCase())) txnAcct=true;
 
 
                                             if(item!=0) {
