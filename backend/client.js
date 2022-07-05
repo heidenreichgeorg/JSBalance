@@ -125,6 +125,8 @@ function postAndDisplay(strCommand,jBody,height) {
     let panel = window.open("", 'Panel',' height='+height+', width=1480, left=1, top='+top+', resizable=no , scrollbars=no  ,toolbar=no ,menubar=no ,location=no ,directories=no ,status=no ');
     panel.document.open();
 
+    console.log("\n\n"+timeSymbol()+' POST data new window opened')
+
     // send POST request
     fetch(url, options)
        .then((resp) => resp.text())
@@ -134,6 +136,7 @@ function postAndDisplay(strCommand,jBody,height) {
           //var page = document.getElementById(target)
           //if(page) page.innerHTML = data;
           panel.document.write(data);
+          console.log(timeSymbol()+' POST data written to new window')
           panel.focus();        
                 })
        .catch(function(error) {

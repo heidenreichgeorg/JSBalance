@@ -224,17 +224,17 @@ function initBalance() {
 }
 
 
+
+// serve your css and index.html as static
+app.use(express.static(__dirname));
+
 // HTTP
 const HTTP_OK = 200;
 const HTTP_WRONG = 400;
 const PORT = 81;
 
-//const { stringify } = require('querystring');
 
-// const { sign } = require('crypto');
 
-// serve your css and index.html as static
-app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
     res.redirect('/SHOW');
@@ -341,14 +341,14 @@ app.get("/LOGIN", (req, res) => {
     //let time   = req.query.time;    
     let sessionId = req.query.sessionId;
     
-    //  let sessionId = strSymbol(time+client+year+time);
-    //  let sessionId = Sheets.symbolic(time+client+year+time);
+    console.dir("0030 app.post LOGIN with client="+client+",year="+year+",r="+remote); // +"  ---> "+sessionId);
 
-    console.dir("0030 app.post LOGIN with client="+client+",year="+year+",r="+remote+"  ---> "+sessionId);
+    if(!sessionId) sessionId=Sheets.sy_findSessionId(client,year);
 
+    let banner = "NO LOGIN with client="+client+",year="+year;
+    if(sessionId) banner = login(sessionId);
 
-    let banner = login(sessionId);
-    console.dir("0060 app.post LOGIN "+banner);
+    console.dir("0060 app.post "+banner);
 
     // send back sessionId to client browser or file
     res.writeHead(HTTP_OK);
@@ -363,10 +363,6 @@ function login(sessionId) {
     let session = Sheets.get(sessionId);
     console.log("0040 login() "+sessionId);
 
-
-    //let balance = phaseOne(session.addrT,session.logT,session.sheetCells);
-    //console.dir("0040 login() creates balance");
-    
     let banner = makeBanner(sessionId,session.year);
 
     console.dir("0050 login() responds with banner="+banner);
@@ -381,7 +377,7 @@ function login(sessionId) {
 
                 // auto-save XLSX
                 Sheets.xlsxWrite(autoId,null,'',''); 
-                console.log("TIMER SAVED XLSX ("+session.client+","+session.year+") SESSION "+autoId);
+                console.log("0051 TIMER SAVED XLSX ("+session.client+","+session.year+") SESSION "+autoId);
                 
                 /*
                 let session = Sheets.get(autoId);
@@ -447,42 +443,6 @@ app.post("/STORE", (req, res) => {
     
     res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
     res.end("\nSTORED.");
-});
-
-
-app.get("/DOWNLOAD", (req, res) => { 
-    // DOWNLOAD to client     
-
-    console.log("\n\n");
-    console.log(timeSymbol());
-    let sessionId = req.query.sessionId;
-    console.log("1500 app.post DOWNLOAD JSON for with session id=("+sessionId+")");
-
-    session = Sheets.get(sessionId);
-
-    if(session && session.year && session.client) {
-
-        // 20220520
-        console.log("1510 app.post DOWNLOAD for year"+session.year);
-
-        let sessionTime=timeSymbol();
-        let monthYearHour = sessionTime.slice(4,10);
-
-        Sheets.xlsxWrite(sessionId,null,sessionTime,sessionId); 
-        console.log("1530 app.post DOWNLOAD writing XLSX");
-
-
-        // download JSON
-        let fileName = session.year+session.client+monthYearHour+'.json';
-        console.log("1530 app.post DOWNLOAD download JSON as "+fileName);
-        res.set('Content-Disposition', 'attachment; fileName='+fileName);
-        res.json(session);    
-
-    } else {
-        console.log("1513 app.post NO DOWNLOAD - INVALID SESSION')");
-        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
-        res.end("\nINVALID SESSION.\n");
-    }
 });
 
 
@@ -622,6 +582,42 @@ app.get('/SHOW/', (req, res)    => {
     else console.dir("1920 app.get SHOW - NO SESSION KNOWN");
     res.end();
 })
+
+
+app.get("/DOWNLOAD", (req, res) => { 
+    // DOWNLOAD to client     
+
+    console.log("\n\n");
+    console.log(timeSymbol());
+    let sessionId = req.query.sessionId;
+    console.log("1500 app.post DOWNLOAD JSON for with session id=("+sessionId+")");
+
+    session = Sheets.get(sessionId);
+
+    if(session && session.year && session.client) {
+
+        // 20220520
+        console.log("1510 app.post DOWNLOAD for year"+session.year);
+
+        let sessionTime=timeSymbol();
+        let monthYearHour = sessionTime.slice(4,10);
+
+        Sheets.xlsxWrite(sessionId,null,sessionTime,sessionId); 
+        console.log("1530 app.post DOWNLOAD writing XLSX");
+
+
+        // download JSON
+        let fileName = session.year+session.client+monthYearHour+'.json';
+        console.log("1530 app.post DOWNLOAD download JSON as "+fileName);
+        res.set('Content-Disposition', 'attachment; fileName='+fileName);
+        res.json(session);    
+
+    } else {
+        console.log("1513 app.post NO DOWNLOAD - INVALID SESSION')");
+        res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
+        res.end("\nINVALID SESSION.\n");
+    }
+});
 
 
 

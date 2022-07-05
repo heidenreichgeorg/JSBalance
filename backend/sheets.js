@@ -6,6 +6,8 @@ const HTTP_OK = 200;
 const HTTP_WRONG = 400;
 
 
+
+
 // ASSETS BEFORE OTHER ACCOUNTS
 // NO NEGATIVE RESULTS in distribute()
 // EXTEND sy_purge ;EXCEL if needed
@@ -106,6 +108,21 @@ module.exports['get']=get;
 
 
 
+
+function sy_findSessionId(client,year) {
+    var result=null;
+    console.log("\n1802  FIND => ( client="+client+"  year="+year+")");
+    arrSession.forEach(session => {
+        console.log("\n1804  CHECK => (SESSION  client="+session.client+"  year="+session.year+")");
+        if(session.year===year && session.client===client) {
+            result=session;
+            console.log("\n1806  FOUND => (SESSION  client="+session.client+"  year="+session.year+")");
+        }
+    });
+    if(result) return result.id;
+    else return null;
+}
+module.exports['sy_findSessionId']=sy_findSessionId;
 
 
 

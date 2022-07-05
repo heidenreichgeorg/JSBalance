@@ -20,18 +20,16 @@
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
 
-      let sidControl = document.getElementById("sessionId");
-      if(sidControl) sidControl.value=urlParams.get('sessionId');
-      else console.log("no sessionId Control");
-
-
       let clientControl = document.getElementById("client");
-      if(clientControl) clientControl.value=urlParams.get('client');
+      let strClient = urlParams.get('client');
+      if(clientControl) clientControl.value=strClient;
       else console.log("no client Control");
 
       let yearControl = document.getElementById("year");
-      if(yearControl) yearControl.value=urlParams.get('year');
+      let strYear = urlParams.get('year');
+      if(yearControl) yearControl.value=strYear;
       else console.log("no year Control");
+
    }
 
 
@@ -50,17 +48,14 @@
          </div>
          <div class="field">
             <input type="text" id="year" class="scalesY">Year</input>
-         </div>        
-        <div class="field">            
-            <input type="text" id="sessionId">SessionId</input> 
-         </div>
+         </div>               
+         <div class="field">                       
+            <input type="text" id="sessionId">Session Id</input> 
        </form>
    </div>
    
 
    <SCRIPT>
-
-
 
       const strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/';
 
@@ -96,8 +91,9 @@
             'time': timeSymbol()
          };
        
+         console.log("\nWelcome.html LOGIN => ( credentials="+JSON.stringify(credentials)+")");
 
-         postAndDisplay("LOGIN",credentials,100);
+         window.open("/LOGIN?client="+form['client'].value+"&year="+form['year'].value);
          
       }
      
