@@ -25,6 +25,8 @@
         <SCRIPT type="text/javascript">
 
             let debug=null;
+            let pageGlobal=null;
+            let textGlobal=[];
 
             // character count for notmal columns
             let iCpField = 16;
@@ -74,13 +76,22 @@
                     "ModalPopUp",
                     'toolbar=no,scrollbars=no,location=no,statusbar=no,menubar=no,resizable=0,width=890,height=100,left = 90,top=300'
                 );               
-                // accumulates text popUpObj.document.open();
 
-                let text = '<DIV class="witBorder"><DIV class="mTable"><DIV class="ulliTab"><DIV class="attrRow">'
-                    +makeBookingText(csvHead,csvText,csvNote,'attrRow')
+
+                // do NOT accumulate text 
+                popUpObj.document.open();
+
+                let text = '<DIV class="mTable"><DIV class="witBorder"><DIV class="mTable"><DIV class="ulliTab">'
+                    +makeBookingText(csvHead,csvText,csvNote,'ulliTab')
                     +'</DIV></DIV></DIV></DIV>';
 
-                popUpObj.document.write('<HTML><TITLE>'+page['Transaction']+'</TITLE><link rel="stylesheet" href="./FBA/mobile_green.css"/>'+text+'</HTML>');
+                textGlobal.push(text);
+
+                popUpObj.document.write('<HTML><TITLE>'+pageGlobal['Transaction']+'</TITLE>'
+                    +'<BODY><link rel="stylesheet" href="./FBA/mobile_green.css"/><DIV class="mTable"><DIV class="witBorder">'
+                    +textGlobal.join('')
+                    +'</DIV></DIV></BODY></HTML>');
+
 
                 popUpObj.focus();
                 
@@ -99,20 +110,21 @@
                 var aLen = response[D_Schema].assets;
                 var eLen = response[D_Schema].eqliab;
                 var gSchema = response[D_Schema];
-                let page = response[D_Page];
+
+                pageGlobal = response[D_Page];
 
 
                 var boxFooter="";
-                if(page) {
+                if(pageGlobal) {
 
-                    let headerInfo = '<DIV class="attrLine"><DIV class="C280">'+page["History"]+'&nbsp;'+page["header"]+'</DIV></DIV>';
+                    let headerInfo = '<DIV class="attrLine"><DIV class="C280">'+pageGlobal["History"]+'&nbsp;'+pageGlobal["header"]+'</DIV></DIV>';
                         //arrHistory.push(headerInfo);
 
                     let htmlPage = createPage(['C140','C140','C140','C140','C140','C140'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                     var cursor=htmlPage;
 
 
-                    console.log("HistoryScreen.html.putResponse.strText="+JSON.stringify(page))
+                    console.log("HistoryScreen.html.putResponse.strText="+JSON.stringify(pageGlobal))
                     
                     // 20220701
                     var lpattern = getParam("LPATTERN");
@@ -195,7 +207,7 @@
                                     let deltaText = "'"+delta.join(CSEP)+"'";
                                     let boxHead = "'"+entry.join(CSEP)+"'";   
                                     let boxText = "'"+credit.join(CSEP)+CSEP+debit.join(CSEP)+"'";   
-                                    let boxNote = "'"+page["author"].replace('&nbsp;',CSEP)+"'";                 
+                                    let boxNote = "'"+pageGlobal["author"].replace('&nbsp;',CSEP)+"'";                 
                                     
                                     
 
@@ -260,7 +272,7 @@
                         +"</DIV><INPUT TYPE='hidden' NAME='sessionId' VALUE='"+sessionId+"'/></FORM>";
                         cursor=printHTML(cursor,searchForm);
 
-                        setTrailer(page, cursor);
+                        setTrailer(pageGlobal, cursor);
                         setScreen(document,htmlPage);
                     }
                 }
