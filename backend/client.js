@@ -230,7 +230,7 @@ function validateCD(creditList,debitList) {
         let value=creditList[name];
         saldoC+=value.cents;
         let display=moneyString(value);
-        creditDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R110' onclick='toggleC2D("+'"'+name+'"'+")'>"+display+"</div>");
+        creditDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R105' onclick='toggleC2D("+'"'+name+'"'+")'>"+display+"</div>");
     }
  
 
@@ -239,7 +239,7 @@ function validateCD(creditList,debitList) {
         let value=debitList[name];
         saldoD+=value.cents;
         let display=moneyString(value);
-        debitDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R110' onclick='toggleD2C("+'"'+name+'"'+")'>"+display+"</div>");
+        debitDivs.push("<div class='L66'>"+name+DOUBLE+"</div><div class='R105' onclick='toggleD2C("+'"'+name+'"'+")'>"+display+"</div>");
     }
 
     var diff=0;
@@ -253,8 +253,8 @@ function validateCD(creditList,debitList) {
 
         var lines=0;
         for(;creditDivs.length>0 || debitDivs.length>0;lines++) {
-            var left=  "<div class='L66'>&nbsp;</DIV><div class='R110'>&nbsp;</DIV>";
-            var right= "<div class='L66'>&nbsp;</DIV><div class='R110'>&nbsp;</DIV>";
+            var left=  "<div class='L66'>&nbsp;</DIV><div class='R105'>&nbsp;</DIV>";
+            var right= "<div class='L66'>&nbsp;</DIV><div class='R105'>&nbsp;</DIV>";
             if(creditDivs.length>0) { left=creditDivs.pop(); }
             if(debitDivs.length>0)  { right=debitDivs.pop(); }
             cdPairs.push(left+"<div class='L66'>&nbsp;</DIV>"+right);
@@ -296,8 +296,8 @@ function makeAccount(index,name) {
 
     var partin=["Date","Sender","Reason","Ref1","Ref2","Target","Saldo"];
     partin[J_ACCT-1] =schemaNames[index];
-    let headerInfo = '<DIV class="R110">'+partin.join('</DIV><DIV class="R110">')+'</DIV>';
-    var htmlAccount = createPage( ['C100','R110','R110','R110','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+    let headerInfo = '<DIV class="R105">'+partin.join('</DIV><DIV class="R105">')+'</DIV>';
+    var htmlAccount = createPage( ['C100','R105','R105','R105','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     var cursor=htmlAccount;
 
 
@@ -369,7 +369,7 @@ function showTransfer(txnForm,commandCent,force) {
 
     let headerInfo = '<DIV class="C280">'+page["Transfer"]+'&nbsp;'+page["header"]+'</DIV>';
 
-    let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+    let htmlPage = createPage( ['L220','L120','L120','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
     if(!terminal) terminal = initTerminal(page,'PageContent',SCREENLINES);  
 
@@ -448,7 +448,7 @@ function showClose(txnForm,nextFuncName) {
 
     let headerInfo = '<DIV class="C280">'+page["Closing"]+'&nbsp;'+page["header"]+'</DIV>';
 
-    let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+    let htmlPage = createPage( ['L220','L120','L120','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
     
     if(!terminal) terminal = initTerminal(page,'PageContent',SCREENLINES,  nextFuncName); 
 
@@ -460,7 +460,7 @@ function showClose(txnForm,nextFuncName) {
     }
 
     cursor=print2Terminal(cursor,"<div class='C100' >&nbsp;</div>"+
-    "<div class='L66'>Credit</DIV><div class='R110'>"+cents2EU(saldoC)+"</div><div class='L66'>&nbsp;</DIV><div class='L66'>Debit</DIV><div class='R110'>"+cents2EU(saldoD)+"</div>");
+    "<div class='L66'>Credit</DIV><div class='R105'>"+cents2EU(saldoC)+"</div><div class='L66'>&nbsp;</DIV><div class='L66'>Debit</DIV><div class='R105'>"+cents2EU(saldoD)+"</div>");
     
 
     showTerminal(terminal,htmlPage);
@@ -483,17 +483,17 @@ function save(jInfo) {
             showTransfer(txnForm);
             postToServer("BOOK",sInfo);
             console.log('client.js save() postToServer'+sInfo);
-            target.innerHTML = "<DIV >&nbsp;</DIV ><DIV onclick='closeWindow' >CLOSE</DIV>" ; // class='R110'
+            target.innerHTML = "<DIV >&nbsp;</DIV ><DIV onclick='closeWindow' >CLOSE</DIV>" ; // class='R105'
 
         }
         else   {  
             console.log('Not Balanced!');
-            target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NOT BALANCED</DIV>" ; // class='R110'
+            target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NOT BALANCED</DIV>" ; // class='R105'
         }
     }
     else   {  
         console.log('No Date!');
-        target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NO DATE</DIV>" ; // class='R110'
+        target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NO DATE</DIV>" ; // class='R105'
     }
 }
 

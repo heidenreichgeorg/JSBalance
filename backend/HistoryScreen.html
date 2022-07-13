@@ -28,7 +28,7 @@
             let pageGlobal=null;
             let textGlobal=[];
 
-            // character count for notmal columns
+            // character count for normal columns
             let iCpField = 16;
 
             function makeBookingText(csvHead,csvText,csvNote,style) {
@@ -230,17 +230,17 @@
                         // LOG button: store transaction pattern  and show it in PatternList
                         postToServer("STORE",sInfo);
                         console.log('HistoryList.html log() postToServer STORE '+sInfo);
-                        target.innerHTML = "<DIV >&nbsp;</DIV ><DIV onclick='closeWindow' >CLOSE</DIV>" ; // class='R110'
+                        target.innerHTML = "<DIV >&nbsp;</DIV ><DIV onclick='closeWindow' >CLOSE</DIV>" ; // class='R105'
 
                     }
                     else   {  
                         console.log('Not Balanced!');
-                        target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NOT BALANCED</DIV>" ; // class='R110'
+                        target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NOT BALANCED</DIV>" ; // class='R105'
                     }
                 }
                 else   {  
                     console.log('No Date!');
-                    target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NO DATE</DIV>" ; // class='R110'
+                    target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NO DATE</DIV>" ; // class='R105'
                 }
             }
        </script>

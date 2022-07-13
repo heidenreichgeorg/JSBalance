@@ -105,11 +105,11 @@
                     postAndDisplay("BOOK",jInfo); // put response into submit button
 
                     console.log('PatternList.html book() postAndDisplay'+sInfo);
-                    target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >CLIENT BOOKED</DIV>" ; // class='R110'
+                    target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >CLIENT BOOKED</DIV>" ; // class='R105'
             }
             else   {  
                 console.log('No Date!');
-                target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NO DATE</DIV>" ; // class='R110'
+                target.innerHTML = "<DIV >&nbsp;</DIV ><DIV >NO DATE</DIV>" ; // class='R105'
             }
         }
 
@@ -190,7 +190,7 @@
 
             // GH20220416
             let headerInfo = '<DIV class="L280">'+page["Patterns"]+'</DIV><DIV class="L280">'+page["Transaction"]+'</DIV>';
-            let htmlPage = createPage( ['L220','L120','L120','R110','R110','R110'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
+            let htmlPage = createPage( ['L220','L120','L120','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
             var cursor=htmlPage;
 
 
@@ -283,7 +283,7 @@
 
                 var partin=["","Sender","Account","Reason","Ref1","Ref2"];
                 partin[J_ACCT-1] =schemaNames[index];
-                let headerInfo = '<DIV class="R110">'+partin.join('</DIV><DIV class="R110">')+'</DIV>';
+                let headerInfo = '<DIV class="R105">'+partin.join('</DIV><DIV class="R105">')+'</DIV>';
                 var htmlPage = createPage( ['L40', 'L150','L150','L150','L150','L150'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                 var cursor=htmlPage;
 

@@ -29,7 +29,7 @@ input { color:#000088; }
 .L280  { width:210px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: left;} 
 .C280  { width:260px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; } 
 .CFUL   { width:533px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; }
-.R110  { width: 84px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: right; }
+.R105  { width: 84px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: right; }
 .R165  { width:150px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: right; }
 .L22      { width: 20px; padding: 1px; border: none; float: left;  font-family: inherit; font-size: 12px; font-weight:400; color: #ffff80; text-align: left;  }		
 a:hover     {  background-color: #ff8; }
