@@ -12,6 +12,18 @@ const D_Schema  = "Schema";
 const D_Muster = "Muster";
 const D_Adressen="Adressen";
 
+
+let X_ASSETS = 'de-gaap-ci_bs.ass';
+let X_EQLIAB = 'de-gaap-ci_bs.eqLiab';
+let X_INCOME = 'de-gaap-ci_is.netIncome';
+let X_INCOME_REGULAR = 'is.netIncome.regular';
+let X_INCOME_REGULAR_OTC = 'is.netIncome.regular.operatingTC';
+let X_INCOME_REGULAR_FIN = 'is.netIncome.regular.fin';
+let X_OTC_OTHER_REVENUE = 'regular.operatingTC.otherOpRevenue';
+let X_ASSET_TAX = 'ass.currAss.receiv.other.otherTaxRec';
+
+
+
 const J_ACCT=6;
 const DOUBLE = ':';
 const CSEP = ';';
@@ -22,6 +34,10 @@ const HTTP_WRONG = 400;
 const PORT = 81;
 
 const SCREENLINES=19;
+
+
+
+
 
 function getFromServer(responseHandler) {
                 
@@ -905,6 +921,95 @@ function showTerminal(terminal,htmlPage) {
     
 }
 
+
+
+
+
+
+
+function prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen) {
+
+    var iBalance=0;
+
+    var entry = [];
+    var credit = ['&nbsp;'];
+    var debit = ['','AN'];
+    var delta = [];
+    var txnAcct = false;
+
+    let parts = jHistory[hash];
+    if(parts && parts.length>2) {
+
+
+        // GH20220701
+        let txnLine = parts.join('');
+        if(!lPattern || txnLine.toLowerCase().includes(lPattern.toLowerCase())) {
+
+
+            // GH20220703
+            txnAcct = (!aPattern || aPattern.length<2);
+
+
+
+            // skip hash or index
+            for(var i=1;i<J_ACCT && i<parts.length;i++) {
+
+                if(parts[i] && parts[i].length>COLMIN) 
+                    entry.push(parts[i].substring(0,iCpField)); 
+                else entry.push(' ');
+                
+            }
+            for(var i=J_ACCT;i<parts.length;i++) {
+                if(parts[i] && parts[i].length>0) { 
+                    
+                    // GH20220307 EU-style numbers
+                    let item = parseInt(parts[i]);
+
+                    
+                    // GH20220703
+                    if(    !txnAcct
+                        && names[i] && names[i].length>1 
+                        && aPattern && aPattern.length>1 
+                        && names[i].toLowerCase().includes(aPattern.toLowerCase())) txnAcct=true;
+
+
+                    if(item!=0) {
+                        delta.push(names[i]+DOUBLE+parts[i]); 
+
+                        // GH20220307
+                        let value = setEUMoney(parts[i]);
+                        if(i<aLen) iBalance += value.cents;
+                        else if(i!=aLen && i!=eLen) iBalance -= value.cents;
+                        console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
+                    }
+
+                    // POS ASSET
+                    if(item>0 && i<aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i]);                                        
+                
+                    // NEG EQLIAB
+                    if(item<0 && i>aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i].replace('-',''));
+                
+                    // NEG ASSET
+                    if(item<0 && i<aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i].replace('-',''));
+                
+                    // POS EQLIAB
+                    if(item>0 && i>aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i]);
+                }
+            }
+        }
+    }
+
+    let result={};
+
+    result.txnAcct=txnAcct;
+    result.entry=entry;
+    result.delta=delta;
+    result.credit=credit;
+    result.debit=debit;
+    result.iBalance=iBalance;
+
+    return result;
+}
 
 
 

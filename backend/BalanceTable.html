@@ -51,7 +51,8 @@
                 
 
                 var jReport = response[D_Report];
-
+                
+                // add three additional accounts: ASSETS, EQLIAB, GAINLOSS
                 if(jReport["xbrlAssets"].account) { 
                     let ass = jReport["xbrlAssets"].account; 
                     console.log("ASSET "+JSON.stringify(ass)); 

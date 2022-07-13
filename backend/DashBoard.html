@@ -113,11 +113,6 @@
                 var pNum=0;
                 var partnerSaldo={};
 
-                let INCOME_REGULAR = 'is.netIncome.regular';
-                let INCOME_REGULAR_OTC = 'is.netIncome.regular.operatingTC';
-                let INCOME_REGULAR_FIN = 'is.netIncome.regular.fin';
-                let OTC_OTHER_REVENUE = 'regular.operatingTC.otherOpRevenue';
-
                 for (let vname in gAccounts)   {
                     var account=gAccounts[vname];
                     var gross = account.gross;
@@ -132,12 +127,12 @@
                         let cGross = setEUMoney(gross).cents;
 
 
-                        if(check.includes(INCOME_REGULAR_OTC)) {
+                        if(check.includes(X_INCOME_REGULAR_OTC)) {
                             centsOTC +=  cGross;
                             if(cGross>0) cSales += cGross;
                         }
 
-                        if(check.includes(INCOME_REGULAR_FIN) || check.includes(OTC_OTHER_REVENUE)) {
+                        if(check.includes(X_INCOME_REGULAR_FIN) || check.includes(X_OTC_OTHER_REVENUE)) {
                             centsFIN += cGross;
                             if(cGross>0) cSales += cGross;
                         }

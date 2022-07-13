@@ -31,11 +31,6 @@
         <SCRIPT type="text/javascript">
 
             let debug=null;
-            let INCOME_REGULAR = 'is.netIncome.regular';
-            let INCOME_REGULAR_OTC = 'is.netIncome.regular.operatingTC';
-            let INCOME_REGULAR_FIN = 'is.netIncome.regular.fin';
-            let OTC_OTHER_REVENUE = 'regular.operatingTC.otherOpRevenue';
-            let ASSET_TAX = 'ass.currAss.receiv.other.otherTaxRec';
                       
             var welcomeRecord = [];
             var partnerRecord={};
@@ -94,7 +89,7 @@
                         // leftmost column with general client info
                         let info = (welcomeRecord.length>wIndex)?welcomeRecord[wIndex]:".";
 
-                        if(check.includes(ASSET_TAX))
+                        if(check.includes(X_ASSET_TAX))
                             cursor=printFormat(cursor,[' ','T',iName,xbrl_pre,gross]);
 
                     } 
@@ -136,7 +131,7 @@
                         // leftmost column with general client info
                         let info = (welcomeRecord.length>wIndex)?welcomeRecord[wIndex]:".";
                         
-                        if(check.includes(INCOME_REGULAR_OTC)) {
+                        if(check.includes(X_INCOME_REGULAR_OTC)) {
 
                             console.log("putResponse OTC "+JSON.stringify(account));
 
@@ -152,7 +147,7 @@
 
 
 
-                partnerRecord[id].push({'item':page['RegularOTC'], 'ref':page['GainLoss'], 'note':page['GainLoss'], 'value':cents2EU(centsOTC), 'xbrl': INCOME_REGULAR_OTC});
+                partnerRecord[id].push({'item':page['RegularOTC'], 'ref':page['GainLoss'], 'note':page['GainLoss'], 'value':cents2EU(centsOTC), 'xbrl': X_INCOME_REGULAR_OTC});
                 cursor=printFormat(cursor,[' ','&nbsp;',page['RegularOTC'],page['GainLoss'],cents2EU(centsOTC)]);
 
                 cursor=printFormat(cursor,[' ']);
@@ -178,7 +173,7 @@
                         // leftmost column with general client info
                         let info = (welcomeRecord.length>wIndex)?welcomeRecord[wIndex]:".";
                         
-                        if(check.includes(INCOME_REGULAR_FIN) || check.includes(OTC_OTHER_REVENUE)) {
+                        if(check.includes(X_INCOME_REGULAR_FIN) || check.includes(X_OTC_OTHER_REVENUE)) {
 
                             console.log("putResponse FIN "+JSON.stringify(account));
 
@@ -193,12 +188,12 @@
                 }
 
                 
-                partnerRecord[id].push({'item':page['RegularFIN'], 'ref':page['GainLoss'], 'note':page['GainLoss'], 'value':cents2EU(centsFIN), 'xbrl': INCOME_REGULAR_FIN});
+                partnerRecord[id].push({'item':page['RegularFIN'], 'ref':page['GainLoss'], 'note':page['GainLoss'], 'value':cents2EU(centsFIN), 'xbrl': X_INCOME_REGULAR_FIN});
                 cursor=printFormat(cursor,[' ','&nbsp;',page['RegularFIN'],page['GainLoss'],cents2EU(centsFIN)]);
 
                 cursor=printFormat(cursor,[' ']);
 
-                partnerRecord[id].push({'item':page['Regular'], 'ref':page['GainLoss'], 'note':page['GainLoss'], 'value':cents2EU(centsFIN+centsOTC), 'xbrl': INCOME_REGULAR});
+                partnerRecord[id].push({'item':page['Regular'], 'ref':page['GainLoss'], 'note':page['GainLoss'], 'value':cents2EU(centsFIN+centsOTC), 'xbrl': X_INCOME_REGULAR});
                 cursor=printFormat(cursor,[' ','&nbsp;',page['GainLoss'],page['GainLoss'],cents2EU(centsFIN+centsOTC)]);
 
                 cursor=printFormat(cursor,[' ']);

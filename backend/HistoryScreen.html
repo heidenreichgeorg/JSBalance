@@ -127,8 +127,11 @@
                     console.log("HistoryScreen.html.putResponse.strText="+JSON.stringify(pageGlobal))
                     
                     // 20220701
-                    var lpattern = getParam("LPATTERN");
-                    if(lpattern && lpattern.length<2) lpattern=null;
+                    var lPattern = getParam("LPATTERN");
+                    if(lPattern && lPattern.length<2) lPattern=null;
+
+                    var aPattern = getParam("APATTERN");
+                    if(aPattern && aPattern.length<2) aPattern=null;
 
 
                     if(gSchema.Names && gSchema.Names.length>0) {
@@ -138,128 +141,43 @@
                         for (let hash in jHistory)  {
                             bLine++;
 
-                            var iBalance=0;
+                            let jPrettyTXN = prettyTXN(jHistory,hash,lPattern,aPattern,names,aLen,eLen);
 
-                            let parts = jHistory[hash];
-                            if(parts && parts.length>0) {
+                            // GH 20220703
+                            if(jPrettyTXN.txnAcct) {
 
-                                // GH20220703
-                                var apattern = getParam("APATTERN");
-                                var txnAcct = (!apattern || apattern.length<2);
-
-
-                                // GH20220701
-                                let txnLine = parts.join('');
-                                if(!lpattern || txnLine.toLowerCase().includes(lpattern.toLowerCase())) {
-
-                                    var entry = [];
-                                    var credit = ['&nbsp;'];
-                                    var debit = ['','AN'];
-                                    var delta = [];
-
-                                    // skip hash or index
-                                    for(var i=1;i<J_ACCT && i<parts.length;i++) {
-
-                                        if(parts[i] && parts[i].length>COLMIN) 
-                                            entry.push(parts[i].substring(0,iCpField)); 
-                                        else entry.push(' ');
-                                        
-                                    }
-                                    for(var i=J_ACCT;i<parts.length;i++) {
-                                        if(parts[i] && parts[i].length>0) { 
-                                            
-                                            // GH20220307 EU-style numbers
-                                            let item = parseInt(parts[i]);
-
-                                            
-                                            // GH20220703
-                                            if(    !txnAcct
-                                                && names[i] && names[i].length>1 
-                                                && apattern && apattern.length>1 
-                                                && names[i].toLowerCase().includes(apattern.toLowerCase())) txnAcct=true;
-
-
-                                            if(item!=0) {
-                                                delta.push(names[i]+DOUBLE+parts[i]); 
-
-                                                // GH20220307
-                                                let value = setEUMoney(parts[i]);
-                                                if(i<aLen) iBalance += value.cents;
-                                                else if(i!=aLen && i!=eLen) iBalance -= value.cents;
-                                                console.dir("ADD "+parts[i]+ " --> "+value.cents+"  --> "+iBalance);
-                                            }
-
-                                            // POS ASSET
-                                            if(item>0 && i<aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i]);                                        
-                                        
-                                            // NEG EQLIAB
-                                            if(item<0 && i>aLen && i!=eLen) credit.push(names[i]+DOUBLE+parts[i].replace('-',''));
-                                        
-                                            // NEG ASSET
-                                            if(item<0 && i<aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i].replace('-',''));
-                                        
-                                            // POS EQLIAB
-                                            if(item>0 && i>aLen && i!=eLen) debit.push(names[i]+DOUBLE+parts[i]);
-                                        }
-                                    }
+                                let deltaText = "'"+jPrettyTXN.delta.join(CSEP)+"'";
+                                let boxHead = "'"+jPrettyTXN.entry.join(CSEP)+"'";   
+                                let boxText = "'"+jPrettyTXN.credit.join(CSEP)+CSEP+jPrettyTXN.debit.join(CSEP)+"'";   
+                                let boxNote = "'"+pageGlobal["author"].replace('&nbsp;',CSEP)+"'";                 
+                                let iBalance= jPrettyTXN.iBalance;
                                 
 
-                                    let deltaText = "'"+delta.join(CSEP)+"'";
-                                    let boxHead = "'"+entry.join(CSEP)+"'";   
-                                    let boxText = "'"+credit.join(CSEP)+CSEP+debit.join(CSEP)+"'";   
-                                    let boxNote = "'"+pageGlobal["author"].replace('&nbsp;',CSEP)+"'";                 
-                                    
-                                    
 
+                                let balCheck= '<DIV class="L66">'+cents2EU(iBalance)+'</DIV>';
+                                console.dir("LINE "+bLine+" --> "+iBalance);
+                                console.dir();
 
-                                    let balCheck= '<DIV class="L66">'+cents2EU(iBalance)+'</DIV>';
-                                    console.dir("LINE "+bLine+" --> "+iBalance);
-                                    console.dir();
+                                let data = (
+                                    jPrettyTXN.entry.join(CSEP)
+                                    +CSEP+jPrettyTXN.credit.join(CSEP)
+                                    +CSEP+jPrettyTXN.debit.join(CSEP)).split(CSEP);
 
-                                    let data = (
-                                            entry.join(CSEP)
-                                        +CSEP+credit.join(CSEP)
-                                        +CSEP+debit.join(CSEP)).split(CSEP);
+                                var i=0;
+                                var htmlLine=['<DIV class="key" id="Show'+hash+'" value="'+hash+'" onclick="showModalPopUp('+boxHead+','+boxText+','+boxNote+')">Show</DIV>',
+                                            '<DIV class="key" id="Log'+hash+'"  value="'+hash+'"  onclick="storeInLog('+boxHead+','+deltaText+')">Log</DIV>'];
 
-
-
-                                    var i=0;
-                                    var htmlLine=['<DIV class="key" id="Show'+hash+'" value="'+hash+'" onclick="showModalPopUp('+boxHead+','+boxText+','+boxNote+')">Show</DIV>',
-                                                '<DIV class="key" id="Log'+hash+'"  value="'+hash+'"  onclick="storeInLog('+boxHead+','+deltaText+')">Log</DIV>'];
-
-
-
-                                    // GH 20220703
-                                    if(txnAcct)
-
-
-                                    for (;i<data.length;i++) {
-                                        let text = '<DIV class="L120">'+data[i]+'</DIV>';
-                                        htmlLine.push(text);
-                                        if(i%6==5 || (i+1)>=data.length) { 
-                                            cursor=printHTML(cursor,htmlLine.join(''));
-                                            htmlLine=[];
-                                        }
+                                for (;i<data.length;i++) {
+                                    let text = '<DIV class="L120">'+data[i]+'</DIV>';
+                                    htmlLine.push(text);
+                                    if(i%6==5 || (i+1)>=data.length) { 
+                                        cursor=printHTML(cursor,htmlLine.join(''));
+                                        htmlLine=[];
                                     }
-
                                 }
-
-
-                            } else {
-                                // ERROR out
                             }
                         }
 
-                        
-
-                        // GH20211028
-                        // modify to show reverse order
-                        /*
-                        if(arrHistory) {
-                            arrHistory.push('<DIV class="attrLine">&nbsp;</DIV>');                            
-                            arrHistory.reverse();
-                        }
-                        */
 
 
                         // 20220701 search pattern 

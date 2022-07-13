@@ -1075,6 +1075,7 @@ function makeBanner(sessionId,year) {
             vbanner.push(buttonOpenWide(target+`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
             vbanner.push(buttonOpenTile(target+`/history?sessionId=${sessionId}`,'History'));
             vbanner.push(buttonOpenTile(target+`/gainloss?sessionId=${sessionId}`,'GainLoss'));
+            vbanner.push(buttonOpenTile(target+`/status?sessionId=${sessionId}`,'Status',3));
             vbanner.push('</DIV><DIV class="attrRow">');
             vbanner.push(buttonOpenTile(target+`/assets?sessionId=${sessionId}`,'Assets'));
             vbanner.push(buttonOpenTile(target+`/balance?sessionId=${sessionId}`,'AcctClose'));
@@ -1085,7 +1086,6 @@ function makeBanner(sessionId,year) {
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
             vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
-            vbanner.push(buttonOpenWide(target+`/status?sessionId=${sessionId}`,'Status',3));
         vbanner.push('</DIV></DIV>');
 
         console.log("0300 makeBanner OK");
