@@ -106,12 +106,13 @@ let de_DE = {
     AcctHistory:"Kontoauszug",
     Assets:"Anlagespiegel",
     BalanceOpen:"Eröffnungsbilanz",
-    DashBoard:"Status",
+    DashBoard:"Übersicht",
     GainlossHGB:"Ergebnis HGB275A2",
     BalanceClose:"Bilanz mit Gewinn",
-    GainLoss:"Gewinn/Verlust",
+    GainLoss:"Gewinn/ Verlust",
     History:"Buchungen",
     Patterns:"Vorlagen",
+    Status:"Status",
 
     // Anlagen
     AssetIdent: "Kennzeichen",
@@ -309,7 +310,9 @@ app.post("/UPLOAD", (req, res) => {
                 console.dir("4000 app.post UPLOAD rendering QR code with #"+html.length+ "chars");
 
 
-                res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1><DIV class="attrRow"><A HREF="'+cmd+'">LOGIN</A></DIV>'+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`+'&sender=WELCOME</DIV>','Closing'));
+                res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1><DIV class="attrRow"><A HREF="'+cmd+'">LOGIN</A></DIV>'
+                    //+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`+'&sender=WELCOME</DIV>','Closing')
+                );
                 res.end();
             });
 
@@ -553,6 +556,7 @@ app.get("/pie", (req, res)       => { res.sendFile(__dirname + "/BalancePie.html
 app.get("/pattern", (req, res)   => { res.sendFile(__dirname + "/PatternList.html"); });
 app.get("/transfer", (req, res)  => { res.sendFile(__dirname + "/Transfer.html"); });
 app.get("/closeandsave",(req,res)=> { res.sendFile(__dirname + "/CloseAndSave.html"); });
+app.get("/status", (req, res) => { res.sendFile(__dirname + "/Status.html"); });
 
 
 
@@ -1081,7 +1085,7 @@ function makeBanner(sessionId,year) {
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
             vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
-//            vbanner.push(buttonTab(target+`/pie?sessionId=${sessionId}`,de_DE['Diagram']));      
+            vbanner.push(buttonOpenWide(target+`/status?sessionId=${sessionId}`,'Status',3));
         vbanner.push('</DIV></DIV>');
 
         console.log("0300 makeBanner OK");
