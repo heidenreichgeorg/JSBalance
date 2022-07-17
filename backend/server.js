@@ -283,9 +283,9 @@ app.post("/UPLOAD", (req, res) => {
             //let banner = login(sessionId);           
             //console.dir("0060 app.post UPLOAD "+banner);
 
-            let action = "/LOGIN";
+            let login = "/LOGIN";
             
-            signup = '<FORM METHOD="GET" ACTION=".'+action+'"><H1>'+year+'&nbsp'+client+'&nbsp;</H1>'+
+            signup = '<FORM METHOD="GET" ACTION=".'+login+'"><H1>'+year+'&nbsp'+client+'&nbsp;</H1>'+
                      '<INPUT TYPE="HIDDEN" NAME="year" VALUE="'+year+'"/>'+
                      '<INPUT TYPE="HIDDEN" NAME="client" VALUE="'+client+'"/>'+
                      '<INPUT TYPE="HIDDEN" NAME="sessionId" VALUE="'+sessionId+'"/>'+
@@ -293,16 +293,15 @@ app.post("/UPLOAD", (req, res) => {
                      '</FORM>';
 
 
-            let cmd = action + "?year="+year+"&client="+client+"&sessionId="+sessionId;
-            let url = localhost() + ":"+ PORT + cmd;
+            let cmdLogin = login + "?year="+year+"&client="+client+"&sessionId="+sessionId;
+            let url = localhost() + ":"+ PORT + cmdLogin;
 
-
+            let cmdJSON = '/DOWNLOAD?sessionId='+sessionId;
 
             qr.toDataURL(url, (err, qrCodeDataUrl) => {
                 if (err) res.send("Error occured");
 
                 res.header('Content-Type', 'text/html');
-                //res.write();
             
                 // Let us return the QR code image as our response and set it to be the source used in the webpage
                 const html = ejs.render('<DIV class="attrRow"><img src="<%= qrCodeDataUrl %>" /></DIV>', { qrCodeDataUrl });
@@ -310,8 +309,9 @@ app.post("/UPLOAD", (req, res) => {
                 console.dir("4000 app.post UPLOAD rendering QR code with #"+html.length+ "chars");
 
 
-                res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1><DIV class="attrRow"><A HREF="'+cmd+'">LOGIN</A></DIV>'
-                    //+buttonOpenTile(`/closeandsave?sessionId=${sessionId}`+'&sender=WELCOME</DIV>','Closing')
+                res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
+                        +'<DIV class="attrRow"><A HREF="'+cmdLogin+'">LOGIN</A>'
+                        +'&nbsp;<A HREF="'+cmdJSON+'">JSON</A></DIV>'
                 );
                 res.end();
             });
@@ -366,7 +366,7 @@ function login(sessionId) {
     let session = Sheets.get(sessionId);
     console.log("0040 login() "+sessionId);
 
-    let banner = makeBanner(sessionId,session.year);
+    let banner = makeBanner(sessionId,session.year,session.client);
 
     console.dir("0050 login() responds with banner="+banner);
     
@@ -589,7 +589,7 @@ app.get('/SHOW/', (req, res)    => {
 
 
 app.get("/DOWNLOAD", (req, res) => { 
-    // DOWNLOAD to client     
+    // DOWNLOAD JSON to client     
 
     console.log("\n\n");
     console.log(timeSymbol());
@@ -1054,7 +1054,7 @@ function localhost() {
 }
 
 
-function makeBanner(sessionId,year) {
+function makeBanner(sessionId,year,client) {
     var vbanner=[];
     
     if(sessionId) {
@@ -1069,26 +1069,29 @@ function makeBanner(sessionId,year) {
 
             let target = ""; // http://${localhost}:${PORT}
 
+            vbanner.push(buttonOpenTile(target+`/status?sessionId=${sessionId}`,'Status',3));
             vbanner.push(buttonOpenTile(target+`/account?sessionId=${sessionId}`,'AcctHistory'));
-            vbanner.push(buttonOpenTile(target+`/hgbbeginyear?sessionId=${sessionId}`,'BalanceOpen'));
+            vbanner.push(buttonOpenTile(target+`/hgbbeginyear?sessionId=${sessionId}`,'BalanceClose'));
             vbanner.push(buttonOpenTile(target+`/openbalance?sessionId=${sessionId}`,'AcctOpen'));
             vbanner.push(buttonOpenWide(target+`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
             vbanner.push(buttonOpenTile(target+`/history?sessionId=${sessionId}`,'History'));
             vbanner.push(buttonOpenTile(target+`/gainloss?sessionId=${sessionId}`,'GainLoss'));
-            vbanner.push(buttonOpenTile(target+`/status?sessionId=${sessionId}`,'Status',3));
+            vbanner.push(labelText(year));
             vbanner.push('</DIV><DIV class="attrRow">');
             vbanner.push(buttonOpenTile(target+`/assets?sessionId=${sessionId}`,'Assets'));
             vbanner.push(buttonOpenTile(target+`/balance?sessionId=${sessionId}`,'AcctClose'));
             vbanner.push(buttonOpenTile(target+`/galshgb?sessionId=${sessionId}`,'GainlossHGB'));
-            vbanner.push(buttonOpenTile(target+`/hgbregular?sessionId=${sessionId}`,'BalanceClose'));
+            vbanner.push(buttonOpenTile(target+`/hgbregular?sessionId=${sessionId}`,'BalanceOpen'));
             if(Sheets.isSameFY(year)) {
                 vbanner.push(buttonOpenTile(target+`/transfer?sessionId=${sessionId}`,'Transfer'));
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
             vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
+            //vbanner.push(buttonDownload(sessionId));
+            vbanner.push(labelText(client));
         vbanner.push('</DIV></DIV>');
 
-        console.log("0300 makeBanner OK");
+        console.log("0300 makeBanner OK for "+client+","+year);
     
     } else return  '<DIV class = "mTable"><DIV class = "ulliTab"><DIV class = "attrRow">NO SESSION info</DIV></DIV></DIV>';
     return '<SCRIPT type="text/javascript" src="/client.js"></SCRIPT><DIV class="mTable"><DIV class="ulliTab">'+vbanner.join('')+'</DIV></DIV>';
@@ -1096,12 +1099,6 @@ function makeBanner(sessionId,year) {
 
 
 // PURE FUNCTIONS
-
-function buttonTab(link,label) {
-    let result =  '<DIV class="C100"><A HREF="'+link+'" target="_blank"><BUTTON class="largeKey">'+label+'</BUTTON></A></DIV>';
-    if(debug>2) console.log(result);
-    return result;
-}
 
 function buttonOpenTile(link,command) {
     let label = de_DE[command];
@@ -1122,6 +1119,9 @@ function buttonOpenWide(link,command,lines) {
     return result;
 }
 
+function labelText(strText) {
+    return  '<DIV class="C100"><BUTTON class="largeKey">'+strText+'</BUTTON></DIV>';
+}
 
 function assetValue(row,iAssets) {
     var column=J_ACCT;
@@ -1284,3 +1284,11 @@ function dateFormat(timeStr) {
     return timeStr.slice(0,4)+"-"+timeStr.slice(4,6)+"-"+timeStr.slice(6,8)+"  "+timeStr.slice(8,10)+":"+timeStr.slice(10,12);
 }
 
+/*
+// trial methods 20220717
+
+function buttonDownload(sessionId) {
+    let strId = "'"+sessionId+"'";
+    return '<A HREF="JavaScript:downloadSession('+strId+')">.</A>';
+}
+*/

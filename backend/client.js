@@ -1098,3 +1098,13 @@ function timeSymbol() { // same as in server.js
       ('0' + u.getUTCSeconds()).slice(-2) +
       (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
 };     
+
+/*
+// trial methods 20220717
+
+function downloadSession(sessionId) {   
+    console.log("1230 CLIENT downloadSession sessionId = "+sessionId);
+    window.open('/DOWNLOAD?sessionId='+sessionId);
+    console.log("1290 CLIENT downloadSession EXIT");
+}
+*/
