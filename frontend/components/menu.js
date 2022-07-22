@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Tabs, Title, Space, LoadingOverlay } from '@mantine/core';
 import { ChartPie3, Notes } from 'tabler-icons-react';
-import useLang from '../lang';
+import useLang from '../modules/lang';
 
 import { useQuery } from 'react-query'
 

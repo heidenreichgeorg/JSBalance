@@ -1,6 +1,6 @@
 import { useState } from "react";
-import DropPage from "../modules/pages/drop";
-import MenuPage from "../modules/pages/menu";
+import DropPage from "../components/drop";
+import MenuPage from "../components/menu";
 
 export default function IndexPage({logged_in}) {
 

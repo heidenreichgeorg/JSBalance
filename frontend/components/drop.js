@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Group, Text, Title, Center, Space } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone'
 import { FileCode2 } from 'tabler-icons-react';
-import useLang from '../lang';
+import useLang from '../frontend/modules/lang';
 
 function readFile(file) {
     return new Promise((resolve, reject) => {
