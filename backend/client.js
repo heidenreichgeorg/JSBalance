@@ -80,45 +80,40 @@ function getFromServer(responseHandler) {
 
 
 
-
-
-function postToServer(strTarget,strParams,callBack) {
+function callServer(cmd,strTarget,strParams,callBack) {
+    // cmd = GET or POST
 
     let strServerDNS = 'http://'+self.location.hostname+':'+PORT+'/'; 
     
     if(strTarget) {
         var request = new XMLHttpRequest();
 
-        /*
-        request.onerror = function (e) {
-            //console.error("Unknown Error Occured. Server response not received.");
-            console.error("postToServer "+strTarget+": "+request.responseText);
-            callBack( request.responseText );
-        };
-        */
+       
+        console.log('\n'+cmd+' '+strServerDNS+strTarget+"?"+strParams+"\n");			
+
 
         request.onreadystatechange = function() {
             if (this.readyState == 4 && this.status>=HTTP_OK) {
-                console.log("postToServer "+strTarget+": "+request.responseText);
+                console.log("callServer "+cmd+' '+strTarget+": "+request.responseText);
                 if(callBack) {
                     
                     if(this.status==HTTP_WRONG) callBack( ""+this.status+" ERROR " );
 
                     else {
                         callBack( request.responseText );
-                        console.log("postToServer callback("+request.responseText+")");
+                        console.log("callServer callback("+request.responseText+")");
                     }
                 }
             }
         };
 
-        request.open('POST',strServerDNS+strTarget, true);						
+        request.open(cmd,strServerDNS+strTarget, true);						
         request.addEventListener('error', handleEvent);
         request.setRequestHeader('Cache-control', 'no-cache, must-revalidate, post-check=0, pre-check=0');
         request.setRequestHeader('Cache-control', 'max-age=0');
         request.setRequestHeader( 'Content-Type', 'application/json;charset=UTF-8'); //("Content-type", "text/json");			
         request.send(strParams);
-    } else alert('postToServer: no target!');
+    } else alert('callServer: no target:  '+cmd+' '+strServerDNS+strTarget+"?"+strParams+"\n");
 }
 
 
@@ -160,8 +155,6 @@ function postAndDisplay(strCommand,jBody,height) {
     });      
     
 }
-
-
 
 
 function handleEvent(event) { 
@@ -481,7 +474,7 @@ function save(jInfo) {
         let  txnForm = validateCD(jInfo.credit,jInfo.debit); 
         if(txnForm.diff==0) {
             showTransfer(txnForm);
-            postToServer("BOOK",sInfo);
+            callServer('POST',"BOOK",sInfo);
             console.log('client.js save() postToServer'+sInfo);
             target.innerHTML = "<DIV >&nbsp;</DIV ><DIV onclick='closeWindow' >CLOSE</DIV>" ; // class='R105'
 
@@ -1099,12 +1092,30 @@ function timeSymbol() { // same as in server.js
       (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
 };     
 
-/*
-// trial methods 20220717
 
-function downloadSession(sessionId) {   
-    console.log("1230 CLIENT downloadSession sessionId = "+sessionId);
-    window.open('/DOWNLOAD?sessionId='+sessionId);
-    console.log("1290 CLIENT downloadSession EXIT");
+function dateFormat(timeStr) {
+    return timeStr.slice(0,4)+"-"+timeStr.slice(4,6)+"-"+timeStr.slice(6,8)+"  "+timeStr.slice(8,10)+":"+timeStr.slice(10,12);
 }
-*/
+
+function setAutoJSON(sessionId) {    
+
+    console.log("0050 SET TIMER FOR SAVING JSON ("+sessionId+").");
+
+    setInterval(function(){
+        let timeStr = timeSymbol();
+        console.log("\n********************************************\nJSON Timer saves at "+dateFormat(timeStr));
+
+        // DOWNLOAD JSON
+        //window.open('/DOWNLOAD?sessionId='+sessionId);
+        
+        let jInfo= { 'sessionId':sessionId };
+        let sInfo=JSON.stringify(jInfo);
+        callServer('GET',"DOWNLOAD?sessionId="+sessionId,"",null);
+        
+        console.log("0053 TIMER POSTED JSON DOWNLOAD("+sInfo+") SESSION\n");
+    }, 
+    72000 ); // 00
+
+}
+
+

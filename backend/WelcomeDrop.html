@@ -78,7 +78,7 @@ function dropHandler(ev) {
                //let cClient = document.getElementById('CLIENT')
                //if(cClient && cClient.value==jData.client) {
                
-                  postToServer("UPLOAD",fileBuffer,showResponse);
+                  callServer('POST',"UPLOAD",fileBuffer,showResponse);
                         
                   //postAndDisplay("UPLOAD",jData);
                //}

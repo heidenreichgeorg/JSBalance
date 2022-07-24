@@ -1,33 +1,22 @@
 // cd backend
-// node server.js root=d:\Privat\ auto=900000
-
+// node server.js root=d:\Privat\ auto=900
 
 let debug=1;
 
 // Imports
 const { addEUMoney, moneyString, iScaleMoney, setEUMoney , setENMoney, setMoney, subEUMoney, lessMoney, cents2EU } = require('./money.js');
 
-
-
 // Modules
 const express = require('express');
 const app = express();
 
-
-
-
 const qr = require('qrcode');
-
-
 const ejs = require("ejs");
-//app.set("view engine", "ejs");
-
 
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json({limit: '900kb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
-
 
 
 const Account = require('./account.js');
@@ -296,8 +285,6 @@ app.post("/UPLOAD", (req, res) => {
             let cmdLogin = login + "?year="+year+"&client="+client+"&sessionId="+sessionId;
             let url = localhost() + ":"+ PORT + cmdLogin;
 
-            let cmdJSON = '/DOWNLOAD?sessionId='+sessionId;
-
             qr.toDataURL(url, (err, qrCodeDataUrl) => {
                 if (err) res.send("Error occured");
 
@@ -310,8 +297,8 @@ app.post("/UPLOAD", (req, res) => {
 
 
                 res.write(html+'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
-                        +'<DIV class="attrRow"><A HREF="'+cmdLogin+'">LOGIN</A>'
-                        +'&nbsp;<A HREF="'+cmdJSON+'">JSON</A></DIV>'
+                        +'<DIV class="attrRow"><DIV class="C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
+                        +'</DIV>'
                 );
                 res.end();
             });
@@ -376,21 +363,15 @@ function login(sessionId) {
     if(autoSave>100000) {
         setInterval(function(){
                 let timeStr = timeSymbol();
-                console.log("\n********************************************\n"+autoSave+" passed: Timer saves at "+dateFormat(timeStr));
+                console.log("\n********************************************\n"+autoSave+" passed: XLSX AUTOSAVE Timer saves at "+dateFormat(timeStr));
 
-                // auto-save XLSX
+                // auto-save XLSX on the server-side
                 Sheets.xlsxWrite(autoId,null,'',''); 
                 console.log("0051 TIMER SAVED XLSX ("+session.client+","+session.year+") SESSION "+autoId);
                 
-                /*
-                let session = Sheets.get(autoId);
-                Sheets.save2Server(session,session.client,session.year);                
-                console.log("TIMER SAVED JSON ("+session.client+","+session.year+") SESSION "+autoId);
-                */
             }, 
             autoSave); 
     }
-
 
 
     return banner;
@@ -449,6 +430,7 @@ app.post("/STORE", (req, res) => {
 });
 
 
+
 app.post('/SAVE', (req, res) => {
     // save  sheetFile into file named by session.sheetFile / sheetName 
     console.log("\n\n");
@@ -465,6 +447,7 @@ app.post('/SAVE', (req, res) => {
 
 });
 // save to Excel
+
 
 
 app.post('/INIT', (req, res) => {
@@ -508,7 +491,7 @@ app.post('/INIT', (req, res) => {
 
 app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/FBA/50eurobill.jpg"); });
 
-
+/*
 let API = require('./api.js');
 
 
@@ -539,7 +522,7 @@ app.get("/apiHGBBeginYear", (req, res)  => {
     }
 });
 
-
+*/
 
 app.get("/account", (req, res)   => { res.sendFile(__dirname + "/AccountHistory.html"); });
 app.get("/assetl", (req, res)    => { res.sendFile(__dirname + "/AssetList.html"); });
@@ -600,8 +583,12 @@ app.get("/DOWNLOAD", (req, res) => {
 
     if(session && session.year && session.client) {
 
-        // 20220520
-        console.log("1510 app.post DOWNLOAD for year"+session.year);
+
+        setAutoJSON(`+strSessionId+`)
+
+
+        // 20220520 server-side XLSX
+        console.log("1510 app.post DOWNLOAD XLSX for year"+session.year);
 
         let sessionTime=timeSymbol();
         let monthYearHour = sessionTime.slice(4,10);
@@ -612,12 +599,12 @@ app.get("/DOWNLOAD", (req, res) => {
 
         // download JSON
         let fileName = session.year+session.client+monthYearHour+'.json';
-        console.log("1530 app.post DOWNLOAD download JSON as "+fileName);
+        console.log("1540 app.post DOWNLOAD download JSON as "+fileName);
         res.set('Content-Disposition', 'attachment; fileName='+fileName);
         res.json(session);    
 
     } else {
-        console.log("1513 app.post NO DOWNLOAD - INVALID SESSION')");
+        console.log("1543 app.post NO DOWNLOAD - INVALID SESSION')");
         res.writeHead(HTTP_OK, {"Content-Type": "text/html"});    
         res.end("\nINVALID SESSION.\n");
     }
@@ -1059,13 +1046,17 @@ function makeBanner(sessionId,year,client) {
     
     if(sessionId) {
         vbanner.push('<DIV class="dosTable"><DIV class="attrRow">');
-        /*
-            vbanner.push('<SCRIPT>let a=document.createElement("a");a.href='
-                    +`"http://${localhost}:${PORT}/JSIG?sessionId=${sessionId}";`
-                    +'a.download="sig.json";'
-                    +'document.body.appendChild(a);a.click();document.body.removeChild(a);</SCRIPT>');
-        */
+        
+
+
             vbanner.push('<SCRIPT>localStorage.setItem("mysession",'+`"${sessionId}"`+');</SCRIPT>');
+
+
+            //vbanner.push('<SCRIPT type="text/javascript" src="/client.js"></SCRIPT>');
+            let strSessionId = "'"+sessionId+"'"; 
+            vbanner.push('<SCRIPT>setAutoJSON('+strSessionId+');</SCRIPT>');
+
+            
 
             let target = ""; // http://${localhost}:${PORT}
 
@@ -1087,7 +1078,6 @@ function makeBanner(sessionId,year,client) {
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
             vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
-            //vbanner.push(buttonDownload(sessionId));
             vbanner.push(labelText(client));
         vbanner.push('</DIV></DIV>');
 
@@ -1284,11 +1274,5 @@ function dateFormat(timeStr) {
     return timeStr.slice(0,4)+"-"+timeStr.slice(4,6)+"-"+timeStr.slice(6,8)+"  "+timeStr.slice(8,10)+":"+timeStr.slice(10,12);
 }
 
-/*
-// trial methods 20220717
 
-function buttonDownload(sessionId) {
-    let strId = "'"+sessionId+"'";
-    return '<A HREF="JavaScript:downloadSession('+strId+')">.</A>';
-}
-*/
+

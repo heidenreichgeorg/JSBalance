@@ -60,7 +60,7 @@
 
                 var sInfo = JSON.stringify(jInfo);
 
-                // GH20220509 postToServer("STORE",sInfo);
+                // GH20220509 callServer('POST',"STORE",sInfo);
                 postAndDisplay("STORE",sInfo);
                 console.log('HistoryList.html storeInLog() postAndDisplay STORE '+sInfo);
 
@@ -228,7 +228,7 @@
                         showClose(txnForm);
 
                         // LOG button: store transaction pattern  and show it in PatternList
-                        postToServer("STORE",sInfo);
+                        callServer('POST',"STORE",sInfo);
                         console.log('HistoryList.html log() postToServer STORE '+sInfo);
                         target.innerHTML = "<DIV >&nbsp;</DIV ><DIV onclick='closeWindow' >CLOSE</DIV>" ; // class='R105'
 
