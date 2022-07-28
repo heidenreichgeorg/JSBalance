@@ -239,7 +239,7 @@ app.post("/UPLOAD", (req, res) => {
 
     // client sends yearclient.JSON file
     // this json has to be stored in heap
-    var signup = "NO SESSION";
+    //var signup = "NO SESSION";
 
     let remote = req.socket.remoteAddress;
     console.log("0010 app.post UPLOAD from "+remote);
@@ -268,21 +268,7 @@ app.post("/UPLOAD", (req, res) => {
             // INSTEAD OF LOCAL FILE STORAGE
             Sheets.setSession(data);
          
-
-            //let banner = login(sessionId);           
-            //console.dir("0060 app.post UPLOAD "+banner);
-
-            let login = "/LOGIN";
-            
-            signup = '<FORM METHOD="GET" ACTION=".'+login+'"><H1>'+year+'&nbsp'+client+'&nbsp;</H1>'+
-                     '<INPUT TYPE="HIDDEN" NAME="year" VALUE="'+year+'"/>'+
-                     '<INPUT TYPE="HIDDEN" NAME="client" VALUE="'+client+'"/>'+
-                     '<INPUT TYPE="HIDDEN" NAME="sessionId" VALUE="'+sessionId+'"/>'+
-                     '<INPUT TYPE="SUBMIT" NAME="submit" VALUE="LOGIN"/>'+
-                     '</FORM>';
-
-
-            let cmdLogin = login + "?year="+year+"&client="+client+"&sessionId="+sessionId;
+            let cmdLogin = "/LOGIN?year="+year+"&client="+client+"&sessionId="+sessionId+"&clientSave=JSON";
             let url = localhost() + ":"+ PORT + cmdLogin;
 
             qr.toDataURL(url, (err, qrCodeDataUrl) => {
@@ -325,18 +311,18 @@ app.get("/LOGIN", (req, res) => {
     console.log(timeSymbol());
 
     console.log("0020 app.post LOGIN "+JSON.stringify(req.query));
-    let remote = req.socket.remoteAddress;
-    let client = req.query.client;
-    let year   = req.query.year;
-    //let time   = req.query.time;    
-    let sessionId = req.query.sessionId;
+    let remote  =  req.socket.remoteAddress;
+    let client  =  req.query.client;
+    let year    =  req.query.year;
+    let clientSave=req.query.clientSave; // 'JSON' to save JSON on client-side, for the client admin console
+    let sessionId= req.query.sessionId;
     
-    console.dir("0030 app.post LOGIN with client="+client+",year="+year+",r="+remote); // +"  ---> "+sessionId);
+    console.dir("0030 app.post LOGIN with client="+client+",year="+year+",r="+remote); 
 
     if(!sessionId) sessionId=Sheets.sy_findSessionId(client,year);
 
     let banner = "NO LOGIN with client="+client+",year="+year;
-    if(sessionId) banner = login(sessionId);
+    if(sessionId) banner = login(sessionId,(clientSave==='JSON')?"clientSave":null);
 
     console.dir("0060 app.post "+banner);
 
@@ -348,18 +334,19 @@ app.get("/LOGIN", (req, res) => {
 });
 
 
-function login(sessionId) {
+function login(sessionId,clientSave) {
 
     let session = Sheets.get(sessionId);
     console.log("0040 login() "+sessionId);
 
-    let banner = makeBanner(sessionId,session.year,session.client);
+    let banner = makeBanner(sessionId,session.year,session.client,clientSave);
 
     console.dir("0050 login() responds with banner="+banner);
     
     let autoId = sessionId;
  
-    // AUTO-SAVE
+    /*
+    // server-side AUTO-SAVE of XLSX file in client backup area
     if(autoSave>100000) {
         setInterval(function(){
                 let timeStr = timeSymbol();
@@ -372,7 +359,7 @@ function login(sessionId) {
             }, 
             autoSave); 
     }
-
+  */
 
     return banner;
 }
@@ -579,12 +566,12 @@ app.get("/DOWNLOAD", (req, res) => {
     let sessionId = req.query.sessionId;
     console.log("1500 app.post DOWNLOAD JSON for with session id=("+sessionId+")");
 
-    session = Sheets.get(sessionId);
+    let session = Sheets.get(sessionId);
 
     if(session && session.year && session.client) {
 
 
-        setAutoJSON(`+strSessionId+`)
+        //setAutoJSON(`+strSessionId+`)
 
 
         // 20220520 server-side XLSX
@@ -657,7 +644,8 @@ function phaseOne(addrT, logT, aoaCells) {
 
         var numLines=aoaCells.length;
 
-        console.log("0100 server.phaseOne() includes "+aoaCells[numLines-1].join('  '));
+        let lastLine = aoaCells[numLines-1];
+        console.log("0100 server.phaseOne() includes "+lastLine[1]+" "+lastLine[3]);
 
         if(numLines>J_MINROW) {
 
@@ -1041,43 +1029,37 @@ function localhost() {
 }
 
 
-function makeBanner(sessionId,year,client) {
+function makeBanner(sessionId,year,client,clientSave) {
     var vbanner=[];
     
     if(sessionId) {
         vbanner.push('<DIV class="dosTable"><DIV class="attrRow">');
-        
-
 
             vbanner.push('<SCRIPT>localStorage.setItem("mysession",'+`"${sessionId}"`+');</SCRIPT>');
 
-
-            //vbanner.push('<SCRIPT type="text/javascript" src="/client.js"></SCRIPT>');
             let strSessionId = "'"+sessionId+"'"; 
-            vbanner.push('<SCRIPT>setAutoJSON('+strSessionId+');</SCRIPT>');
+            if(clientSave) vbanner.push('<SCRIPT>setAutoJSON('+strSessionId+');</SCRIPT>');
+            //  set automatic client-side JSON download
 
-            
 
-            let target = ""; // http://${localhost}:${PORT}
-
-            vbanner.push(buttonOpenTile(target+`/status?sessionId=${sessionId}`,'Status',3));
-            vbanner.push(buttonOpenTile(target+`/account?sessionId=${sessionId}`,'AcctHistory'));
-            vbanner.push(buttonOpenTile(target+`/hgbbeginyear?sessionId=${sessionId}`,'BalanceClose'));
-            vbanner.push(buttonOpenTile(target+`/openbalance?sessionId=${sessionId}`,'AcctOpen'));
-            vbanner.push(buttonOpenWide(target+`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
-            vbanner.push(buttonOpenTile(target+`/history?sessionId=${sessionId}`,'History'));
-            vbanner.push(buttonOpenTile(target+`/gainloss?sessionId=${sessionId}`,'GainLoss'));
+            vbanner.push(buttonOpenTile(`/status?sessionId=${sessionId}`,'Status',3));
+            vbanner.push(buttonOpenTile(`/account?sessionId=${sessionId}`,'AcctHistory'));
+            vbanner.push(buttonOpenTile(`/hgbbeginyear?sessionId=${sessionId}`,'BalanceClose'));
+            vbanner.push(buttonOpenTile(`/openbalance?sessionId=${sessionId}`,'AcctOpen'));
+            vbanner.push(buttonOpenWide(`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
+            vbanner.push(buttonOpenTile(`/history?sessionId=${sessionId}`,'History'));
+            vbanner.push(buttonOpenTile(`/gainloss?sessionId=${sessionId}`,'GainLoss'));
             vbanner.push(labelText(year));
             vbanner.push('</DIV><DIV class="attrRow">');
-            vbanner.push(buttonOpenTile(target+`/assets?sessionId=${sessionId}`,'Assets'));
-            vbanner.push(buttonOpenTile(target+`/balance?sessionId=${sessionId}`,'AcctClose'));
-            vbanner.push(buttonOpenTile(target+`/galshgb?sessionId=${sessionId}`,'GainlossHGB'));
-            vbanner.push(buttonOpenTile(target+`/hgbregular?sessionId=${sessionId}`,'BalanceOpen'));
+            vbanner.push(buttonOpenTile(`/assets?sessionId=${sessionId}`,'Assets'));
+            vbanner.push(buttonOpenTile(`/balance?sessionId=${sessionId}`,'AcctClose'));
+            vbanner.push(buttonOpenTile(`/galshgb?sessionId=${sessionId}`,'GainlossHGB'));
+            vbanner.push(buttonOpenTile(`/hgbregular?sessionId=${sessionId}`,'BalanceOpen'));
             if(Sheets.isSameFY(year)) {
-                vbanner.push(buttonOpenTile(target+`/transfer?sessionId=${sessionId}`,'Transfer'));
+                vbanner.push(buttonOpenTile(`/transfer?sessionId=${sessionId}`,'Transfer'));
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
-            vbanner.push(buttonOpenTile(target+`/pattern?sessionId=${sessionId}`,'Patterns'));      
-            vbanner.push(buttonOpenTile(target+`/closeandsave?sessionId=${sessionId}`,'Closing'));
+            vbanner.push(buttonOpenTile(`/pattern?sessionId=${sessionId}`,'Patterns'));      
+            vbanner.push(buttonOpenTile(`/closeandsave?sessionId=${sessionId}`,'Closing'));
             vbanner.push(labelText(client));
         vbanner.push('</DIV></DIV>');
 
@@ -1197,22 +1179,16 @@ function prepareTXN(sessionId,reqBody) {
     if(session) {
         console.dir("server.js prepareTXN("+sessionId+") book "+JSON.stringify(reqBody));
 
-        var jFlag = reqBody.flag; if(!jFlag) jFlag=0;
-        var jDate = reqBody.date;
-        var jSender = reqBody.sender;
-        var jAcct = reqBody.refAcct;
-        var jSVWZ = reqBody.svwz;
+        var jFlag  = reqBody.flag; if(!jFlag) jFlag=0;
+        var jDate  = reqBody.date;
+        var jSender= reqBody.sender;
+        var jAcct  = reqBody.refAcct;
+        var jSVWZ  = reqBody.svwz;
         var jSVWZ2 = reqBody.svwz2;
-        var jCredit = reqBody.credit;
+        var jCredit= reqBody.credit;
         var jDebit = reqBody.debit;
 
-
-        // UNNECESSARY CREATION OF NEW SESSION FROM FILE READ !!
-        //var balance = Sheets.load(sessionId,phaseOne);
-        // needs sheets.load via expert as the only reader
         var balance = phaseOne(session.addrT, session.logT, session.sheetCells);
-        //GH20220127
-
 
         if(balance && balance[D_Schema]) {
 

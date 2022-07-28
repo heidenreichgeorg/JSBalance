@@ -443,7 +443,8 @@ function getNLine(aoaCells) {
 
         var numLines=aoaCells.length;
 
-        console.log("0100 sheets.getNLine() includes "+aoaCells[numLines-1].join('  '));
+        let lastLine = aoaCells[numLines-1];
+        console.log("0100 sheets.getNLine() LAST TXN at "+lastLine[1]+' for '+lastLine[3]);
 
         if(numLines>J_MINROW) {
 

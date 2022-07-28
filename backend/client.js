@@ -94,14 +94,13 @@ function callServer(cmd,strTarget,strParams,callBack) {
 
         request.onreadystatechange = function() {
             if (this.readyState == 4 && this.status>=HTTP_OK) {
-                console.log("callServer "+cmd+' '+strTarget+": "+request.responseText);
                 if(callBack) {
                     
                     if(this.status==HTTP_WRONG) callBack( ""+this.status+" ERROR " );
 
                     else {
                         callBack( request.responseText );
-                        console.log("callServer callback("+request.responseText+")");
+                        console.log("callServer callback(responseText)");
                     }
                 }
             }
@@ -1098,24 +1097,60 @@ function dateFormat(timeStr) {
 }
 
 function setAutoJSON(sessionId) {    
-
+    // client-side JSON download 
     console.log("0050 SET TIMER FOR SAVING JSON ("+sessionId+").");
 
     setInterval(function(){
         let timeStr = timeSymbol();
-        console.log("\n********************************************\nJSON Timer saves at "+dateFormat(timeStr));
+        console.log("\n********************************************\n1560  TIMER saves JSON at "+dateFormat(timeStr));
 
+        // Fail 1
         // DOWNLOAD JSON
         //window.open('/DOWNLOAD?sessionId='+sessionId);
         
+        // Fail 2
         let jInfo= { 'sessionId':sessionId };
         let sInfo=JSON.stringify(jInfo);
-        callServer('GET',"DOWNLOAD?sessionId="+sessionId,"",null);
+        callServer('GET',"DOWNLOAD?sessionId="+sessionId,"",downloadSession);
         
-        console.log("0053 TIMER POSTED JSON DOWNLOAD("+sInfo+") SESSION\n");
+        console.log("1570 TIMER POSTED JSON DOWNLOAD("+sInfo+") SESSION\n");
     }, 
-    72000 ); // 00
+    3600000 ); // hourly interval of saving a JSON file
 
 }
 
+// 20220726
+
+function downloadSession(strOut) {
+
+  let session=JSON.parse(strOut);
+
+  let sessionTime=timeSymbol();
+  let monthYearHour = sessionTime.slice(4,10);
+  let fileName = session.year+session.client+monthYearHour+'.json';
+  
+  console.log("1580 Client.downloadJSON saving to file="+fileName);
+  console.log(strOut);
+
+  var textFile=null,makeTextFile = function (text) {
+    var data = new Blob([text], {type: 'text/plain'});
+    if (textFile !== null) {
+      window.URL.revokeObjectURL(textFile);
+    }
+    textFile = window.URL.createObjectURL(data);
+
+    // returns a URL you can use as a href
+    return textFile;
+  };
+
+  var a = document.createElement("a");
+  document.body.appendChild(a);
+  a.style = "display: none";
+  let url=makeTextFile(strOut);
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  window.URL.revokeObjectURL(url);
+  return textFile;
+}
 
