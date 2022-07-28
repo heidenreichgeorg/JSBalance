@@ -36,7 +36,7 @@
                 var gSchema = response[D_Schema];
                 let page = response[D_Page];
                 
-                let headerInfo = '<DIV class="attrLine"><DIV class="C280">'+page["BalanceOpen"]+'&nbsp;'+page["header"]+'</DIV></DIV>';
+                let headerInfo = '<DIV class="attrLine"><DIV class="C280">'+page["BalanceClose"]+'&nbsp;'+page["header"]+'</DIV></DIV>';
 
                 let htmlPage = createPage(['L280','R105','R105','R105','R105'],"<DIV class='attrLine'>"+headerInfo+"</DIV>",'PageContent');
                 var cursor = htmlPage;
