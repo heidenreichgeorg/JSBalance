@@ -37,6 +37,8 @@ const J_ACCT = 6; // first account
 const J_MINROW=7;
 
 
+const clientHead= "<HEAD><meta http-equiv='content-type' content='text/html; charset=utf-8'><LINK REL='stylesheet' HREF='./FBA/mobile_green.css'/><TITLE>Welcome</TITLE></HEAD>";
+
 //import { argv } from 'process';
 var instance=null;
 var autoSave=36000000; // seconds, defaults to ten-hourly-save
@@ -269,6 +271,10 @@ app.post("/UPLOAD", (req, res) => {
             Sheets.setSession(data);
          
             let cmdLogin = "/LOGIN?year="+year+"&client="+client+"&sessionId="+sessionId+"&clientSave=JSON";
+
+            /*
+            // 20220728
+
             let url = localhost() + ":"+ PORT + cmdLogin;
 
             qr.toDataURL(url, (err, qrCodeDataUrl) => {
@@ -288,8 +294,13 @@ app.post("/UPLOAD", (req, res) => {
                 );
                 res.end();
             });
-
+*/
             console.dir("0070 app.post UPLOAD rendering QR code");
+            res.write('<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
+            +'<DIV class="attrRow"><DIV class="C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
+            +'</DIV>'
+            );
+            res.end();
 
         } else console.log ( "0011 UPLOAD client="+client+",year="+year+",time="+time+",addr="+remote+"  ---> "+fileId);
 
@@ -305,64 +316,97 @@ app.post("/UPLOAD", (req, res) => {
 
 
 
-// LOGIN to an existing session
+// LOGIN clientSave=JSON -> admin console with OCR and auto-saving JSON
+// LOGIN                 -> user console 
 app.get("/LOGIN", (req, res) => { 
+
     console.log("\n\n");
     console.log(timeSymbol());
+    console.log("0020 app.get LOGIN "+JSON.stringify(req.query));
 
-    console.log("0020 app.post LOGIN "+JSON.stringify(req.query));
+
     let remote  =  req.socket.remoteAddress;
     let client  =  req.query.client;
     let year    =  req.query.year;
-    let clientSave=req.query.clientSave; // 'JSON' to save JSON on client-side, for the client admin console
+    let clientFlag=req.query.clientSave; // 'JSON' to save JSON on client-side, for the client admin console
+    let clientSave = (clientFlag==='JSON') ? true:false;
     let sessionId= req.query.sessionId;
     
-    console.dir("0030 app.post LOGIN with client="+client+",year="+year+",r="+remote); 
+    console.dir("0030 app.get LOGIN with client="+client+",year="+year+",r="+remote); 
 
     if(!sessionId) sessionId=Sheets.sy_findSessionId(client,year);
 
+
     let banner = "NO LOGIN with client="+client+",year="+year;
-    if(sessionId) banner = login(sessionId,(clientSave==='JSON')?"clientSave":null);
 
-    console.dir("0060 app.post "+banner);
+    if(sessionId)  {
 
-    // send back sessionId to client browser or file
-    res.writeHead(HTTP_OK);
-    res.end("\n<HTML>"
-            +"<HEAD><meta http-equiv='content-type' content='text/html; charset=utf-8'><LINK REL='stylesheet' HREF='./FBA/mobile_green.css'/><TITLE>Welcome</TITLE></HEAD>"
-            +"<BODY>"+banner+"</BODY></HTML>\n");
+        let session = Sheets.get(sessionId);
+        console.log("0040 login() "+sessionId);
+
+
+        let client  =  session.client;
+        let year    =  session.year;
+
+        banner = makeBanner(sessionId,year,client,clientSave);
+
+        console.dir("0050 login() responds with banner="+banner);
+        
+    
+        /*
+        let autoId = sessionId;
+        // server-side AUTO-SAVE of XLSX file in client backup area
+        if(autoSave>100000) {
+            setInterval(function(){
+                    let timeStr = timeSymbol();
+                    console.log("\n********************************************\n"+autoSave+" passed: XLSX AUTOSAVE Timer saves at "+dateFormat(timeStr));
+
+                    // auto-save XLSX on the server-side
+                    Sheets.xlsxWrite(autoId,null,'',''); 
+                    console.log("0051 TIMER SAVED XLSX ("+session.client+","+session.year+") SESSION "+autoId);
+                    
+                }, 
+                autoSave); 
+        }
+        */
+
+        // 20220728
+        if(clientSave) {
+
+            let usrLogin = "/LOGIN?year="+year+"&client="+client+"&sessionId="+sessionId;
+            let url = localhost() + ":"+ PORT + usrLogin;
+
+            qr.toDataURL(url, (err, qrCodeDataUrl) => {
+                if (err) res.send("Error occured");
+
+                res.header('Content-Type', 'text/html');
+            
+                // Let us return the QR code image as our response and set it to be the source used in the webpage
+                const html = ejs.render('<DIV class="attrRow"><img src="<%= qrCodeDataUrl %>" /></DIV>', { qrCodeDataUrl });
+
+                console.dir("4000 app.post UPLOAD rendering QR code with #"+html.length+ "chars");
+
+                res.writeHead(HTTP_OK);
+                res.write(
+                    "<HTML>"+clientHead+"<BODY>"
+                    +html
+                    +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
+                    +banner
+                    //+'<DIV class="attrRow"><DIV class="C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
+                    +'</DIV></BODY></HTML>'
+                );
+                res.end();
+            });
+    
+        } else {
+            res.writeHead(HTTP_OK);
+            res.end("\n<HTML>"+clientHead+"<BODY>"+banner+"</BODY></HTML>\n");
+        }
+    }
+    console.dir("0060 app.get LOGIN responded: "+banner);
 });
 
 
-function login(sessionId,clientSave) {
-
-    let session = Sheets.get(sessionId);
-    console.log("0040 login() "+sessionId);
-
-    let banner = makeBanner(sessionId,session.year,session.client,clientSave);
-
-    console.dir("0050 login() responds with banner="+banner);
-    
-    let autoId = sessionId;
- 
-    /*
-    // server-side AUTO-SAVE of XLSX file in client backup area
-    if(autoSave>100000) {
-        setInterval(function(){
-                let timeStr = timeSymbol();
-                console.log("\n********************************************\n"+autoSave+" passed: XLSX AUTOSAVE Timer saves at "+dateFormat(timeStr));
-
-                // auto-save XLSX on the server-side
-                Sheets.xlsxWrite(autoId,null,'',''); 
-                console.log("0051 TIMER SAVED XLSX ("+session.client+","+session.year+") SESSION "+autoId);
-                
-            }, 
-            autoSave); 
-    }
-  */
-
-    return banner;
-}
 
 app.post("/BOOK", (req, res) => { 
     console.log("\n\n");
@@ -478,38 +522,7 @@ app.post('/INIT', (req, res) => {
 
 app.get("/favicon.ico", (req, res)  => { res.sendFile(__dirname + "/FBA/50eurobill.jpg"); });
 
-/*
-let API = require('./api.js');
 
-
-app.get("/apiHGBBeginYear", (req, res)  => {   
-    let sessionId = req.query.sessionId;
-    if(sessionId) {
-        let session = Sheets.get(sessionId);
-        if(session) {
-
-            if(debug) console.log("1810 app.get apiHGBBeginYear session="+JSON.stringify(session));
-
-            let balance = phaseOne(session.addrT, session.logT, session.sheetCells);
-            let jPage = API.apiHGBBeginYear(sessionId,balance);
-            res.json(jPage);
-
-
-            // NO session found
-        } else {
-            if(debug) console.log("1811 app.get apiHGBBeginYear NO session");
-            res.end("\n");
-        }
-    
-
-    // NO ?sesssionId=XYZ
-    } else {
-        if(debug) console.log("1801 app.get apiHGBBeginYear NO req.query.sessionId");
-        res.end("\n");
-    }
-});
-
-*/
 
 app.get("/account", (req, res)   => { res.sendFile(__dirname + "/AccountHistory.html"); });
 app.get("/assetl", (req, res)    => { res.sendFile(__dirname + "/AssetList.html"); });
@@ -1038,29 +1051,36 @@ function makeBanner(sessionId,year,client,clientSave) {
             vbanner.push('<SCRIPT>localStorage.setItem("mysession",'+`"${sessionId}"`+');</SCRIPT>');
 
             let strSessionId = "'"+sessionId+"'"; 
-            if(clientSave) vbanner.push('<SCRIPT>setAutoJSON('+strSessionId+');</SCRIPT>');
-            //  set automatic client-side JSON download
+            if(clientSave) {
+                vbanner.push('<SCRIPT>setAutoJSON('+strSessionId+');</SCRIPT>');
+                //  set automatic client-side JSON download
+            }
 
 
             vbanner.push(buttonOpenTile(`/status?sessionId=${sessionId}`,'Status',3));
             vbanner.push(buttonOpenTile(`/account?sessionId=${sessionId}`,'AcctHistory'));
-            vbanner.push(buttonOpenTile(`/hgbbeginyear?sessionId=${sessionId}`,'BalanceClose'));
             vbanner.push(buttonOpenTile(`/openbalance?sessionId=${sessionId}`,'AcctOpen'));
+            vbanner.push(buttonOpenTile(`/hgbregular?sessionId=${sessionId}`,'BalanceClose'));
             vbanner.push(buttonOpenWide(`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
             vbanner.push(buttonOpenTile(`/history?sessionId=${sessionId}`,'History'));
             vbanner.push(buttonOpenTile(`/gainloss?sessionId=${sessionId}`,'GainLoss'));
-            vbanner.push(labelText(year));
+            if(clientSave) {
+                vbanner.push(labelText(year));
+            }
             vbanner.push('</DIV><DIV class="attrRow">');
             vbanner.push(buttonOpenTile(`/assets?sessionId=${sessionId}`,'Assets'));
             vbanner.push(buttonOpenTile(`/balance?sessionId=${sessionId}`,'AcctClose'));
             vbanner.push(buttonOpenTile(`/galshgb?sessionId=${sessionId}`,'GainlossHGB'));
-            vbanner.push(buttonOpenTile(`/hgbregular?sessionId=${sessionId}`,'BalanceOpen'));
+            vbanner.push(buttonOpenTile(`/hgbbeginyear?sessionId=${sessionId}`,'BalanceOpen'));
             if(Sheets.isSameFY(year)) {
                 vbanner.push(buttonOpenTile(`/transfer?sessionId=${sessionId}`,'Transfer'));
             } else console.log("server.makeBanner "+year +" PAST YEAR ("+unixYear()+")- NO XFER command");
             vbanner.push(buttonOpenTile(`/pattern?sessionId=${sessionId}`,'Patterns'));      
-            vbanner.push(buttonOpenTile(`/closeandsave?sessionId=${sessionId}`,'Closing'));
-            vbanner.push(labelText(client));
+            if(clientSave) {
+                vbanner.push(buttonOpenTile(`/closeandsave?sessionId=${sessionId}`,'Closing'));
+                vbanner.push(labelText(client));
+            }
+            else vbanner.push(labelText(client+" "+year));
         vbanner.push('</DIV></DIV>');
 
         console.log("0300 makeBanner OK for "+client+","+year);
