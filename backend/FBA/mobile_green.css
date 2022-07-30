@@ -32,6 +32,7 @@
 .attrRow     {              padding: 1px; float: left; background-color: inherit;  min-height: 28px;               font-family: Inconsolata, 'Montserrat', sans-serif; font-size: 14px; font-weight:400; text-align: center; color: #201d5e;  }
 .attrDash    { width:850px; padding: 1px; float: left; background-color: inherit;  min-height: 28px;               font-family: Inconsolata, sans-serif; font-size: 14px; font-weight:400; text-align: center; color: #201d5e; border-bottom: 1px solid #CCC;   }
 .attrLine    { width:850px; padding: 1px; float: left;               color:inherit;min-height: 16px; height: 16px; font-family :Inconsolata, monospace; font-size: 14px;font-weight:400;text-align: center;}
+.attrKeys    { width:750px; padding: 1px; float: left; background-color: inherit;  min-height: 48px;               font-family: Inconsolata, sans-serif; font-size: 14px; font-weight:400; text-align: center; color: #201d5e; border-bottom: 1px solid #CCC;   }
 .attrLine:nth-child(2n){  background: rgba(10, 95, 10, 0.10);  } 
 
 

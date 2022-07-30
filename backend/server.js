@@ -391,8 +391,7 @@ app.get("/LOGIN", (req, res) => {
                     "<HTML>"+clientHead+"<BODY>"
                     +html
                     +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
-                    +banner
-                    //+'<DIV class="attrRow"><DIV class="C100"><A HREF="'+cmdLogin+'"><BUTTON class="largeKey">LOGIN</BUTTON></A></DIV></DIV>'
+                    +banner                    
                     +'</DIV></BODY></HTML>'
                 );
                 res.end();
@@ -884,10 +883,11 @@ function phaseOne(addrT, logT, aoaCells) {
                                         // OPEN
                                         // MUST VERIFY existing identifier
                                         result[D_FixAss][idnt]={ "date":date, "type":type, "init":iVal,  "nmbr":nmbr, "idnt":idnt, "rest":rest, "cost":cost  };
-                                        if(debug>1) console.log("YIELD "+idnt+" = "+result[D_FixAss][idnt].rest);
+                                        if(debug>1) console.log("YIELD amount="+amnt+" changes "+idnt+" from "+cuur+" to "+result[D_FixAss][idnt].rest);
+
                                         } else  console.log("YIELD UNKNOWN "+idnt+" ASSET");
                                 } else {
-                                    if(debug>1) console.log("YIELD UNKNOWN "+idnt+" = "+result[D_FixAss][idnt].rest);
+                                    if(debug>1) console.log("YIELD UNKNOWN "+idnt);
                                 }
                             }
                         }
@@ -1046,10 +1046,15 @@ function makeBanner(sessionId,year,client,clientSave) {
     var vbanner=[];
     
     if(sessionId) {
-        vbanner.push('<DIV class="dosTable"><DIV class="attrRow">');
+        vbanner.push('<SCRIPT type="text/javascript" src="/client.js"></SCRIPT>');
 
-            vbanner.push('<SCRIPT>localStorage.setItem("mysession",'+`"${sessionId}"`+');</SCRIPT>');
+        vbanner.push('<SCRIPT>localStorage.setItem("mysession",'+`"${sessionId}"`+');</SCRIPT>');
 
+        if(!clientSave) vbanner.push('<DIV class="dosBorder">');
+        
+        vbanner.push('<DIV class="mTable"><DIV class="ulliTab"><DIV class="attrKeys">');
+
+        
             let strSessionId = "'"+sessionId+"'"; 
             if(clientSave) {
                 vbanner.push('<SCRIPT>setAutoJSON('+strSessionId+');</SCRIPT>');
@@ -1063,11 +1068,10 @@ function makeBanner(sessionId,year,client,clientSave) {
             vbanner.push(buttonOpenTile(`/hgbregular?sessionId=${sessionId}`,'BalanceClose'));
             vbanner.push(buttonOpenWide(`/dashboard?sessionId=${sessionId}`,'DashBoard',3));
             vbanner.push(buttonOpenTile(`/history?sessionId=${sessionId}`,'History'));
-            vbanner.push(buttonOpenTile(`/gainloss?sessionId=${sessionId}`,'GainLoss'));
-            if(clientSave) {
-                vbanner.push(labelText(year));
-            }
-            vbanner.push('</DIV><DIV class="attrRow">');
+            vbanner.push(buttonOpenTile(`/gainloss?sessionId=${sessionId}`,'GainLoss'));           
+            vbanner.push('</DIV><DIV class="attrKeys">');
+            
+
             vbanner.push(buttonOpenTile(`/assets?sessionId=${sessionId}`,'Assets'));
             vbanner.push(buttonOpenTile(`/balance?sessionId=${sessionId}`,'AcctClose'));
             vbanner.push(buttonOpenTile(`/galshgb?sessionId=${sessionId}`,'GainlossHGB'));
@@ -1078,15 +1082,22 @@ function makeBanner(sessionId,year,client,clientSave) {
             vbanner.push(buttonOpenTile(`/pattern?sessionId=${sessionId}`,'Patterns'));      
             if(clientSave) {
                 vbanner.push(buttonOpenTile(`/closeandsave?sessionId=${sessionId}`,'Closing'));
-                vbanner.push(labelText(client));
             }
             else vbanner.push(labelText(client+" "+year));
-        vbanner.push('</DIV></DIV>');
+
+            
+            // fill table
+            vbanner.push('</DIV><DIV class="attrKeys">');
+            vbanner.push('</DIV><DIV class="attrKeys">');
+            vbanner.push('</DIV><DIV class="attrKeys">');
+            vbanner.push('</DIV></DIV></DIV>');
+
+            if(!clientSave) vbanner.push('</DIV>');
 
         console.log("0300 makeBanner OK for "+client+","+year);
     
-    } else return  '<DIV class = "mTable"><DIV class = "ulliTab"><DIV class = "attrRow">NO SESSION info</DIV></DIV></DIV>';
-    return '<SCRIPT type="text/javascript" src="/client.js"></SCRIPT><DIV class="mTable"><DIV class="ulliTab">'+vbanner.join('')+'</DIV></DIV>';
+    } else return  '<DIV class = "mTable"><DIV class = "ulliTab"><DIV class = "attrLine">NO SESSION info</DIV></DIV></DIV>';
+    return vbanner.join('');
 }
 
 
