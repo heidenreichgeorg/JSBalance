@@ -106,6 +106,20 @@ function get(id) {
 }
 module.exports['get']=get;
 
+// 20220730
+function getClient(client) { 
+    let result=null;
+    arrSession.forEach(session => {
+        if(session.client===client && session.id!=null) result=session;
+    });
+    if(result) {
+        console.log("\n1800  => (SESSION  time="+result.time+"  client="+result.client+"  year="+result.year+")");
+    }
+
+    return result; 
+}
+module.exports['getClient']=getClient;
+
 
 
 

@@ -542,32 +542,39 @@ app.get("/status", (req, res) => { res.sendFile(__dirname + "/Status.html"); });
 
 
 
-// set Event Listener for LOAD/client/year/prefix/ext/
-// internal client page response 
-app.get('/SHOW/', (req, res)    => { 
+
+app.get('/SHOW/', (req, res)    => {     
+    // NORMAL DASHBOARD
     console.log("\n\n");
     console.log(timeSymbol());
-
-    console.log("1910 app.get SHOW req.query.sessionId="+req.query.sessionId);
+    console.log("1910 app.get SHOW ?sessionId="+ req.query.sessionId+ "  ?client="+req.query.client);
 
     // load session via id
-    let session = Sheets.get(req.query.sessionId);
+    let session = null;
+    if(req.query.sessionId) session=Sheets.get(req.query.sessionId);
     
-    //var strSession=['Session']; for(let key in session) strSession.push(key); console.log("Server.js SHOW session="+strSession.join(','));
     if(session) {
         let balance = phaseOne(session.addrT,session.logT, session.sheetCells);
-
         console.dir("1920 app.get SHOW sends Balance ="+JSON.stringify(balance));
-
-        //var strBalance=['Balance']; for(let key in balance) strBalance.push(key); console.log("Server.js SHOW balance="+strBalance.join(','));
-
         res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
-
         Sender.send(res,balance); 
     }
-    else console.dir("1920 app.get SHOW - NO SESSION KNOWN");
+    else {
+        // 20220730
+        // SY !!
+        console.dir("1930 app.get SHOW - NO SESSION ID KNOWN");
+        if(req.query.client) session=Sheets.getClient(req.query.client);
+        
+        let cmdLogin = "/LOGIN?year="+session.year+"&client="+session.client+"&sessionId="+session.id;
+
+        res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
+        res.write("<HTML><BODY><A HREF='"+cmdLogin+"'>"+session.year+"&nbsp;"+session.client+"</A></BODY></HTML>")
+    }
     res.end();
 })
+
+
+
 
 
 app.get("/DOWNLOAD", (req, res) => { 
