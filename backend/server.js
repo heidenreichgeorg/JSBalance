@@ -270,12 +270,13 @@ app.post("/UPLOAD", (req, res) => {
             // INSTEAD OF LOCAL FILE STORAGE
             Sheets.setSession(data);
          
-            let cmdLogin = "/LOGIN?year="+year+"&client="+client+"&sessionId="+sessionId+"&clientSave=JSON";
+            let usrLogin = jLoginURL(year,client,sessionId).url;
+            let cmdLogin = usrLogin+"&clientSave=JSON";
 
-            /*
+/*
             // 20220728
 
-            let url = localhost() + ":"+ PORT + cmdLogin;
+            let url = localhost() + ":"+ PORT + usrLogin;
 
             qr.toDataURL(url, (err, qrCodeDataUrl) => {
                 if (err) res.send("Error occured");
@@ -330,9 +331,15 @@ app.get("/LOGIN", (req, res) => {
     let year    =  req.query.year;
     let clientFlag=req.query.clientSave; // 'JSON' to save JSON on client-side, for the client admin console
     let clientSave = (clientFlag==='JSON') ? true:false;
-    let sessionId= req.query.sessionId;
+
+    // 20220731
+    let mainSid= req.query.mainSid;
+    let postFix = req.query.postFix; 
+    let sessionId= mainSid+postFix; 
+
     
-    console.dir("0030 app.get LOGIN with client="+client+",year="+year+",r="+remote); 
+    
+    console.dir("0030 app.get "+remote+" LOGIN with client="+client+",year="+year+",postFix="+postFix); 
 
     if(!sessionId) sessionId=Sheets.sy_findSessionId(client,year);
 
@@ -342,67 +349,68 @@ app.get("/LOGIN", (req, res) => {
     if(sessionId)  {
 
         let session = Sheets.get(sessionId);
-        console.log("0040 login() "+sessionId);
+        console.log("0040 login() with sessionId="+sessionId);
 
+        if(session) {
+            let client  =  session.client;
+            let year    =  session.year;
 
-        let client  =  session.client;
-        let year    =  session.year;
+            banner = makeBanner(sessionId,year,client,clientSave);
 
-        banner = makeBanner(sessionId,year,client,clientSave);
-
-        console.dir("0050 login() responds with banner="+banner);
-        
-    
-        /*
-        let autoId = sessionId;
-        // server-side AUTO-SAVE of XLSX file in client backup area
-        if(autoSave>100000) {
-            setInterval(function(){
-                    let timeStr = timeSymbol();
-                    console.log("\n********************************************\n"+autoSave+" passed: XLSX AUTOSAVE Timer saves at "+dateFormat(timeStr));
-
-                    // auto-save XLSX on the server-side
-                    Sheets.xlsxWrite(autoId,null,'',''); 
-                    console.log("0051 TIMER SAVED XLSX ("+session.client+","+session.year+") SESSION "+autoId);
-                    
-                }, 
-                autoSave); 
-        }
-        */
-
-        // 20220728
-        if(clientSave) {
-
-            let usrLogin = "/LOGIN?year="+year+"&client="+client+"&sessionId="+sessionId;
-            let url = localhost() + ":"+ PORT + usrLogin;
-
-            qr.toDataURL(url, (err, qrCodeDataUrl) => {
-                if (err) res.send("Error occured");
-
-                res.header('Content-Type', 'text/html');
+            console.dir("0050 login() responds with banner="+banner);
             
-                // Let us return the QR code image as our response and set it to be the source used in the webpage
-                const html = ejs.render('<DIV class="attrRow"><img src="<%= qrCodeDataUrl %>" /></DIV>', { qrCodeDataUrl });
+        
+            /*
+            let autoId = sessionId;
+            // server-side AUTO-SAVE of XLSX file in client backup area
+            if(autoSave>100000) {
+                setInterval(function(){
+                        let timeStr = timeSymbol();
+                        console.log("\n********************************************\n"+autoSave+" passed: XLSX AUTOSAVE Timer saves at "+dateFormat(timeStr));
 
-                console.dir("4000 app.post UPLOAD rendering QR code with #"+html.length+ "chars");
+                        // auto-save XLSX on the server-side
+                        Sheets.xlsxWrite(autoId,null,'',''); 
+                        console.log("0051 TIMER SAVED XLSX ("+session.client+","+session.year+") SESSION "+autoId);
+                        
+                    }, 
+                    autoSave); 
+            }
+            */
 
+            // 20220728
+            if(clientSave) {
+
+                let usrLogin = jLoginURL(year,client,sessionId).url;
+                let url = localhost() + ":"+ PORT + usrLogin;
+
+                qr.toDataURL(url, (err, qrCodeDataUrl) => {
+                    if (err) res.send("Error occured");
+
+                    res.header('Content-Type', 'text/html');
+                
+                    // Let us return the QR code image as our response and set it to be the source used in the webpage
+                    const html = ejs.render('<DIV class="attrRow"><img src="<%= qrCodeDataUrl %>" /></DIV>', { qrCodeDataUrl });
+
+                    console.dir("4000 app.post LOGIN rendering QR code with #"+html.length+ "chars");
+
+                    res.writeHead(HTTP_OK);
+                    res.write(
+                        "<HTML>"+clientHead+"<BODY>"
+                        +html
+                        +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;'+postFix+'</H1>'
+                        +banner                    
+                        +'</DIV></BODY></HTML>'
+                    );
+                    res.end();
+                });
+        
+            } else {
                 res.writeHead(HTTP_OK);
-                res.write(
-                    "<HTML>"+clientHead+"<BODY>"
-                    +html
-                    +'<DIV class="attrRow"><H1>'+year+'&nbsp;'+client+'&nbsp;</H1>'
-                    +banner                    
-                    +'</DIV></BODY></HTML>'
-                );
-                res.end();
-            });
-    
-        } else {
-            res.writeHead(HTTP_OK);
-            res.end("\n<HTML>"+clientHead+"<BODY>"+banner+"</BODY></HTML>\n");
+                res.end("\n<HTML>"+clientHead+"<BODY>"+banner+"</BODY></HTML>\n");
+            }
         }
+        console.dir("0060 app.get LOGIN responded: "+banner);
     }
-    console.dir("0060 app.get LOGIN responded: "+banner);
 });
 
 
@@ -544,7 +552,9 @@ app.get("/status", (req, res) => { res.sendFile(__dirname + "/Status.html"); });
 
 
 app.get('/SHOW/', (req, res)    => {     
-    // NORMAL DASHBOARD
+    // two very different functions here
+    // 1. with SESSION-ID: returns normal JSON data structure
+    // 2. with client name: return HTML dialoge with latest session
     console.log("\n\n");
     console.log(timeSymbol());
     console.log("1910 app.get SHOW ?sessionId="+ req.query.sessionId+ "  ?client="+req.query.client);
@@ -565,10 +575,17 @@ app.get('/SHOW/', (req, res)    => {
         console.dir("1930 app.get SHOW - NO SESSION ID KNOWN");
         if(req.query.client) session=Sheets.getClient(req.query.client);
         
-        let cmdLogin = "/LOGIN?year="+session.year+"&client="+session.client+"&sessionId="+session.id;
+        let jLogin = jLoginURL(session.year,session.client,session.id);
 
         res.writeHead(HTTP_OK, {"Content-Type": "text/html"}); 
-        res.write("<HTML><BODY><A HREF='"+cmdLogin+"'>"+session.year+"&nbsp;"+session.client+"</A></BODY></HTML>")
+        
+        
+        res.write("<HTML><BODY><FORM METHOD='GET' ACTION='LOGIN'><BUTTON TYPE='submit' VALUE='ENTER'>Enter</BUTTON>"
+            +"<INPUT type='text' name='year'  value='"+session.year+"'>"+session.year+"</INPUT>"
+            +"<INPUT type='text' name='client' value='"+session.client+"'>"+session.client+"</INPUT>"
+            +"<INPUT type= 'hidden' name='mainSid' value='"+jLogin.mainSid+"'></INPUT>"
+            +"<INPUT type= 'edit' name='postFix'>....</INPUT>"
+            +"</FORM></BODY></HTML>")
     }
     res.end();
 })
@@ -1268,7 +1285,7 @@ function prepareTXN(sessionId,reqBody) {
         } else console.error("server.js prepareTXN("+sessionId+") no BALANCE table ");
 
     } else console.error("server.js prepareTXN("+sessionId+") no SESSION ");
-// receiver will append this to sheetCells
+    // receiver will append this to sheetCells
     return bookingForm;
 
 }
@@ -1284,9 +1301,16 @@ function timeSymbol() { // same as in client.js
       (u.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5);
 };     
 
+
 function dateFormat(timeStr) {
     return timeStr.slice(0,4)+"-"+timeStr.slice(4,6)+"-"+timeStr.slice(6,8)+"  "+timeStr.slice(8,10)+":"+timeStr.slice(10,12);
 }
 
 
+function jLoginURL(year,client,sessionId) {
+    let postFix=sessionId.slice(-4);
+    let mainSid=sessionId.slice(0,sessionId.length-4);
+    // console.dir(">>> URL: "+mainSid+"."+postFix+"="+sessionId);
+    return {'url':"/LOGIN?year="+year+"&client="+client+"&mainSid="+mainSid+"&postFix="+postFix, 'mainSid':mainSid, 'postFix':postFix };
+}
 
